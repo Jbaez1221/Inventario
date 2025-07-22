@@ -1,0 +1,181 @@
+.asignaciones-container {
+  padding: 24px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #121212;
+  color: #ffffff;
+}
+
+h2, h3 {
+  font-size: 24px;
+  margin-bottom: 16px;
+  color: #ffffff;
+  border-bottom: 2px solid #444;
+  padding-bottom: 6px;
+}
+
+.tabla-asignaciones {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+  background-color: #1e1e1e;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.5);
+}
+
+.tabla-asignaciones th,
+.tabla-asignaciones td {
+  border: 1px solid #000000;
+  padding: 12px 16px;
+  text-align: center;
+  color: #ffffff;
+}
+
+.tabla-asignaciones tr:nth-child(even) {
+  background-color: #181818;
+}
+
+.tabla-asignaciones tr:hover {
+  background-color: #363535;
+}
+
+
+/* Botón asignar/devolver */
+.btn-asignar,
+.btn-devolver {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-asignar {
+  background-color: #007bff;
+  color: #fff;
+}
+.btn-asignar:hover {
+  background-color: #0056b3;
+}
+
+/* Mensaje de éxito */
+.mensaje-exito {
+  background-color: #44c663;
+  color: #fff;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* MODAL mejorado */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  
+ 
+}
+
+.modal label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #cccccc;
+  margin-right: 1.5em;
+}
+
+.modal input,
+.modal textarea {
+  padding: 15px;
+  margin-bottom: 0px;
+  border-radius: 6px;
+  border: 1px solid #ffffff;
+  background-color: #ffffff;
+  color: #000000;
+  margin-right: 1.5em;
+  
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+  
+}
+
+.modal-actions .btn-asignar {
+  background-color: #007bff;
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 4px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  display:block;
+  
+  
+}
+
+.modal-actions .btn-asignar:hover {
+  background-color: #0056b3;
+}
+
+.modal-actions .btn-cancelar {
+  background-color: #fd7804;
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 4px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-actions .btn-cancelar:hover {
+  background-color: #ce6203;
+  
+}
+
+.modal-actions button:not(:last-child) {
+  margin-right: 0.5em;
+}
+
+.busqueda-empleados {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.busqueda-empleados input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background-color: #1a1a1a;
+  color: #fff;
+}
+
+.btn-buscar {
+  padding: 8px 16px;
+  border: none;
+  background-color: #6c757d;
+  color: white;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-buscar:hover {
+  background-color: #495057;
+}

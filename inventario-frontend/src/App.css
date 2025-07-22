@@ -1,0 +1,299 @@
+/* App.css */
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background-color: #1e1e1e;
+  color: white;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #121212;
+  padding: 12px 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.navbar-title {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 16px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  background-color: #333;
+}
+
+/* Contenido principal */
+.container {
+  padding: 20px;
+}
+
+h2 {
+  margin-bottom: 16px;
+}
+
+/* Tabla */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  color: white;
+}
+
+th,
+td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #444;
+}
+
+th {
+  background-color: #2c2c2c;
+}
+
+/* Botones */
+button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.btn-add {
+  background-color: #2d72d9;
+}
+
+.btn-delete {
+  background-color: #d32f2f;
+}
+
+
+/* Empleado */
+.empleados-container {
+  padding: 20px;
+  color: #fff;
+}
+
+.formulario-empleado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.formulario-empleado input,
+.formulario-empleado select {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #888;
+}
+
+.formulario-empleado .botones {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.formulario-empleado button {
+  padding: 6px 12px;
+  background: #1e40af;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.formulario-empleado button:hover {
+  background: #1a336e;
+}
+
+.tabla-empleados {
+  width: 100%;
+  border-collapse: collapse;
+  background: #222;
+}
+
+.tabla-empleados th,
+.tabla-empleados td {
+  padding: 10px;
+  border: 1px solid #444;
+  text-align: center;
+}
+
+.tabla-empleados button {
+  margin: 0 5px;
+  padding: 4px 8px;
+  background: #444;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.tabla-empleados button:hover {
+  background: #666;
+}
+
+/*modal empleados*/
+.modal-confirmacion {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-contenido {
+  background: rgb(255, 0, 0);
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.modal-acciones {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.btn-rojo {
+  background: crimson;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+}
+
+.btn-gris {
+  background: gray;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+}
+
+/*EQUIPOS*/
+.equipos-container {
+  padding: 20px;
+}
+
+.formulario-equipo input,
+.formulario-equipo select {
+  margin: 5px;
+  padding: 6px;
+}
+
+.tabla-equipos {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+  background-color: #222;
+  color: #fff;
+}
+
+.tabla-equipos th,
+.tabla-equipos td {
+  border: 1px solid #444;
+  padding: 8px;
+  text-align: left;
+}
+
+.tabla-equipos th {
+  background-color: #333;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-contenido {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  color: black;
+  min-width: 300px;
+}
+
+.modal-botones {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+
+
+
+/*ASIGNACIONES*/
+
+.asignaciones-container {
+  padding: 20px;
+  color: white;
+}
+
+.tabla-asignaciones {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #1e1e1e;
+}
+
+.tabla-asignaciones th,
+.tabla-asignaciones td {
+  border: 1px solid #444;
+  padding: 10px;
+  text-align: center;
+}
+
+.tabla-asignaciones th {
+  background-color: #2a2a2a;
+}
+
+.btn-devolver {
+  background-color: #e53935;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.btn-devolver:hover {
+  background-color: #c62828;
+}
+
+.sin-asignaciones {
+  text-align: center;
+  padding: 20px;
+  color: #aaa;
+}
+
+

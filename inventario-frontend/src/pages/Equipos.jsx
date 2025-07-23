@@ -30,6 +30,7 @@ const Equipos = () => {
       const res = await axiosBackend.get("/equipos");
       setEquipos(res.data);
     } catch (err) {
+      console.error("Error al cargar equipos:", err);
       alert("Error al cargar equipos");
     }
   };
@@ -62,6 +63,7 @@ const Equipos = () => {
       });
       obtenerEquipos();
     } catch (err) {
+      console.error("Error al guardar equipo:", err);
       alert("Error al guardar equipo");
     }
   };
@@ -72,6 +74,7 @@ const Equipos = () => {
       await axiosBackend.delete(`/equipos/${id}`);
       obtenerEquipos();
     } catch (err) {
+      console.error("Error al eliminar equipo:", err);
       alert("Error al eliminar equipo");
     }
   };
@@ -115,6 +118,7 @@ const Equipos = () => {
       setHistorial(res.data);
       setMostrarHistorial(true);
     } catch (error) {
+      console.error("Error al cargar historial:", error);
       alert("Error al cargar historial");
     }
   };
@@ -143,11 +147,13 @@ const Equipos = () => {
         <input name="serie" value={form.serie} onChange={handleChange} placeholder="Serie" />
         <input name="fecha_ingreso" type="date" value={form.fecha_ingreso} onChange={handleChange} />
         <input name="ubicacion" value={form.ubicacion} onChange={handleChange} placeholder="Ubicación" />
-        <select name="estado" value={form.estado} onChange={handleChange}>
-          <option value="Disponible">Disponible</option>
-          <option value="Asignado">Asignado</option>
-          <option value="Malogrado">Malogrado</option>
-        </select>
+        {modoEdicion && (
+          <select name="estado" value={form.estado} onChange={handleChange}>
+            <option value="Disponible">Disponible</option>
+            <option value="Reparación">Reparación</option>
+            <option value="Baja">Baja</option>
+          </select>
+        )}
         <input name="garantia_fin" type="date" value={form.garantia_fin} onChange={handleChange} />
         <input name="valor_compra" value={form.valor_compra} onChange={handleChange} placeholder="Valor compra" />
         <input name="observaciones" value={form.observaciones} onChange={handleChange} placeholder="Observaciones" />
@@ -171,7 +177,7 @@ const Equipos = () => {
       <table className="tabla-equipos">
         <thead>
           <tr>
-            <th>ID</th>
+            <th>N°</th>
             <th>Tipo</th>
             <th>Marca</th>
             <th>Modelo</th>
@@ -183,9 +189,9 @@ const Equipos = () => {
           </tr>
         </thead>
         <tbody>
-          {equiposFiltrados.map((equipo) => (
+          {equiposFiltrados.map((equipo, index) => (
             <tr key={equipo.id}>
-              <td>{equipo.id}</td>
+              <td>{index + 1}</td>
               <td>{equipo.tipo}</td>
               <td>{equipo.marca}</td>
               <td>{equipo.modelo}</td>

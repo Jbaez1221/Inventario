@@ -65,64 +65,24 @@ const asignarEquipoPorDNI = async (req, res) => {
     const equipoRes = await db.query("SELECT * FROM equipos WHERE id = $1", [equipo_id]);
     const equipo = equipoRes.rows[0];
 
-    // Crear acta PDF con PDFKit
-    const actaFileName = `acta_equipo_${equipo_id}_${Date.now()}.pdf`;
-    const actaPath = path.join(__dirname, "..", "public", "actas", actaFileName);
-
-    const doc = new PDFDocument();
-    doc.pipe(fs.createWriteStream(actaPath));
-
-    doc.fontSize(14).text("CORASUR S.A - ÁREA DE SISTEMAS", { align: "center" });
-    doc.moveDown();
-    doc.fontSize(16).text("ACTA DE ENTREGA DE EQUIPO INFORMÁTICO", { align: "center" });
-    doc.moveDown();
-    doc.fontSize(12).text(`Por medio de la presente, Yo ${empleado.nombre_completo} identificado con documento ${empleado.dni}, trabajador de la empresa CORASUR S.A, Local AV. GARCILASO, hago constar que para el desempeño de actividades asignadas por la empresa, poseo un celular con las siguientes características:`);
-    doc.moveDown();
-    doc.text(`ID: ${equipo.id}`);
-    doc.text(`Tipo: ${equipo.tipo}`);
-    doc.text(`Marca: ${equipo.marca}`);
-    doc.text(`Modelo: ${equipo.modelo}`);
-    doc.text(`Serie: ${equipo.serie}`);
-    doc.text(`Observaciones: ${observaciones || "—"}`);
-    doc.moveDown();
-    doc.text(`Fecha de Entrega: ${fecha_entrega}`);
-    doc.moveDown();
-    doc.text("Firma Entrega: ___________________________");
-    doc.text("Firma Recepción: _________________________");
-
-    doc.end();
-
-    // Registrar asignación con ruta al PDF
+    // Registrar asignación (sin PDF)
     const nueva = await AsignacionModel.crearAsignacion({
       empleado_id: empleado.id,
       equipo_id,
       fecha_entrega,
       observaciones,
-      acta_pdf: actaFileName, // nuevo campo
+      // acta_pdf eliminado
     });
 
-    // Opcional: enviar el PDF por correo
-    if (empleado.correo) {
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS
-        },
-      });
-
-      
-
-      await transporter.sendMail({
-        from: '"CORASUR S.A" <hunt3r1221@gmail.com>',
-        to: empleado.correo,
-        subject: "Acta de Entrega de Equipo",
-        text: "Adjunto encontrarás el acta de entrega del equipo asignado.",
-        attachments: [{ filename: actaFileName, path: actaPath }],
-      });
-    }
-
-    res.status(201).json({ mensaje: "Equipo asignado y acta generada", asignacion: nueva });
+    // Devuelve todos los datos necesarios para que el frontend genere el PDF
+    res.status(201).json({ 
+      mensaje: "Equipo asignado",
+      asignacion: nueva,
+      empleado,
+      equipo,
+      fecha_entrega,
+      observaciones
+    });
   } catch (error) {
     console.error("Error al asignar equipo:", error);
     res.status(500).json({ error: "Error al asignar equipo", detalle: error.message });

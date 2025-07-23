@@ -4,10 +4,19 @@ const db = require("../database");
 const obtenerAsignaciones = async () => {
   const result = await db.query(`
     SELECT 
-      a.id, a.fecha_entrega, a.fecha_devolucion, a.observaciones, a.acta_pdf,
-      e.nombre_completo AS empleado, 
+      a.id, 
+      a.fecha_entrega, 
+      a.fecha_devolucion, 
+      a.observaciones, 
+      a.acta_pdf,
+      a.equipo_id,                    
+      e.nombre_completo AS empleado,
+      e.dni AS empleado_dni,          
+      eq.id AS equipo_id,             
       eq.serie AS equipo_serie, 
-      eq.tipo AS equipo_tipo
+      eq.tipo AS equipo_tipo,
+      eq.marca AS equipo_marca,       
+      eq.modelo AS equipo_modelo
     FROM asignaciones a
     JOIN empleados e ON a.empleado_id = e.id
     JOIN equipos eq ON a.equipo_id = eq.id

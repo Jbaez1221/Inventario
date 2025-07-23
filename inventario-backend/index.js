@@ -20,6 +20,8 @@ app.use("/api/empleados", empleadosRoutes);
 const asignacionesRoutes = require("./routes/asignaciones.routes");
 app.use("/api/asignaciones", asignacionesRoutes);
 
+const enviarActaRoutes = require('./routes/enviarActa.routes');
+app.use('/api/enviar-acta', enviarActaRoutes);
 
 
 // Ruta de prueba

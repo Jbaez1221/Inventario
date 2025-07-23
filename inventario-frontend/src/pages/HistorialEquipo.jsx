@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axiosBackend from "../api/axios";
-// ActaDevPDF ya no es necesario aquí
 import "../HistorialEquipo.css";
 
 const HistorialEquipo = () => {
@@ -10,11 +9,6 @@ const HistorialEquipo = () => {
   const [idADevolver, setIdADevolver] = useState(null);
   const [devolucionObservaciones, setDevolucionObservaciones] = useState(""); // Estado para las observaciones de devolución
 
-  // Se eliminan los estados relacionados al acta del frontend
-  // const [mostrarActaDevolucion, setMostrarActaDevolucion] = useState(false);
-  // const [datosActaDevolucion, setDatosActaDevolucion] = useState(null);
-
-  // Nuevos estados para los filtros
   const [busquedaEmpleado, setBusquedaEmpleado] = useState("");
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
@@ -40,7 +34,7 @@ const HistorialEquipo = () => {
 
   const confirmarDevolucion = (id) => {
     setIdADevolver(id);
-    setDevolucionObservaciones(""); // Limpiar observaciones anteriores
+    setDevolucionObservaciones("");
     setModalDevolverVisible(true);
   };
 
@@ -52,7 +46,6 @@ const HistorialEquipo = () => {
     const hoy = `${anio}-${mes}-${dia}`;
 
     try {
-      // Llamada al nuevo endpoint del backend
       const response = await axiosBackend.post(
         `/devoluciones/${idADevolver}`,
         {
@@ -60,11 +53,10 @@ const HistorialEquipo = () => {
           observaciones: devolucionObservaciones,
         },
         {
-          responseType: 'blob', // ¡Importante para recibir el archivo!
+          responseType: 'blob',
         }
       );
 
-      // Lógica para descargar el PDF recibido del backend
       const nombreArchivo = `Acta-Devolucion-${idADevolver}.pdf`;
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -76,7 +68,7 @@ const HistorialEquipo = () => {
 
       setMensaje("Equipo devuelto y acta generada correctamente ✅");
       setTimeout(() => setMensaje(""), 4000);
-      obtenerAsignaciones(); // Refrescar la lista
+      obtenerAsignaciones();
 
     } catch (error) {
       console.error("Error en el proceso de devolución:", error);
@@ -87,14 +79,12 @@ const HistorialEquipo = () => {
     }
   };
 
-  // Lógica de filtrado corregida
   const asignacionesFiltradas = asignaciones.filter((a) => {
     const busquedaLower = busquedaEmpleado.toLowerCase();
     const matchEmpleado =
       a.empleado.toLowerCase().includes(busquedaLower) ||
       (a.empleado_dni && a.empleado_dni.toLowerCase().includes(busquedaLower));
 
-    // Compara solo la parte de la fecha (YYYY-MM-DD), ignorando la hora/zona horaria
     const matchFechaInicio = !fechaInicio || a.fecha_entrega.split('T')[0] === fechaInicio;
     
     const matchFechaFin = !fechaFin || (a.fecha_devolucion && a.fecha_devolucion.split('T')[0] === fechaFin);
@@ -107,7 +97,6 @@ const HistorialEquipo = () => {
       <h2 className="historial-titulo">Historial General de Asignaciones</h2>
       {mensaje && <div className="mensaje-exito">{mensaje}</div>}
 
-      {/* Filtros */}
       <div className="filtros-historial">
         <input
           type="text"
@@ -205,7 +194,6 @@ const HistorialEquipo = () => {
         </div>
       )}
 
-      {/* El componente ActaDevPDF ya no se renderiza aquí */}
     </div>
   );
 };

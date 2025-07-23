@@ -5,10 +5,8 @@ const nodemailer = require("nodemailer");
 const AsignacionModel = require("../models/asignaciones.model");
 const { generarActaPDF } = require('../services/pdf.service');
 const { enviarActaPorCorreo } = require('../services/email.service');
-// La base de datos está en la raíz, no en /config. Subimos un nivel desde /controllers.
 const db = require('../database');
 
-// Listar asignaciones
 const listarAsignaciones = async (req, res) => {
   try {
     const asignaciones = await AsignacionModel.obtenerAsignaciones();
@@ -18,7 +16,6 @@ const listarAsignaciones = async (req, res) => {
   }
 };
 
-// Obtener historial por equipo
 const obtenerHistorialPorEquipo = async (req, res) => {
   const { equipo_id } = req.params;
   try {
@@ -41,13 +38,10 @@ const obtenerHistorialPorEquipo = async (req, res) => {
   }
 };
 
-// Asignar equipo por DNI y generar acta
 const asignarEquipoPorDNI = async (req, res) => {
   try {
-    // Esta función ahora existe en el modelo y devuelve la estructura correcta
     const nuevaAsignacionCompleta = await AsignacionModel.crearAsignacionPorDNI(req.body);
 
-    // Preparar los datos para el PDF
     const datosParaPDF = {
       numeroActa: nuevaAsignacionCompleta.asignacion.id,
       empleado: nuevaAsignacionCompleta.empleado,
@@ -56,22 +50,18 @@ const asignarEquipoPorDNI = async (req, res) => {
       fecha_entrega: nuevaAsignacionCompleta.asignacion.fecha_entrega,
     };
 
-    // Generar el PDF
     const nombreArchivo = `Acta-Entrega-${datosParaPDF.numeroActa}.pdf`;
     const pdfBuffer = await generarActaPDF(datosParaPDF, 'entrega');
 
-    // Enviar correo (opcional)
     enviarActaPorCorreo(pdfBuffer, nombreArchivo, 'entrega').catch(err => {
         console.error("Fallo al enviar el correo de entrega por DNI:", err);
     });
 
-    // Enviar el PDF al frontend
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=${nombreArchivo}`);
     res.send(pdfBuffer);
 
   } catch (error) {
-    // Este bloque ahora capturará el error si el DNI no se encuentra
     console.error("Error en el proceso de asignación por DNI:", error);
     res.status(500).json({ error: "Error en el proceso de asignación por DNI", detalle: error.message });
   }
@@ -101,10 +91,8 @@ const devolverEquipo = async (req, res) => {
 
 const crearAsignacionYGenerarActa = async (req, res) => {
   try {
-    // 1. Crear la asignación en la base de datos
     const nuevaAsignacion = await AsignacionModel.crearAsignacion(req.body);
 
-    // 2. Obtener los datos completos para el PDF
     const datosParaPDF = {
       numeroActa: nuevaAsignacion.asignacion.id,
       empleado: nuevaAsignacion.empleado,
@@ -113,16 +101,13 @@ const crearAsignacionYGenerarActa = async (req, res) => {
       fecha_entrega: nuevaAsignacion.asignacion.fecha_entrega,
     };
 
-    // 3. Generar el PDF
     const nombreArchivo = `Acta-Entrega-${datosParaPDF.numeroActa}.pdf`;
     const pdfBuffer = await generarActaPDF(datosParaPDF, 'entrega');
 
-    // 4. Enviar correo en segundo plano (opcional, pero consistente)
     enviarActaPorCorreo(pdfBuffer, nombreArchivo, 'entrega').catch(err => {
         console.error("Fallo al enviar el correo de entrega:", err);
     });
 
-    // 5. Enviar el PDF al frontend para descarga
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=${nombreArchivo}`);
     res.send(pdfBuffer);

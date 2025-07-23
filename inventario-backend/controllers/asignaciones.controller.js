@@ -3,7 +3,10 @@ const path = require("path");
 const PDFDocument = require("pdfkit");
 const nodemailer = require("nodemailer");
 const AsignacionModel = require("../models/asignaciones.model");
-const db = require("../database");
+const { generarActaPDF } = require('../services/pdf.service');
+const { enviarActaPorCorreo } = require('../services/email.service');
+// La base de datos está en la raíz, no en /config. Subimos un nivel desde /controllers.
+const db = require('../database');
 
 // Listar asignaciones
 const listarAsignaciones = async (req, res) => {
@@ -40,52 +43,37 @@ const obtenerHistorialPorEquipo = async (req, res) => {
 
 // Asignar equipo por DNI y generar acta
 const asignarEquipoPorDNI = async (req, res) => {
-  const { equipo_id, dni, observaciones = "" } = req.body;
-
   try {
-    const result = await db.query("SELECT * FROM empleados WHERE dni = $1", [dni]);
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Empleado no encontrado" });
-    }
+    // Esta función ahora existe en el modelo y devuelve la estructura correcta
+    const nuevaAsignacionCompleta = await AsignacionModel.crearAsignacionPorDNI(req.body);
 
-    const empleado = result.rows[0];
+    // Preparar los datos para el PDF
+    const datosParaPDF = {
+      numeroActa: nuevaAsignacionCompleta.asignacion.id,
+      empleado: nuevaAsignacionCompleta.empleado,
+      equipo: nuevaAsignacionCompleta.equipo,
+      observaciones: nuevaAsignacionCompleta.asignacion.observaciones,
+      fecha_entrega: nuevaAsignacionCompleta.asignacion.fecha_entrega,
+    };
 
-    // Validar que el equipo no esté asignado actualmente
-    const validacion = await db.query(
-      `SELECT * FROM asignaciones WHERE equipo_id = $1 AND fecha_devolucion IS NULL`,
-      [equipo_id]
-    );
-    if (validacion.rows.length > 0) {
-      return res.status(400).json({ error: "El equipo ya está asignado" });
-    }
+    // Generar el PDF
+    const nombreArchivo = `Acta-Entrega-${datosParaPDF.numeroActa}.pdf`;
+    const pdfBuffer = await generarActaPDF(datosParaPDF, 'entrega');
 
-    const fecha_entrega = new Date().toISOString().split("T")[0];
-
-    // Obtener datos del equipo
-    const equipoRes = await db.query("SELECT * FROM equipos WHERE id = $1", [equipo_id]);
-    const equipo = equipoRes.rows[0];
-
-    // Registrar asignación (sin PDF)
-    const nueva = await AsignacionModel.crearAsignacion({
-      empleado_id: empleado.id,
-      equipo_id,
-      fecha_entrega,
-      observaciones,
-      // acta_pdf eliminado
+    // Enviar correo (opcional)
+    enviarActaPorCorreo(pdfBuffer, nombreArchivo, 'entrega').catch(err => {
+        console.error("Fallo al enviar el correo de entrega por DNI:", err);
     });
 
-    // Devuelve todos los datos necesarios para que el frontend genere el PDF
-    res.status(201).json({ 
-      mensaje: "Equipo asignado",
-      asignacion: nueva,
-      empleado,
-      equipo,
-      fecha_entrega,
-      observaciones
-    });
+    // Enviar el PDF al frontend
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${nombreArchivo}`);
+    res.send(pdfBuffer);
+
   } catch (error) {
-    console.error("Error al asignar equipo:", error);
-    res.status(500).json({ error: "Error al asignar equipo", detalle: error.message });
+    // Este bloque ahora capturará el error si el DNI no se encuentra
+    console.error("Error en el proceso de asignación por DNI:", error);
+    res.status(500).json({ error: "Error en el proceso de asignación por DNI", detalle: error.message });
   }
 };
 
@@ -111,10 +99,45 @@ const devolverEquipo = async (req, res) => {
   }
 };
 
+const crearAsignacionYGenerarActa = async (req, res) => {
+  try {
+    // 1. Crear la asignación en la base de datos
+    const nuevaAsignacion = await AsignacionModel.crearAsignacion(req.body);
+
+    // 2. Obtener los datos completos para el PDF
+    const datosParaPDF = {
+      numeroActa: nuevaAsignacion.asignacion.id,
+      empleado: nuevaAsignacion.empleado,
+      equipo: nuevaAsignacion.equipo,
+      observaciones: nuevaAsignacion.asignacion.observaciones,
+      fecha_entrega: nuevaAsignacion.asignacion.fecha_entrega,
+    };
+
+    // 3. Generar el PDF
+    const nombreArchivo = `Acta-Entrega-${datosParaPDF.numeroActa}.pdf`;
+    const pdfBuffer = await generarActaPDF(datosParaPDF, 'entrega');
+
+    // 4. Enviar correo en segundo plano (opcional, pero consistente)
+    enviarActaPorCorreo(pdfBuffer, nombreArchivo, 'entrega').catch(err => {
+        console.error("Fallo al enviar el correo de entrega:", err);
+    });
+
+    // 5. Enviar el PDF al frontend para descarga
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${nombreArchivo}`);
+    res.send(pdfBuffer);
+
+  } catch (error) {
+    console.error("Error en el proceso de asignación:", error);
+    res.status(500).json({ error: "Error en el proceso de asignación", detalle: error.message });
+  }
+};
+
 module.exports = {
   listarAsignaciones,
   registrarAsignacion,
   devolverEquipo,
   asignarEquipoPorDNI,
   obtenerHistorialPorEquipo,
+  crearAsignacionYGenerarActa,
 };

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axiosBackend from "../api/axios";
-import ActaDevPDF from "../components/ActaDevPDF";
+// ActaDevPDF ya no es necesario aquí
 import "../HistorialEquipo.css";
 
 const HistorialEquipo = () => {
@@ -8,8 +8,12 @@ const HistorialEquipo = () => {
   const [mensaje, setMensaje] = useState("");
   const [modalDevolverVisible, setModalDevolverVisible] = useState(false);
   const [idADevolver, setIdADevolver] = useState(null);
-  const [mostrarActaDevolucion, setMostrarActaDevolucion] = useState(false);
-  const [datosActaDevolucion, setDatosActaDevolucion] = useState(null);
+  const [devolucionObservaciones, setDevolucionObservaciones] = useState(""); // Estado para las observaciones de devolución
+
+  // Se eliminan los estados relacionados al acta del frontend
+  // const [mostrarActaDevolucion, setMostrarActaDevolucion] = useState(false);
+  // const [datosActaDevolucion, setDatosActaDevolucion] = useState(null);
+
   // Nuevos estados para los filtros
   const [busquedaEmpleado, setBusquedaEmpleado] = useState("");
   const [fechaInicio, setFechaInicio] = useState("");
@@ -36,6 +40,7 @@ const HistorialEquipo = () => {
 
   const confirmarDevolucion = (id) => {
     setIdADevolver(id);
+    setDevolucionObservaciones(""); // Limpiar observaciones anteriores
     setModalDevolverVisible(true);
   };
 
@@ -47,38 +52,35 @@ const HistorialEquipo = () => {
     const hoy = `${anio}-${mes}-${dia}`;
 
     try {
-      await axiosBackend.put(`/asignaciones/${idADevolver}/devolver`, {
-        fecha_devolucion: hoy,
-      });
-      const asignacion = asignaciones.find((a) => a.id === idADevolver);
-      let empleado = { nombre_completo: asignacion.empleado, dni: asignacion.empleado_dni };
-      try {
-        const resEmpleado = await axiosBackend.get(`/empleados/por-dni/${asignacion.empleado_dni}`);
-        if (resEmpleado.data) empleado = resEmpleado.data;
-      } catch {
-        console.warn("No se pudieron obtener detalles del empleado, se usarán los datos de la asignación.");
-      }
+      // Llamada al nuevo endpoint del backend
+      const response = await axiosBackend.post(
+        `/devoluciones/${idADevolver}`,
+        {
+          fecha_devolucion: hoy,
+          observaciones: devolucionObservaciones,
+        },
+        {
+          responseType: 'blob', // ¡Importante para recibir el archivo!
+        }
+      );
 
-      setDatosActaDevolucion({
-        numeroActa: asignacion?.id || "",
-        id: asignacion?.equipo_id || "",
-        empleado: empleado?.nombre_completo || asignacion?.empleado || "",
-        dni: empleado?.dni || asignacion?.empleado_dni || "",
-        tipo: asignacion?.equipo_tipo || "",
-        marca: asignacion?.equipo_marca || "",
-        modelo: asignacion?.equipo_modelo || "",
-        serie: asignacion?.equipo_serie || "",
-        observaciones: asignacion?.observaciones || "—",
-        fecha_entrega: asignacion?.fecha_entrega || "",
-        fecha_devolucion: hoy,
-      });
-      setMostrarActaDevolucion(true);
-      setMensaje("Equipo devuelto correctamente ✅");
-      setTimeout(() => setMensaje(""), 3000);
-      obtenerAsignaciones();
+      // Lógica para descargar el PDF recibido del backend
+      const nombreArchivo = `Acta-Devolucion-${idADevolver}.pdf`;
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', nombreArchivo);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      setMensaje("Equipo devuelto y acta generada correctamente ✅");
+      setTimeout(() => setMensaje(""), 4000);
+      obtenerAsignaciones(); // Refrescar la lista
+
     } catch (error) {
-      console.error("Error al devolver el equipo:", error);
-      alert("No se pudo devolver el equipo.");
+      console.error("Error en el proceso de devolución:", error);
+      alert("No se pudo completar la devolución.");
     } finally {
       setModalDevolverVisible(false);
       setIdADevolver(null);
@@ -182,9 +184,15 @@ const HistorialEquipo = () => {
         <div className="modal-overlay">
           <div className="modal">
             <p>¿Deseas devolver este equipo?</p>
+            <label>Observaciones de devolución:</label>
+            <textarea
+              value={devolucionObservaciones}
+              onChange={(e) => setDevolucionObservaciones(e.target.value)}
+              placeholder="Ej: El equipo se devuelve en buen estado."
+            />
             <div className="modal-actions">
               <button className="btn-asignar" onClick={ejecutarDevolucion}>
-                Sí, devolver
+                Sí, devolver y generar acta
               </button>
               <button
                 className="btn-cancelar"
@@ -197,12 +205,7 @@ const HistorialEquipo = () => {
         </div>
       )}
 
-      {mostrarActaDevolucion && datosActaDevolucion && (
-        <ActaDevPDF
-          datos={datosActaDevolucion}
-          onClose={() => setMostrarActaDevolucion(false)}
-        />
-      )}
+      {/* El componente ActaDevPDF ya no se renderiza aquí */}
     </div>
   );
 };

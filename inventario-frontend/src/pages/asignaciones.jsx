@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axiosBackend from "../api/axios";
-import ActaPDF from "../components/ActaPDF";
 
 const Asignaciones = () => {
   const [mensaje, setMensaje] = useState("");
@@ -9,8 +8,6 @@ const Asignaciones = () => {
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
   const [dni, setDni] = useState("");
   const [observaciones, setObservaciones] = useState("");
-  const [mostrarActa, setMostrarActa] = useState(false);
-  const [datosActa, setDatosActa] = useState(null);
 
   useEffect(() => {
     obtenerEquiposDisponibles();
@@ -36,45 +33,39 @@ const Asignaciones = () => {
     if (!dni) return alert("Debe ingresar el DNI del empleado");
 
     try {
-      // Obtener datos del empleado
-      const resEmpleado = await axiosBackend.get(`/empleados/por-dni/${dni}`);
-      const empleado = resEmpleado.data;
-      console.log("Empleado recibido:", empleado);
+      // Llamada al endpoint que crea la asignación y devuelve el PDF
+      const response = await axiosBackend.post(
+        `/asignaciones/por-dni`,
+        {
+          equipo_id: equipoSeleccionado.id,
+          dni,
+          observaciones,
+        },
+        {
+          responseType: 'blob', // ¡Importante para recibir el archivo!
+        }
+      );
 
-      // Crear la asignación
-      await axiosBackend.post("/asignaciones/por-dni", {
-        equipo_id: equipoSeleccionado.id,
-        dni,
-        observaciones,
-      });
+      // Lógica para descargar el PDF recibido del backend
+      const nombreArchivo = `Acta-Entrega-${equipoSeleccionado.id}.pdf`;
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', nombreArchivo);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
 
-      // Obtener total de asignaciones actuales
-      const resAsignaciones = await axiosBackend.get("/asignaciones");
-      const numeroActa = resAsignaciones.data.length + 1;
-      const fechaEntrega = new Date().toISOString().split("T")[0];
-
-      // Construir los datos del acta
-      setDatosActa({
-        numeroActa: numeroActa,
-        id: equipoSeleccionado.id,
-        empleado: empleado.nombre_completo || "Sin Nombre",
-        dni: empleado.dni || "Sin DNI",
-        tipo: equipoSeleccionado.tipo,
-        marca: equipoSeleccionado.marca,
-        modelo: equipoSeleccionado.modelo,
-        serie: equipoSeleccionado.serie,
-        observaciones: observaciones || "—",
-        fecha_entrega: fechaEntrega || "Sin fecha",
-      });
-
-      setMostrarActa(true);
+      setMensaje("Equipo asignado y acta generada correctamente ✅");
+      setTimeout(() => setMensaje(""), 4000);
+      
+      // Cerrar modal y refrescar lista
       setModalVisible(false);
-      setMensaje("Equipo asignado correctamente ✅");
-      setTimeout(() => setMensaje(""), 3000);
       obtenerEquiposDisponibles();
+
     } catch (error) {
-      console.error(error);
-      alert(error.response?.data?.error || "Error al asignar equipo");
+      console.error("Error en el proceso de asignación:", error);
+      alert("No se pudo completar la asignación. Verifique el DNI.");
     }
   };
 
@@ -139,7 +130,7 @@ const Asignaciones = () => {
             />
             <div className="modal-actions">
               <button className="btn-asignar" onClick={asignar}>
-                Asignar
+                Asignar y Generar Acta
               </button>
               <button
                 className="btn-cancelar"
@@ -150,11 +141,6 @@ const Asignaciones = () => {
             </div>
           </div>
         </div>
-      )}
-
-      {/* Acta PDF */}
-      {mostrarActa && datosActa && (
-        <ActaPDF datos={datosActa} onClose={() => setMostrarActa(false)} />
       )}
     </div>
   );

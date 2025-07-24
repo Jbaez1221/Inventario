@@ -1,4 +1,3 @@
-// src/components/Navbar.jsx
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import "../App.css";

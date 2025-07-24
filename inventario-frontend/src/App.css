@@ -399,5 +399,129 @@ button:hover {
 .login-form button:hover {
   background-color: #0056b3;
 }
+.modal-overlay .modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #fff;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+}
+
+.tabla-historial {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.tabla-historial th,
+.tabla-historial td {
+  border: 1px solid #333;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.tabla-historial th {
+  background-color: #2c2c2c;
+  color: #fff;
+  font-weight: 600;
+}
+
+.tabla-historial td {
+  color: #ccc;
+}
+
+.modal-overlay .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.form-group-image {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+  border: 1px dashed #555;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.form-group-image label {
+  font-weight: bold;
+  color: #ccc;
+}
+
+.image-preview {
+  margin-top: 10px;
+}
+
+.image-preview img {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 8px;
+  border: 2px solid #444;
+}
+
+.file-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-input-wrapper input[type="file"] {
+  display: none;
+}
+
+.btn-file-upload {
+  display: inline-block;
+  padding: 8px 15px;
+  background-color: #4a4a4a;
+  color: #fff;
+  border: 1px solid #666;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.btn-file-upload:hover {
+  background-color: #5a5a5a;
+}
+
+.file-name {
+  color: #ccc;
+  font-style: italic;
+}
+
+
+
+.equipo-thumbnail {
+  width: 60px;          
+  height: 60px;         
+  object-fit: cover;    
+  border-radius: 5px;  
+  border: 1px solid #444;
+  cursor: pointer;     
+  transition: transform 0.2s;
+}
+
+.equipo-thumbnail:hover {
+  transform: scale(1.1);
+}
+
+.no-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background-color: #333;
+  color: #888;
+  font-size: 12px;
+  text-align: center;
+  border-radius: 5px;
+}
+/* --- FIN: ESTILOS PARA LA MINIATURA DE IMAGEN EN LA TABLA --- */
 
 

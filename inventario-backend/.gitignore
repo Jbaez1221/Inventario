@@ -1,0 +1,26 @@
+# Archivos de dependencias
+# La carpeta node_modules se genera al ejecutar 'npm install'
+/node_modules
+
+# Archivos de entorno
+# ¡MUY IMPORTANTE! Contiene contraseñas y secretos.
+.env
+
+# Archivos subidos por los usuarios
+# Esta carpeta contiene las imágenes de los equipos y no debe estar en el repositorio.
+/public/uploads/
+
+# Archivos de registro (logs)
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Archivos generados por el sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de configuración del editor de código (opcional)
+.vscode/

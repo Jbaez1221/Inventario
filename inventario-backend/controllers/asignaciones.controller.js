@@ -24,7 +24,9 @@ const obtenerHistorialPorEquipo = async (req, res) => {
         a.fecha_entrega, 
         a.fecha_devolucion, 
         a.observaciones,
-        e.nombre_completo AS nombre_empleado
+        e.nombre_completo AS nombre_empleado,
+        e.cargo,
+        e.area
       FROM asignaciones a
       JOIN empleados e ON a.empleado_id = e.id
       WHERE a.equipo_id = $1

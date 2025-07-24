@@ -11,7 +11,8 @@ const Empleados = () => {
     correo: "",
     area: "",
     cargo: "",
-    estado: "Activo"
+    estado: "Activo",
+    celular: ""
   });
   const [modoEdicion, setModoEdicion] = useState(false);
   const [empleadoEditandoId, setEmpleadoEditandoId] = useState(null);
@@ -39,8 +40,8 @@ const Empleados = () => {
 
   const guardarEmpleado = async () => {
     for (const key in form) {
-      if (form[key] === "") {
-        alert("Todos los campos son obligatorios.");
+      if (key !== 'celular' && form[key] === "") {
+        alert(`El campo ${key.replace('_', ' ')} es obligatorio.`);
         return;
       }
     }
@@ -60,7 +61,8 @@ const Empleados = () => {
         correo: "",
         area: "",
         cargo: "",
-        estado: "Activo"
+        estado: "Activo",
+        celular: ""
       });
       obtenerEmpleados();
     } catch (err) {
@@ -100,7 +102,8 @@ const Empleados = () => {
       correo: "",
       area: "",
       cargo: "",
-      estado: "Activo"
+      estado: "Activo",
+      celular: ""
     });
   };
 
@@ -108,6 +111,7 @@ const Empleados = () => {
     empleado.nombre_completo.toLowerCase().includes(busqueda.toLowerCase()) ||
     empleado.dni.toLowerCase().includes(busqueda.toLowerCase()) ||
     empleado.correo.toLowerCase().includes(busqueda.toLowerCase()) ||
+    (empleado.celular && empleado.celular.toLowerCase().includes(busqueda.toLowerCase())) || // 4. AÑADIR CELULAR A LA BÚSQUEDA
     empleado.area.toLowerCase().includes(busqueda.toLowerCase()) ||
     empleado.cargo.toLowerCase().includes(busqueda.toLowerCase()) ||
     empleado.estado.toLowerCase().includes(busqueda.toLowerCase())
@@ -122,6 +126,7 @@ const Empleados = () => {
           <input name="nombre_completo" value={form.nombre_completo} onChange={handleChange} placeholder="Nombre completo" />
           <input name="dni" value={form.dni} onChange={handleChange} placeholder="DNI" />
           <input name="correo" value={form.correo} onChange={handleChange} placeholder="Correo" />
+          <input name="celular" value={form.celular} onChange={handleChange} placeholder="Celular" /> {/* 2. AÑADIR INPUT PARA CELULAR */}
           <input name="area" value={form.area} onChange={handleChange} placeholder="Área" />
           <input name="cargo" value={form.cargo} onChange={handleChange} placeholder="Cargo" />
           <select name="estado" value={form.estado} onChange={handleChange}>
@@ -138,7 +143,7 @@ const Empleados = () => {
       <div className="busqueda-empleados">
         <input
           type="text"
-          placeholder="Buscar por nombre, DNI, correo, área, cargo o estado..."
+          placeholder="Buscar por nombre, DNI, correo, celular, área..."
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
@@ -152,6 +157,7 @@ const Empleados = () => {
             <th>Nombre</th>
             <th>DNI</th>
             <th>Correo</th>
+            <th>Celular</th>
             <th>Área</th>
             <th>Cargo</th>
             <th>Estado</th>
@@ -165,6 +171,7 @@ const Empleados = () => {
               <td>{empleado.nombre_completo}</td>
               <td>{empleado.dni}</td>
               <td>{empleado.correo}</td>
+              <td>{empleado.celular || '—'}</td>
               <td>{empleado.area}</td>
               <td>{empleado.cargo}</td>
               <td>{empleado.estado}</td>

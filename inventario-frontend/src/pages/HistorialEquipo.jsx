@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import axiosBackend from "../api/axios";
 import "../HistorialEquipo.css";
+import { useAuth } from "../hooks/useAuth";
 
 const HistorialEquipo = () => {
+  const { token } = useAuth();
   const [asignaciones, setAsignaciones] = useState([]);
   const [mensaje, setMensaje] = useState("");
   const [modalDevolverVisible, setModalDevolverVisible] = useState(false);
@@ -12,11 +14,22 @@ const HistorialEquipo = () => {
   const [busquedaEmpleado, setBusquedaEmpleado] = useState("");
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(20);
 
   const obtenerAsignaciones = async () => {
     try {
       const response = await axiosBackend.get("/asignaciones");
-      setAsignaciones(response.data);
+      const asignacionesOrdenadas = response.data.sort((a, b) => {
+        const aSinDevolver = !a.fecha_devolucion;
+        const bSinDevolver = !b.fecha_devolucion;
+
+        if (aSinDevolver && !bSinDevolver) return -1;
+        if (!aSinDevolver && bSinDevolver) return 1;
+
+        return b.id - a.id;
+      });
+      setAsignaciones(asignacionesOrdenadas);
     } catch (error) {
       console.error("Error al obtener asignaciones", error);
     }
@@ -92,6 +105,17 @@ const HistorialEquipo = () => {
     return matchEmpleado && matchFechaInicio && matchFechaFin;
   });
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = asignacionesFiltradas.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(asignacionesFiltradas.length / itemsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [busquedaEmpleado, fechaInicio, fechaFin]);
+
   return (
     <div className="historial-container">
       <h2 className="historial-titulo">Historial General de Asignaciones</h2>
@@ -127,23 +151,25 @@ const HistorialEquipo = () => {
         <thead>
           <tr>
             <th>Empleado</th>
+            <th>Área</th>
             <th>Serie</th>
             <th>Tipo</th>
             <th>Fecha entrega</th>
             <th>Fecha devolución</th>
             <th>Observaciones</th>
-            <th>Acción</th>
+            {token && <th>Acción</th>}
           </tr>
         </thead>
         <tbody>
           {asignacionesFiltradas.length === 0 ? (
             <tr>
-              <td colSpan="7">No hay asignaciones que coincidan con los filtros.</td>
+              <td colSpan="8">No hay asignaciones que coincidan con los filtros.</td>
             </tr>
           ) : (
-            asignacionesFiltradas.map((a) => (
+            currentItems.map((a) => (
               <tr key={a.id}>
                 <td>{a.empleado}</td>
+                <td>{a.empleado_area || "—"}</td>
                 <td>{a.equipo_serie}</td>
                 <td>{a.equipo_tipo}</td>
                 <td>{formatearFecha(a.fecha_entrega)}</td>
@@ -153,21 +179,43 @@ const HistorialEquipo = () => {
                     : "—"}
                 </td>
                 <td>{a.observaciones || "—"}</td>
-                <td>
-                  {!a.fecha_devolucion && (
-                    <button
-                      onClick={() => confirmarDevolucion(a.id)}
-                      className="btn-devolver"
-                    >
-                      Devolver
-                    </button>
-                  )}
-                </td>
+                {token && (
+                  <td>
+                    {!a.fecha_devolucion && (
+                      <button
+                        onClick={() => confirmarDevolucion(a.id)}
+                        className="btn-devolver"
+                      >
+                        Devolver
+                      </button>
+                    )}
+                  </td>
+                )}
               </tr>
             ))
           )}
         </tbody>
       </table>
+
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>
+            Anterior
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => paginate(i + 1)}
+              className={currentPage === i + 1 ? 'active' : ''}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>
+            Siguiente
+          </button>
+        </div>
+      )}
 
       {modalDevolverVisible && (
         <div className="modal-overlay">

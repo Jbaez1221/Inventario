@@ -1,6 +1,36 @@
-// src/pages/Dashboard.jsx
 import { useEffect, useState } from "react";
 import axiosBackend from "../api/axios";
+import {
+  FaLaptop,
+  FaCheckCircle,
+  FaUserTie,
+  FaUsers,
+  FaClipboardList,
+} from "react-icons/fa";
+import { Doughnut, Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+} from "chart.js";
+
+import "../Dashboard.css";
+
+// Registrar componentes de Chart.js
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title
+);
 
 const Dashboard = () => {
   const [estadisticas, setEstadisticas] = useState({
@@ -11,9 +41,34 @@ const Dashboard = () => {
     asignacionesActivas: 0,
   });
 
+  const [asignacionesPorMes, setAsignacionesPorMes] = useState([]);
+  const [equiposPorSede, setEquiposPorSede] = useState({});
+  const [equiposPorTipo, setEquiposPorTipo] = useState({});
+  const [fechaInicio, setFechaInicio] = useState("");
+  const [fechaFin, setFechaFin] = useState("");
+
   useEffect(() => {
     cargarEstadisticas();
-  }, []);
+  }, [fechaInicio, fechaFin]);
+
+  const contarPorCampo = (lista, campo) => {
+    const conteo = {};
+    lista.forEach((item) => {
+      const clave = item[campo] || "Sin especificar";
+      conteo[clave] = (conteo[clave] || 0) + 1;
+    });
+    return conteo;
+  };
+
+  const dentroDelRango = (fecha) => {
+    if (!fechaInicio && !fechaFin) return true;
+    const f = new Date(fecha);
+    const inicio = fechaInicio ? new Date(fechaInicio) : null;
+    const fin = fechaFin ? new Date(fechaFin) : null;
+    if (inicio && f < inicio) return false;
+    if (fin && f > fin) return false;
+    return true;
+  };
 
   const cargarEstadisticas = async () => {
     try {
@@ -23,11 +78,28 @@ const Dashboard = () => {
         axiosBackend.get("/asignaciones"),
       ]);
 
-      const totalEquipos = resEquipos.data.length;
-      const disponibles = resEquipos.data.filter((e) => e.estado === "Disponible").length;
+      const equipos = resEquipos.data;
+      const asignaciones = resAsignaciones.data;
+
+      const totalEquipos = equipos.length;
+      const disponibles = equipos.filter((e) => e.estado === "Disponible").length;
       const asignados = totalEquipos - disponibles;
       const empleados = resEmpleados.data.length;
-      const asignacionesActivas = resAsignaciones.data.filter((a) => !a.fecha_devolucion).length;
+      const asignacionesActivas = asignaciones.filter((a) => !a.fecha_devolucion).length;
+
+      const asignacionesFiltradas = asignaciones.filter((a) =>
+        dentroDelRango(a.fecha_entrega)
+      );
+      const equiposFiltrados = equipos.filter((e) =>
+        dentroDelRango(e.fecha_ingreso)
+      );
+
+      const asignacionesMes = Array(12).fill(0);
+      asignacionesFiltradas.forEach((a) => {
+        const fecha = new Date(a.fecha_entrega);
+        const mes = fecha.getMonth();
+        asignacionesMes[mes]++;
+      });
 
       setEstadisticas({
         totalEquipos,
@@ -36,29 +108,142 @@ const Dashboard = () => {
         empleados,
         asignacionesActivas,
       });
+
+      setAsignacionesPorMes(asignacionesMes);
+      setEquiposPorSede(contarPorCampo(equiposFiltrados, "ubicacion"));
+      setEquiposPorTipo(contarPorCampo(equiposFiltrados, "tipo"));
     } catch (error) {
       console.error("Error cargando estadísticas:", error);
     }
   };
 
+  const opcionesGenerales = {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      title: { display: false },
+    },
+    scales: {
+      x: {
+        ticks: { color: "#fff" },
+        grid: { color: "#333" },
+      },
+      y: {
+        beginAtZero: true,
+        ticks: { color: "#fff" },
+        grid: { color: "#333" },
+      },
+    },
+  };
+
+  const dataDoughnut = {
+    labels: ["Disponibles", "Asignados"],
+    datasets: [
+      {
+        data: [estadisticas.disponibles, estadisticas.asignados],
+        backgroundColor: ["#10B981", "#F59E0B"],
+        borderColor: "#1f1f1f",
+        borderWidth: 5,
+      },
+    ],
+  };
+
+  const dataBarMeses = {
+    labels: [
+      "Ene", "Feb", "Mar", "Abr", "May", "Jun",
+      "Jul", "Ago", "Sep", "Oct", "Nov", "Dic",
+    ],
+    datasets: [
+      {
+        label: "Asignaciones por mes",
+        data: asignacionesPorMes,
+        backgroundColor: "#3B82F6",
+        borderRadius: 5,
+      },
+    ],
+  };
+
+  const dataPorSede = {
+    labels: Object.keys(equiposPorSede),
+    datasets: [
+      {
+        label: "Equipos por Sede",
+        data: Object.values(equiposPorSede),
+        backgroundColor: "#22d3ee",
+        borderRadius: 5,
+      },
+    ],
+  };
+
+  const dataPorTipo = {
+    labels: Object.keys(equiposPorTipo),
+    datasets: [
+      {
+        label: "Equipos por Tipo",
+        data: Object.values(equiposPorTipo),
+        backgroundColor: "#a78bfa",
+        borderRadius: 5,
+      },
+    ],
+  };
+
   return (
-    <div className="p-6 text-white">
-      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        <Card titulo="Total Equipos" valor={estadisticas.totalEquipos} color="bg-blue-600" />
-        <Card titulo="Disponibles" valor={estadisticas.disponibles} color="bg-green-600" />
-        <Card titulo="Asignados" valor={estadisticas.asignados} color="bg-yellow-500" />
-        <Card titulo="Empleados" valor={estadisticas.empleados} color="bg-purple-600" />
-        <Card titulo="Asignaciones Activas" valor={estadisticas.asignacionesActivas} color="bg-red-600" />
+    <div className="dashboard-container">
+      <h1 className="dashboard-title">Dashboard</h1>
+
+      <div className="filtro-fechas">
+        <label>
+          Fecha Inicio:
+          <input type="date" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} />
+        </label>
+        <label>
+          Fecha Fin:
+          <input type="date" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} />
+        </label>
+      </div>
+
+      <div className="tarjetas-grid">
+        <Card titulo="Total Equipos" valor={estadisticas.totalEquipos} icon={<FaLaptop />} />
+        <Card titulo="Disponibles" valor={estadisticas.disponibles} icon={<FaCheckCircle />} />
+        <Card titulo="Asignados" valor={estadisticas.asignados} icon={<FaClipboardList />} />
+        <Card titulo="Empleados" valor={estadisticas.empleados} icon={<FaUsers />} />
+        <Card titulo="Asignaciones Activas" valor={estadisticas.asignacionesActivas} icon={<FaUserTie />} />
+      </div>
+
+      <div className="chart-grid">
+        <div className="chart-box">
+  <h2 className="chart-title">Distribución de Equipos</h2>
+  <div className="doughnut-container">
+    <Doughnut data={dataDoughnut} />
+  </div>
+</div>
+        <div className="chart-box">
+          <h2 className="chart-title">Asignaciones por Mes</h2>
+          <Bar data={dataBarMeses} options={opcionesGenerales} />
+        </div>
+      </div>
+
+      <div className="chart-grid" style={{ marginTop: "40px" }}>
+        <div className="chart-box">
+          <h2 className="chart-title">Equipos por Sede</h2>
+          <Bar data={dataPorSede} options={opcionesGenerales} />
+        </div>
+        <div className="chart-box">
+          <h2 className="chart-title">Equipos por Tipo</h2>
+          <Bar data={dataPorTipo} options={opcionesGenerales} />
+        </div>
       </div>
     </div>
   );
 };
 
-const Card = ({ titulo, valor, color }) => (
-  <div className={`p-6 rounded shadow ${color}`}>
-    <h3 className="text-xl font-semibold">{titulo}</h3>
-    <p className="text-3xl font-bold">{valor}</p>
+const Card = ({ titulo, valor, icon }) => (
+  <div className="card">
+    <div className="card-header">
+      <h3 className="card-title">{titulo}</h3>
+      <div className="text-2xl">{icon}</div>
+    </div>
+    <p className="card-value">{valor}</p>
   </div>
 );
 

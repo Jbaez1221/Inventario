@@ -29,6 +29,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:4002`);
+  console.log('Servidor corriendo en http://localhost:4002');
 });
-

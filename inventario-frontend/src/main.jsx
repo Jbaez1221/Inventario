@@ -7,6 +7,7 @@ import './Equipos.css';
 import './Asignaciones.css';
 import "./Empleados.css";
 import "./HistorialEquipo.css";
+import "./Dashboard.css";
 
 
 

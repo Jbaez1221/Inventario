@@ -38,8 +38,8 @@
 
 .filtros-historial button {
   padding: 10px 20px;
-  background-color: #f0f0f0;
-  color: #121212;
+  background-color: #00d0ff;
+  color: #ffffff;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -48,7 +48,7 @@
 }
 
 .filtros-historial button:hover {
-  background-color: #dddddd;
+  background-color: #ff0000;
 }
 
 .pagination {

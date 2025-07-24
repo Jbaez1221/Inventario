@@ -11,7 +11,7 @@ const enviarActaPorCorreo = async (correoDestino, asunto, cuerpo, pathPDF) => {
   });
 
   const mailOptions = {
-    from: '"CORASUR S.A" <hunt3r1221@gmail.com>',
+    from: '"CORASUR S.A" <jayobaez1221@gmail.com',
     to: correoDestino,
     subject: asunto,
     text: cuerpo,

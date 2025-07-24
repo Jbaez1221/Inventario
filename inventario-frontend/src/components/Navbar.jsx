@@ -8,7 +8,7 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <div className="navbar-title">Inventario</div>
+      <div className="navbar-title">CORASUR</div>
       <div className="navbar-links">
         <NavLink to="/historial" className="nav-link">Historial</NavLink>
         <NavLink to="/asignaciones" className="nav-link">Asignaciones</NavLink>

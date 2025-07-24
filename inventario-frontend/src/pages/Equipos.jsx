@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import axiosBackend from "../api/axios";
+import { useAuth } from "../hooks/useAuth";
 
 const Equipos = () => {
+  const { token } = useAuth();
   const [equipos, setEquipos] = useState([]);
   const [form, setForm] = useState({
     tipo: "",
@@ -40,6 +42,16 @@ const Equipos = () => {
   };
 
   const guardarEquipo = async () => {
+    for (const key in form) {
+      if (key === 'observaciones') {
+        continue;
+      }
+      if (form[key] === "") {
+        alert(`El campo '${key}' es obligatorio.`);
+        return;
+      }
+    }
+
     try {
       if (modoEdicion) {
         await axiosBackend.put(`/equipos/${equipoEditandoId}`, form);
@@ -140,30 +152,31 @@ const Equipos = () => {
     <div className="equipos-container">
       <h2>Equipos</h2>
 
-      <div className="formulario-equipo">
-        <input name="tipo" value={form.tipo} onChange={handleChange} placeholder="Tipo" />
-        <input name="marca" value={form.marca} onChange={handleChange} placeholder="Marca" />
-        <input name="modelo" value={form.modelo} onChange={handleChange} placeholder="Modelo" />
-        <input name="serie" value={form.serie} onChange={handleChange} placeholder="Serie" />
-        <input name="fecha_ingreso" type="date" value={form.fecha_ingreso} onChange={handleChange} />
-        <input name="ubicacion" value={form.ubicacion} onChange={handleChange} placeholder="Ubicación" />
-        {modoEdicion && (
-          <select name="estado" value={form.estado} onChange={handleChange}>
-            <option value="Disponible">Disponible</option>
-            <option value="Reparación">Reparación</option>
-            <option value="Baja">Baja</option>
-          </select>
-        )}
-        <input name="garantia_fin" type="date" value={form.garantia_fin} onChange={handleChange} />
-        <input name="valor_compra" value={form.valor_compra} onChange={handleChange} placeholder="Valor compra" />
-        <input name="observaciones" value={form.observaciones} onChange={handleChange} placeholder="Observaciones" />
-        <div className="botones">
-          <button onClick={guardarEquipo}>{modoEdicion ? "Actualizar" : "Agregar"}</button>
-          {modoEdicion && <button onClick={cancelarEdicion}>Cancelar</button>}
+      {token && (
+        <div className="formulario-equipo">
+          <input name="tipo" value={form.tipo} onChange={handleChange} placeholder="Tipo" />
+          <input name="marca" value={form.marca} onChange={handleChange} placeholder="Marca" />
+          <input name="modelo" value={form.modelo} onChange={handleChange} placeholder="Modelo" />
+          <input name="serie" value={form.serie} onChange={handleChange} placeholder="Serie" />
+          <input name="fecha_ingreso" type="date" value={form.fecha_ingreso} onChange={handleChange} />
+          <input name="ubicacion" value={form.ubicacion} onChange={handleChange} placeholder="Ubicación" />
+          {modoEdicion && (
+            <select name="estado" value={form.estado} onChange={handleChange}>
+              <option value="Disponible">Disponible</option>
+              <option value="Reparación">Reparación</option>
+              <option value="Baja">Baja</option>
+            </select>
+          )}
+          <input name="garantia_fin" type="date" value={form.garantia_fin} onChange={handleChange} />
+          <input name="valor_compra" value={form.valor_compra} onChange={handleChange} placeholder="Valor compra" />
+          <input name="observaciones" value={form.observaciones} onChange={handleChange} placeholder="Observaciones" />
+          <div className="botones">
+            <button onClick={guardarEquipo}>{modoEdicion ? "Actualizar" : "Agregar"}</button>
+            {modoEdicion && <button onClick={cancelarEdicion}>Cancelar</button>}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Buscador */}
       <div className="busqueda-equipos">
         <input
           type="text"
@@ -185,7 +198,7 @@ const Equipos = () => {
             <th>Ubicación</th>
             <th>Observaciones</th>
             <th>Estado</th>
-            <th>Acciones</th>
+            {token && <th>Acciones</th>}
           </tr>
         </thead>
         <tbody>
@@ -199,11 +212,13 @@ const Equipos = () => {
               <td>{equipo.ubicacion}</td>
               <td>{equipo.observaciones}</td>
               <td>{equipo.estado}</td>
-              <td>
-                <button onClick={() => iniciarEdicion(equipo)}>Editar</button>
-                <button onClick={() => eliminarEquipo(equipo.id)}>Eliminar</button>
-                <button onClick={() => verHistorial(equipo.id)}>Historial</button>
-              </td>
+              {token && (
+                <td>
+                  <button onClick={() => iniciarEdicion(equipo)}>Editar</button>
+                  <button onClick={() => eliminarEquipo(equipo.id)}>Eliminar</button>
+                  <button onClick={() => verHistorial(equipo.id)}>Historial</button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

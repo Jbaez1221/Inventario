@@ -1,13 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const AsignacionesController = require("../controllers/asignaciones.controller");
+const { protegerRuta } = require('../middleware/auth.middleware');
 
 router.get("/", AsignacionesController.listarAsignaciones);
-router.put("/:id/devolver", AsignacionesController.devolverEquipo);
 router.get("/historial/:equipo_id", AsignacionesController.obtenerHistorialPorEquipo);
 
-router.post("/por-dni", AsignacionesController.asignarEquipoPorDNI);
 
-router.post("/con-acta", AsignacionesController.crearAsignacionYGenerarActa);
+
+router.put("/:id/devolver", protegerRuta, AsignacionesController.devolverEquipo);
+router.post("/por-dni", protegerRuta, AsignacionesController.asignarEquipoPorDNI);
+router.post("/con-acta", protegerRuta, AsignacionesController.crearAsignacionYGenerarActa);
 
 module.exports = router;

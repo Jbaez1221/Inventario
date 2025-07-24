@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import axiosBackend from "../api/axios";
+import { useAuth } from "../hooks/useAuth";
 
 const Asignaciones = () => {
+  const { token } = useAuth();
   const [mensaje, setMensaje] = useState("");
   const [equiposDisponibles, setEquiposDisponibles] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -33,7 +35,6 @@ const Asignaciones = () => {
     if (!dni) return alert("Debe ingresar el DNI del empleado");
 
     try {
-      // Llamada al endpoint que crea la asignación y devuelve el PDF
       const response = await axiosBackend.post(
         `/asignaciones/por-dni`,
         {
@@ -42,11 +43,10 @@ const Asignaciones = () => {
           observaciones,
         },
         {
-          responseType: 'blob', // ¡Importante para recibir el archivo!
+          responseType: 'blob',
         }
       );
 
-      // Lógica para descargar el PDF recibido del backend
       const nombreArchivo = `Acta-Entrega-${equipoSeleccionado.id}.pdf`;
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -59,7 +59,6 @@ const Asignaciones = () => {
       setMensaje("Equipo asignado y acta generada correctamente ✅");
       setTimeout(() => setMensaje(""), 4000);
       
-      // Cerrar modal y refrescar lista
       setModalVisible(false);
       obtenerEquiposDisponibles();
 
@@ -82,7 +81,7 @@ const Asignaciones = () => {
             <th>Modelo</th>
             <th>Serie</th>
             <th>Ubicación</th>
-            <th>Acción</th>
+            {token && <th>Acción</th>}
           </tr>
         </thead>
         <tbody>
@@ -99,21 +98,22 @@ const Asignaciones = () => {
                 <td>{equipo.modelo}</td>
                 <td>{equipo.serie}</td>
                 <td>{equipo.ubicacion}</td>
-                <td>
-                  <button
-                    className="btn-asignar"
-                    onClick={() => abrirFormularioAsignacion(equipo)}
-                  >
-                    Asignar
-                  </button>
-                </td>
+                {token && (
+                  <td>
+                    <button
+                      className="btn-asignar"
+                      onClick={() => abrirFormularioAsignacion(equipo)}
+                    >
+                      Asignar
+                    </button>
+                  </td>
+                )}
               </tr>
             ))
           )}
         </tbody>
       </table>
 
-      {/* Modal de asignación */}
       {modalVisible && (
         <div className="modal-overlay">
           <div className="modal">

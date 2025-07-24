@@ -24,7 +24,7 @@ const EquiposAdmin = () => {
       setTipo("");
       setSerie("");
       obtenerEquipos();
-    } catch (error) {
+    } catch{
       alert("Error al agregar equipo");
     }
   };
@@ -35,7 +35,7 @@ const EquiposAdmin = () => {
     try {
       await axiosBackend.delete(`/equipos/${id}`);
       obtenerEquipos();
-    } catch (error) {
+    } catch{
       alert("No se pudo eliminar");
     }
   };

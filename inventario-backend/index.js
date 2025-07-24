@@ -8,6 +8,9 @@ const PORT = process.env.PORT || 4002;
 app.use(cors());
 app.use(express.json());
 
+const authRoutes = require('./routes/auth.routes');
+app.use('/api/auth', authRoutes);
+
 const equiposRoutes = require("./routes/equipos.routes");
 app.use("/api/equipos", equiposRoutes);
 

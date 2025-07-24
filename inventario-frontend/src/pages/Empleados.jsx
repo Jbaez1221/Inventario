@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import axiosBackend from "../api/axios";
+import { useAuth } from "../hooks/useAuth";
 
 const Empleados = () => {
+  const { token } = useAuth();
   const [empleados, setEmpleados] = useState([]);
   const [form, setForm] = useState({
     nombre_completo: "",
@@ -26,6 +28,7 @@ const Empleados = () => {
       const res = await axiosBackend.get("/empleados");
       setEmpleados(res.data);
     } catch (err) {
+      console.error("Error al cargar empleados:", err);
       alert("Error al cargar empleados");
     }
   };
@@ -35,6 +38,13 @@ const Empleados = () => {
   };
 
   const guardarEmpleado = async () => {
+    for (const key in form) {
+      if (form[key] === "") {
+        alert("Todos los campos son obligatorios.");
+        return;
+      }
+    }
+
     try {
       if (modoEdicion) {
         await axiosBackend.put(`/empleados/${empleadoEditandoId}`, form);
@@ -54,6 +64,7 @@ const Empleados = () => {
       });
       obtenerEmpleados();
     } catch (err) {
+      console.error("Error al guardar empleado:", err);
       alert("Error al guardar empleado");
     }
   };
@@ -69,6 +80,7 @@ const Empleados = () => {
       setMostrarConfirmacion(false);
       obtenerEmpleados();
     } catch (err) {
+      console.error("Error al eliminar empleado:", err);
       alert("Error al eliminar");
     }
   };
@@ -105,23 +117,24 @@ const Empleados = () => {
     <div className="empleados-container">
       <h2>Empleados</h2>
 
-      <div className="formulario-empleado">
-        <input name="nombre_completo" value={form.nombre_completo} onChange={handleChange} placeholder="Nombre completo" />
-        <input name="dni" value={form.dni} onChange={handleChange} placeholder="DNI" />
-        <input name="correo" value={form.correo} onChange={handleChange} placeholder="Correo" />
-        <input name="area" value={form.area} onChange={handleChange} placeholder="Área" />
-        <input name="cargo" value={form.cargo} onChange={handleChange} placeholder="Cargo" />
-        <select name="estado" value={form.estado} onChange={handleChange}>
-          <option value="Activo">Activo</option>
-          <option value="Inactivo">Inactivo</option>
-        </select>
-        <div className="botones">
-          <button onClick={guardarEmpleado}>{modoEdicion ? "Actualizar" : "Agregar"}</button>
-          {modoEdicion && <button onClick={cancelarEdicion}>Cancelar</button>}
+      {token && (
+        <div className="formulario-empleado">
+          <input name="nombre_completo" value={form.nombre_completo} onChange={handleChange} placeholder="Nombre completo" />
+          <input name="dni" value={form.dni} onChange={handleChange} placeholder="DNI" />
+          <input name="correo" value={form.correo} onChange={handleChange} placeholder="Correo" />
+          <input name="area" value={form.area} onChange={handleChange} placeholder="Área" />
+          <input name="cargo" value={form.cargo} onChange={handleChange} placeholder="Cargo" />
+          <select name="estado" value={form.estado} onChange={handleChange}>
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+          </select>
+          <div className="botones">
+            <button onClick={guardarEmpleado}>{modoEdicion ? "Actualizar" : "Agregar"}</button>
+            {modoEdicion && <button onClick={cancelarEdicion}>Cancelar</button>}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Buscador */}
       <div className="busqueda-empleados">
         <input
           type="text"
@@ -142,7 +155,7 @@ const Empleados = () => {
             <th>Área</th>
             <th>Cargo</th>
             <th>Estado</th>
-            <th>Acciones</th>
+            {token && <th>Acciones</th>}
           </tr>
         </thead>
         <tbody>
@@ -155,16 +168,17 @@ const Empleados = () => {
               <td>{empleado.area}</td>
               <td>{empleado.cargo}</td>
               <td>{empleado.estado}</td>
-              <td>
-                <button onClick={() => handleEditar(empleado)}>Editar</button>
-                <button onClick={() => confirmarEliminacion(empleado)}>Eliminar</button>
-              </td>
+              {token && (
+                <td>
+                  <button onClick={() => handleEditar(empleado)}>Editar</button>
+                  <button onClick={() => confirmarEliminacion(empleado)}>Eliminar</button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
       </table>
 
-      {/* Modal de confirmación */}
       {mostrarConfirmacion && (
         <div className="modal-confirmacion">
           <div className="modal-contenido">

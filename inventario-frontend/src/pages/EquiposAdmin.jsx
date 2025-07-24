@@ -1,4 +1,3 @@
-// src/pages/EquiposAdmin.jsx
 import { useEffect, useState } from "react";
 import axiosBackend from "../api/axios";
 

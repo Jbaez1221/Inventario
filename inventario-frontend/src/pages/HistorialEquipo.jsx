@@ -219,16 +219,20 @@ const HistorialEquipo = () => {
 
       {modalDevolverVisible && (
         <div className="modal-overlay">
-          <div className="modal">
-            <p>¿Deseas devolver este equipo?</p>
-            <label>Observaciones de devolución:</label>
+          <div className="modal-content">
+            <button className="modal-close-button" onClick={() => setModalDevolverVisible(false)}>&times;</button>
+            
+            <h4>Confirmar Devolución de Equipo</h4>
+            
+            <label>Observaciones de devolución (opcional):</label>
             <textarea
               value={devolucionObservaciones}
               onChange={(e) => setDevolucionObservaciones(e.target.value)}
-              placeholder="Ej: El equipo se devuelve en buen estado."
+              placeholder="Ej: El equipo se devuelve en buen estado, con cargador."
+              rows="3"
             />
             <div className="modal-actions">
-              <button className="btn-asignar" onClick={ejecutarDevolucion}>
+              <button className="btn-devolver-confirmar" onClick={ejecutarDevolucion}>
                 Sí, devolver y generar acta
               </button>
               <button

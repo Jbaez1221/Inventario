@@ -10,6 +10,7 @@ const Asignaciones = () => {
   const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
   const [dni, setDni] = useState("");
   const [observaciones, setObservaciones] = useState("");
+  const [busqueda, setBusqueda] = useState("");
 
   useEffect(() => {
     obtenerEquiposDisponibles();
@@ -32,14 +33,27 @@ const Asignaciones = () => {
   };
 
   const asignar = async () => {
-    if (!dni) return alert("Debe ingresar el DNI del empleado");
+    const dniTrimmed = dni.trim();
+    if (!dniTrimmed) return alert("Debe ingresar el DNI del empleado");
 
     try {
+      const empleadoResponse = await axiosBackend.get(`/empleados/por-dni/${dniTrimmed}`);
+      const empleado = empleadoResponse.data;
+      if (!empleado) {
+        alert("Error: No se encontró ningún empleado con el DNI proporcionado.");
+        return;
+      }
+
+      if (empleado.estado === 'Inactivo') {
+        alert("Error: El empleado no está activo y no se le puede asignar un equipo.");
+        return;
+      }
+
       const response = await axiosBackend.post(
         `/asignaciones/por-dni`,
         {
           equipo_id: equipoSeleccionado.id,
-          dni,
+          dni: dniTrimmed,
           observaciones,
         },
         {
@@ -47,7 +61,7 @@ const Asignaciones = () => {
         }
       );
 
-      const nombreArchivo = `Acta-Entrega-${equipoSeleccionado.id}.pdf`;
+      const nombreArchivo = `Acta-Entrega-${equipoSeleccionado.marca}-${equipoSeleccionado.serie}.pdf`;
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -64,14 +78,39 @@ const Asignaciones = () => {
 
     } catch (error) {
       console.error("Error en el proceso de asignación:", error);
-      alert("No se pudo completar la asignación. Verifique el DNI.");
+      const errorMsg = error.response?.data?.error || "No se pudo completar la asignación. Verifique los datos.";
+      alert(errorMsg);
     }
   };
+
+  const equiposFiltrados = equiposDisponibles.filter((equipo) => {
+    const busquedaLower = busqueda.toLowerCase().trim();
+    if (!busquedaLower) return true;
+
+    return (
+      equipo.tipo.toLowerCase().includes(busquedaLower) ||
+      equipo.marca.toLowerCase().includes(busquedaLower) ||
+      equipo.modelo.toLowerCase().includes(busquedaLower) ||
+      equipo.serie.toLowerCase().includes(busquedaLower) ||
+      equipo.ubicacion.toLowerCase().includes(busquedaLower)
+    );
+  });
 
   return (
     <div className="asignaciones-container">
       <h3>Equipos disponibles para asignar</h3>
       {mensaje && <div className="mensaje-exito">{mensaje}</div>}
+
+      <div className="busqueda-equipos" style={{ marginBottom: '20px' }}>
+        <input
+          type="text"
+          placeholder="Buscar por tipo, marca, modelo, serie..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+        />
+        <button onClick={() => setBusqueda("")}>Limpiar</button>
+      </div>
+
       <table className="tabla-asignaciones">
         <thead>
           <tr>
@@ -85,12 +124,14 @@ const Asignaciones = () => {
           </tr>
         </thead>
         <tbody>
-          {equiposDisponibles.length === 0 ? (
+          {equiposFiltrados.length === 0 ? (
             <tr>
-              <td colSpan="7">No hay equipos disponibles.</td>
+              <td colSpan="7">
+                {busqueda ? "No se encontraron equipos que coincidan con la búsqueda." : "No hay equipos disponibles."}
+              </td>
             </tr>
           ) : (
-            equiposDisponibles.map((equipo) => (
+            equiposFiltrados.map((equipo) => (
               <tr key={equipo.id}>
                 <td>{equipo.id}</td>
                 <td>{equipo.tipo}</td>
@@ -116,17 +157,24 @@ const Asignaciones = () => {
 
       {modalVisible && (
         <div className="modal-overlay">
-          <div className="modal">
-            <label>DNI:</label>
+          <div className="modal-content">
+            <button className="modal-close-button" onClick={() => setModalVisible(false)}>&times;</button>
+            
+            <h4>Asignar: {equipoSeleccionado.marca} {equipoSeleccionado.modelo} (S/N: {equipoSeleccionado.serie})</h4>
+            
+            <label>DNI del Empleado:</label>
             <input
               type="text"
               value={dni}
               onChange={(e) => setDni(e.target.value)}
+              placeholder="Ingrese el DNI"
             />
-            <label>Observaciones:</label>
-            <input
+            <label>Observaciones (opcional):</label>
+            <textarea
               value={observaciones}
               onChange={(e) => setObservaciones(e.target.value)}
+              placeholder="Ej: Se entrega con cargador y maletín."
+              rows="3"
             />
             <div className="modal-actions">
               <button className="btn-asignar" onClick={asignar}>

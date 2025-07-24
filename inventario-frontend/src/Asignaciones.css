@@ -71,61 +71,98 @@ h2, h3 {
   text-align: center;
 }
 
-/* MODAL mejorado */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
-  
- 
+  z-index: 1000;
 }
 
-.modal label {
-  display: block;
-  margin-bottom: 6px;
+.modal-content {
+  background-color: #1f1f1f;
+  padding: 30px 40px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+  border: 1px solid #333;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #e53935;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.modal-content h4 {
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: #fff;
   font-weight: 500;
-  color: #cccccc;
-  margin-right: 1.5em;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
 }
 
-.modal input,
-.modal textarea {
-  padding: 15px;
-  margin-bottom: 0px;
-  border-radius: 6px;
-  border: 1px solid #ffffff;
-  background-color: #ffffff;
-  color: #000000;
-  margin-right: 1.5em;
-  
+.modal-content label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #ccc;
+  text-align: left;
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  background-color: #2c2c2c;
+  border: 1px solid #444;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  box-sizing: border-box;
 }
 
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
   margin-top: 10px;
-  
+}
+
+.modal-actions .btn-asignar,
+.modal-actions .btn-cancelar {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .modal-actions .btn-asignar {
   background-color: #007bff;
-  color: #ffffff;
-  padding: 8px 18px;
-  border-radius: 4px;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  display:block;
-  
-  
+  color: #fff;
 }
 
 .modal-actions .btn-asignar:hover {
@@ -133,22 +170,12 @@ h2, h3 {
 }
 
 .modal-actions .btn-cancelar {
-  background-color: #fd7804;
-  color: #ffffff;
-  padding: 8px 18px;
-  border-radius: 4px;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
+  background-color: #6c757d;
+  color: #fff;
 }
 
 .modal-actions .btn-cancelar:hover {
-  background-color: #ce6203;
-  
-}
-
-.modal-actions button:not(:last-child) {
-  margin-right: 0.5em;
+  background-color: #5a6268;
 }
 
 .busqueda-empleados {

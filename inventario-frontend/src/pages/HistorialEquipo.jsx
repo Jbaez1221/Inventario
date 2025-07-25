@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axiosBackend from "../api/axios";
-import "../HistorialEquipo.css";
 import { useAuth } from "../hooks/useAuth";
 
 const HistorialEquipo = () => {
@@ -147,55 +146,57 @@ const HistorialEquipo = () => {
         }}>Limpiar</button>
       </div>
 
-      <table className="tabla-asignaciones">
-        <thead>
-          <tr>
-            <th>Empleado</th>
-            <th>Área</th>
-            <th>Serie</th>
-            <th>Tipo</th>
-            <th>Fecha entrega</th>
-            <th>Fecha devolución</th>
-            <th>Observaciones</th>
-            {token && <th>Acción</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {asignacionesFiltradas.length === 0 ? (
+      <div className="tabla-container">
+        <table className="tabla-datos">
+          <thead>
             <tr>
-              <td colSpan="8">No hay asignaciones que coincidan con los filtros.</td>
+              <th>Empleado</th>
+              <th>Área</th>
+              <th>Serie</th>
+              <th>Tipo</th>
+              <th>Fecha entrega</th>
+              <th>Fecha devolución</th>
+              <th>Observaciones</th>
+              {token && <th>Acción</th>}
             </tr>
-          ) : (
-            currentItems.map((a) => (
-              <tr key={a.id}>
-                <td>{a.empleado}</td>
-                <td>{a.empleado_area || "—"}</td>
-                <td>{a.equipo_serie}</td>
-                <td>{a.equipo_tipo}</td>
-                <td>{formatearFecha(a.fecha_entrega)}</td>
-                <td>
-                  {a.fecha_devolucion
-                    ? formatearFecha(a.fecha_devolucion)
-                    : "—"}
-                </td>
-                <td>{a.observaciones || "—"}</td>
-                {token && (
-                  <td>
-                    {!a.fecha_devolucion && (
-                      <button
-                        onClick={() => confirmarDevolucion(a.id)}
-                        className="btn-devolver"
-                      >
-                        Devolver
-                      </button>
-                    )}
-                  </td>
-                )}
+          </thead>
+          <tbody>
+            {asignacionesFiltradas.length === 0 ? (
+              <tr>
+                <td colSpan="8">No hay asignaciones que coincidan con los filtros.</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              currentItems.map((a) => (
+                <tr key={a.id}>
+                  <td>{a.empleado}</td>
+                  <td>{a.empleado_area || "—"}</td>
+                  <td>{a.equipo_serie}</td>
+                  <td>{a.equipo_tipo}</td>
+                  <td>{formatearFecha(a.fecha_entrega)}</td>
+                  <td>
+                    {a.fecha_devolucion
+                      ? formatearFecha(a.fecha_devolucion)
+                      : "—"}
+                  </td>
+                  <td>{a.observaciones || "—"}</td>
+                  {token && (
+                    <td>
+                      {!a.fecha_devolucion && (
+                        <button
+                          onClick={() => confirmarDevolucion(a.id)}
+                          className="btn-devolver"
+                        >
+                          Devolver
+                        </button>
+                      )}
+                    </td>
+                  )}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {totalPages > 1 && (
         <div className="pagination">

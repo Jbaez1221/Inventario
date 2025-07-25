@@ -8,34 +8,6 @@ body {
   color: white;
 }
 
-nav {
-  background-color: #121212;
-  padding: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-nav .logo {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-nav .links a {
-  color: white;
-  text-decoration: none;
-  margin: 0 10px;
-  padding: 6px 12px;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
-}
-
-nav .links a:hover,
-nav .links .active {
-  background-color: #333;
-}
-
 .container {
   padding: 24px;
 }

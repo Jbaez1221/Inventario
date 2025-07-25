@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axiosBackend from "../api/axios";
 import {
   FaLaptop,
@@ -19,103 +19,46 @@ import {
   Title,
 } from "chart.js";
 
-import "../Dashboard.css";
-
-// Registrar componentes de Chart.js
 ChartJS.register(
-  ArcElement,
-  Tooltip,
-  Legend,
   CategoryScale,
   LinearScale,
   BarElement,
-  Title
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
 );
 
 const Dashboard = () => {
-  const [estadisticas, setEstadisticas] = useState({
-    totalEquipos: 0,
-    disponibles: 0,
-    asignados: 0,
-    empleados: 0,
-    asignacionesActivas: 0,
-  });
+  const [estadisticas, setEstadisticas] = useState(null);
 
-  const [asignacionesPorMes, setAsignacionesPorMes] = useState([]);
-  const [equiposPorSede, setEquiposPorSede] = useState({});
-  const [equiposPorTipo, setEquiposPorTipo] = useState({});
-  const [fechaInicio, setFechaInicio] = useState("");
-  const [fechaFin, setFechaFin] = useState("");
+  const cargarEstadisticas = useCallback(async () => {
+    try {
+      const res = await axiosBackend.get("/dashboard/estadisticas");
+      setEstadisticas(res.data);
+    } catch (error) {
+      console.error("Error al cargar estadísticas:", error);
+    }
+  }, []);
 
   useEffect(() => {
     cargarEstadisticas();
-  }, [fechaInicio, fechaFin]);
+  }, [cargarEstadisticas]);
 
-  const contarPorCampo = (lista, campo) => {
-    const conteo = {};
-    lista.forEach((item) => {
-      const clave = item[campo] || "Sin especificar";
-      conteo[clave] = (conteo[clave] || 0) + 1;
-    });
-    return conteo;
-  };
+  if (!estadisticas) {
+    return <div>Cargando estadísticas...</div>;
+  }
 
-  const dentroDelRango = (fecha) => {
-    if (!fechaInicio && !fechaFin) return true;
-    const f = new Date(fecha);
-    const inicio = fechaInicio ? new Date(fechaInicio) : null;
-    const fin = fechaFin ? new Date(fechaFin) : null;
-    if (inicio && f < inicio) return false;
-    if (fin && f > fin) return false;
-    return true;
-  };
-
-  const cargarEstadisticas = async () => {
-    try {
-      const [resEquipos, resEmpleados, resAsignaciones] = await Promise.all([
-        axiosBackend.get("/equipos"),
-        axiosBackend.get("/empleados"),
-        axiosBackend.get("/asignaciones"),
-      ]);
-
-      const equipos = resEquipos.data;
-      const asignaciones = resAsignaciones.data;
-
-      const totalEquipos = equipos.length;
-      const disponibles = equipos.filter((e) => e.estado === "Disponible").length;
-      const asignados = totalEquipos - disponibles;
-      const empleados = resEmpleados.data.length;
-      const asignacionesActivas = asignaciones.filter((a) => !a.fecha_devolucion).length;
-
-      const asignacionesFiltradas = asignaciones.filter((a) =>
-        dentroDelRango(a.fecha_entrega)
-      );
-      const equiposFiltrados = equipos.filter((e) =>
-        dentroDelRango(e.fecha_ingreso)
-      );
-
-      const asignacionesMes = Array(12).fill(0);
-      asignacionesFiltradas.forEach((a) => {
-        const fecha = new Date(a.fecha_entrega);
-        const mes = fecha.getMonth();
-        asignacionesMes[mes]++;
-      });
-
-      setEstadisticas({
-        totalEquipos,
-        disponibles,
-        asignados,
-        empleados,
-        asignacionesActivas,
-      });
-
-      setAsignacionesPorMes(asignacionesMes);
-      setEquiposPorSede(contarPorCampo(equiposFiltrados, "ubicacion"));
-      setEquiposPorTipo(contarPorCampo(equiposFiltrados, "tipo"));
-    } catch (error) {
-      console.error("Error cargando estadísticas:", error);
-    }
-  };
+  const {
+    totalEquipos,
+    disponibles,
+    asignados,
+    empleados,
+    asignacionesActivas,
+    asignacionesPorMes,
+    equiposPorSede,
+    equiposPorTipo,
+  } = estadisticas;
 
   const opcionesGenerales = {
     responsive: true,
@@ -140,7 +83,7 @@ const Dashboard = () => {
     labels: ["Disponibles", "Asignados"],
     datasets: [
       {
-        data: [estadisticas.disponibles, estadisticas.asignados],
+        data: [disponibles, asignados],
         backgroundColor: ["#10B981", "#F59E0B"],
         borderColor: "#1f1f1f",
         borderWidth: 5,
@@ -191,32 +134,21 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <h1 className="dashboard-title">Dashboard</h1>
 
-      <div className="filtro-fechas">
-        <label>
-          Fecha Inicio:
-          <input type="date" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} />
-        </label>
-        <label>
-          Fecha Fin:
-          <input type="date" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} />
-        </label>
-      </div>
-
       <div className="tarjetas-grid">
-        <Card titulo="Total Equipos" valor={estadisticas.totalEquipos} icon={<FaLaptop />} />
-        <Card titulo="Disponibles" valor={estadisticas.disponibles} icon={<FaCheckCircle />} />
-        <Card titulo="Asignados" valor={estadisticas.asignados} icon={<FaClipboardList />} />
-        <Card titulo="Empleados" valor={estadisticas.empleados} icon={<FaUsers />} />
-        <Card titulo="Asignaciones Activas" valor={estadisticas.asignacionesActivas} icon={<FaUserTie />} />
+        <Card titulo="Total Equipos" valor={totalEquipos} icon={<FaLaptop />} />
+        <Card titulo="Disponibles" valor={disponibles} icon={<FaCheckCircle />} />
+        <Card titulo="Asignados" valor={asignados} icon={<FaClipboardList />} />
+        <Card titulo="Empleados" valor={empleados} icon={<FaUsers />} />
+        <Card titulo="Asignaciones Activas" valor={asignacionesActivas} icon={<FaUserTie />} />
       </div>
 
       <div className="chart-grid">
         <div className="chart-box">
-  <h2 className="chart-title">Distribución de Equipos</h2>
-  <div className="doughnut-container">
-    <Doughnut data={dataDoughnut} />
-  </div>
-</div>
+          <h2 className="chart-title">Distribución de Equipos</h2>
+          <div className="doughnut-container">
+            <Doughnut data={dataDoughnut} />
+          </div>
+        </div>
         <div className="chart-box">
           <h2 className="chart-title">Asignaciones por Mes</h2>
           <Bar data={dataBarMeses} options={opcionesGenerales} />

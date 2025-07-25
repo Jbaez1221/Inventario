@@ -122,7 +122,7 @@ const Empleados = () => {
       <h2>Empleados</h2>
 
       {token && (
-        <div className="formulario-empleado">
+        <div className="formulario">
           <input name="nombre_completo" value={form.nombre_completo} onChange={handleChange} placeholder="Nombre completo" />
           <input name="dni" value={form.dni} onChange={handleChange} placeholder="DNI" />
           <input name="correo" value={form.correo} onChange={handleChange} placeholder="Correo" />
@@ -150,49 +150,53 @@ const Empleados = () => {
         <button className="btn-buscar" onClick={() => setBusqueda("")}>Limpiar</button>
       </div>
 
-      <table className="tabla-empleados">
-        <thead>
-          <tr>
-            <th>N°</th>
-            <th>Nombre</th>
-            <th>DNI</th>
-            <th>Correo</th>
-            <th>Celular</th>
-            <th>Área</th>
-            <th>Cargo</th>
-            <th>Estado</th>
-            {token && <th>Acciones</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {empleadosFiltrados.map((empleado, index) => (
-            <tr key={empleado.id}>
-              <td>{index + 1}</td>
-              <td>{empleado.nombre_completo}</td>
-              <td>{empleado.dni}</td>
-              <td>{empleado.correo}</td>
-              <td>{empleado.celular || '—'}</td>
-              <td>{empleado.area}</td>
-              <td>{empleado.cargo}</td>
-              <td>{empleado.estado}</td>
-              {token && (
-                <td>
-                  <button onClick={() => handleEditar(empleado)}>Editar</button>
-                  <button onClick={() => confirmarEliminacion(empleado)}>Eliminar</button>
-                </td>
-              )}
+      <div className="tabla-container">
+        <table className="tabla-datos">
+          <thead>
+            <tr>
+              <th>N°</th>
+              <th>Nombre</th>
+              <th>DNI</th>
+              <th>Correo</th>
+              <th>Celular</th>
+              <th>Área</th>
+              <th>Cargo</th>
+              <th>Estado</th>
+              {token && <th>Acciones</th>}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {empleadosFiltrados.map((empleado, index) => (
+              <tr key={empleado.id}>
+                <td>{index + 1}</td>
+                <td>{empleado.nombre_completo}</td>
+                <td>{empleado.dni}</td>
+                <td>{empleado.correo}</td>
+                <td>{empleado.celular || '—'}</td>
+                <td>{empleado.area}</td>
+                <td>{empleado.cargo}</td>
+                <td>{empleado.estado}</td>
+                {token && (
+                  <td>
+                    <button onClick={() => handleEditar(empleado)}>Editar</button>
+                    <button onClick={() => confirmarEliminacion(empleado)}>Eliminar</button>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {mostrarConfirmacion && (
-        <div className="modal-confirmacion">
-          <div className="modal-contenido">
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <button className="modal-close-button" onClick={() => setMostrarConfirmacion(false)}>&times;</button>
+            <h4>Confirmar Eliminación</h4>
             <p>¿Estás seguro de eliminar a <strong>{empleadoAEliminar?.nombre_completo}</strong>?</p>
-            <div className="modal-acciones">
-              <button onClick={eliminarEmpleado} className="btn-rojo">Sí, eliminar</button>
-              <button onClick={() => setMostrarConfirmacion(false)} className="btn-gris">Cancelar</button>
+            <div className="modal-actions">
+              <button onClick={() => setMostrarConfirmacion(false)}>Cancelar</button>
+              <button onClick={eliminarEmpleado} style={{ backgroundColor: '#d32f2f', color: 'white' }}>Sí, eliminar</button>
             </div>
           </div>
         </div>

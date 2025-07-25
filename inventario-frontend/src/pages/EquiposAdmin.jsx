@@ -23,7 +23,7 @@ const EquiposAdmin = () => {
       setTipo("");
       setSerie("");
       obtenerEquipos();
-    } catch{
+    } catch {
       alert("Error al agregar equipo");
     }
   };
@@ -34,73 +34,64 @@ const EquiposAdmin = () => {
     try {
       await axiosBackend.delete(`/equipos/${id}`);
       obtenerEquipos();
-    } catch{
+    } catch {
       alert("No se pudo eliminar");
     }
   };
 
   return (
-    <div className="p-4 text-white">
-      <h2 className="text-2xl font-bold mb-4">Gestión de Equipos</h2>
+    <div>
+      <h2>Gestión de Equipos (Admin)</h2>
 
-      <div className="mb-6 flex flex-wrap gap-2 items-end">
-        <div>
-          <label className="block">Tipo:</label>
-          <input
-            type="text"
-            value={tipo}
-            onChange={(e) => setTipo(e.target.value)}
-            className="p-2 border rounded text-black"
-            placeholder="Laptop, Celular..."
-          />
+      <div className="formulario" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))' }}>
+        <input
+          type="text"
+          value={tipo}
+          onChange={(e) => setTipo(e.target.value)}
+          placeholder="Laptop, Celular..."
+        />
+        <input
+          type="text"
+          value={serie}
+          onChange={(e) => setSerie(e.target.value)}
+          placeholder="N° de serie"
+        />
+        <div className="botones">
+          <button onClick={registrarEquipo}>Agregar</button>
         </div>
-        <div>
-          <label className="block">Serie:</label>
-          <input
-            type="text"
-            value={serie}
-            onChange={(e) => setSerie(e.target.value)}
-            className="p-2 border rounded text-black"
-            placeholder="N° de serie"
-          />
-        </div>
-        <button
-          className="bg-green-600 px-4 py-2 rounded text-white hover:bg-green-700"
-          onClick={registrarEquipo}
-        >
-          Agregar
-        </button>
       </div>
 
-      <table className="w-full table-auto border border-gray-600">
-        <thead>
-          <tr className="bg-gray-800">
-            <th className="p-2">ID</th>
-            <th className="p-2">Tipo</th>
-            <th className="p-2">Serie</th>
-            <th className="p-2">Estado</th>
-            <th className="p-2">Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          {equipos.map((eq) => (
-            <tr key={eq.id} className="text-center border-t border-gray-700">
-              <td>{eq.id}</td>
-              <td>{eq.tipo}</td>
-              <td>{eq.serie}</td>
-              <td>{eq.estado}</td>
-              <td>
-                <button
-                  className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                  onClick={() => eliminarEquipo(eq.id)}
-                >
-                  Eliminar
-                </button>
-              </td>
+      <div className="tabla-container">
+        <table className="tabla-datos">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tipo</th>
+              <th>Serie</th>
+              <th>Estado</th>
+              <th>Acción</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {equipos.map((eq) => (
+              <tr key={eq.id}>
+                <td>{eq.id}</td>
+                <td>{eq.tipo}</td>
+                <td>{eq.serie}</td>
+                <td>{eq.estado}</td>
+                <td>
+                  <button
+                    style={{ backgroundColor: '#d32f2f', color: 'white' }}
+                    onClick={() => eliminarEquipo(eq.id)}
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

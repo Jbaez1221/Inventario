@@ -97,94 +97,91 @@ const Asignaciones = () => {
   });
 
   return (
-    <div className="asignaciones-container">
-      <h3>Equipos disponibles para asignar</h3>
+    <div>
+      <h2>Equipos disponibles para asignar</h2>
       {mensaje && <div className="mensaje-exito">{mensaje}</div>}
 
-      <div className="busqueda-equipos" style={{ marginBottom: '20px' }}>
+      <div className="filtros-container">
         <input
           type="text"
           placeholder="Buscar por tipo, marca, modelo, serie..."
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
+          style={{ flexGrow: 1 }}
         />
         <button onClick={() => setBusqueda("")}>Limpiar</button>
       </div>
 
-      <table className="tabla-asignaciones">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Tipo</th>
-            <th>Marca</th>
-            <th>Modelo</th>
-            <th>Serie</th>
-            <th>Ubicación</th>
-            {token && <th>Acción</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {equiposFiltrados.length === 0 ? (
+      <div className="tabla-container">
+        <table className="tabla-datos">
+          <thead>
             <tr>
-              <td colSpan="7">
-                {busqueda ? "No se encontraron equipos que coincidan con la búsqueda." : "No hay equipos disponibles."}
-              </td>
+              <th>ID</th>
+              <th>Tipo</th>
+              <th>Marca</th>
+              <th>Modelo</th>
+              <th>Serie</th>
+              <th>Ubicación</th>
+              {token && <th>Acción</th>}
             </tr>
-          ) : (
-            equiposFiltrados.map((equipo) => (
-              <tr key={equipo.id}>
-                <td>{equipo.id}</td>
-                <td>{equipo.tipo}</td>
-                <td>{equipo.marca}</td>
-                <td>{equipo.modelo}</td>
-                <td>{equipo.serie}</td>
-                <td>{equipo.ubicacion}</td>
-                {token && (
-                  <td>
-                    <button
-                      className="btn-asignar"
-                      onClick={() => abrirFormularioAsignacion(equipo)}
-                    >
-                      Asignar
-                    </button>
-                  </td>
-                )}
+          </thead>
+          <tbody>
+            {equiposFiltrados.length === 0 ? (
+              <tr>
+                <td colSpan={token ? "7" : "6"}>
+                  {busqueda ? "No se encontraron equipos." : "No hay equipos disponibles."}
+                </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              equiposFiltrados.map((equipo) => (
+                <tr key={equipo.id}>
+                  <td>{equipo.id}</td>
+                  <td>{equipo.tipo}</td>
+                  <td>{equipo.marca}</td>
+                  <td>{equipo.modelo}</td>
+                  <td>{equipo.serie}</td>
+                  <td>{equipo.ubicacion}</td>
+                  {token && (
+                    <td>
+                      <button onClick={() => abrirFormularioAsignacion(equipo)}>
+                        Asignar
+                      </button>
+                    </td>
+                  )}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {modalVisible && (
         <div className="modal-overlay">
           <div className="modal-content">
             <button className="modal-close-button" onClick={() => setModalVisible(false)}>&times;</button>
             
-            <h4>Asignar: {equipoSeleccionado.marca} {equipoSeleccionado.modelo} (S/N: {equipoSeleccionado.serie})</h4>
+            <h4>Asignar: {equipoSeleccionado.marca} {equipoSeleccionado.modelo}</h4>
             
-            <label>DNI del Empleado:</label>
-            <input
-              type="text"
-              value={dni}
-              onChange={(e) => setDni(e.target.value)}
-              placeholder="Ingrese el DNI"
-            />
-            <label>Observaciones (opcional):</label>
-            <textarea
-              value={observaciones}
-              onChange={(e) => setObservaciones(e.target.value)}
-              placeholder="Ej: Se entrega con cargador y maletín."
-              rows="3"
-            />
+            <div className="formulario" style={{ padding: 0, border: 'none', background: 'none' }}>
+              <input
+                type="text"
+                value={dni}
+                onChange={(e) => setDni(e.target.value)}
+                placeholder="DNI del Empleado"
+              />
+              <textarea
+                value={observaciones}
+                onChange={(e) => setObservaciones(e.target.value)}
+                placeholder="Observaciones (opcional)"
+                rows="3"
+                style={{ gridColumn: '1 / -1' }}
+              />
+            </div>
+
             <div className="modal-actions">
-              <button className="btn-asignar" onClick={asignar}>
+              <button onClick={() => setModalVisible(false)}>Cancelar</button>
+              <button onClick={asignar} style={{ backgroundColor: '#28a745', color: 'white' }}>
                 Asignar y Generar Acta
-              </button>
-              <button
-                className="btn-cancelar"
-                onClick={() => setModalVisible(false)}
-              >
-                Cancelar
               </button>
             </div>
           </div>

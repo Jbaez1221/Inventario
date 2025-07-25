@@ -160,7 +160,7 @@ const Equipos = () => {
     <div className="equipos-container">
       <h2>Equipos</h2>
       {token && (
-        <div className="formulario-equipo">
+        <div className="formulario">
           <input name="tipo" value={form.tipo} onChange={handleChange} placeholder="Tipo" />
           <input name="marca" value={form.marca} onChange={handleChange} placeholder="Marca" />
           <input name="modelo" value={form.modelo} onChange={handleChange} placeholder="Modelo" />
@@ -218,51 +218,53 @@ const Equipos = () => {
         <button onClick={() => setBusqueda("")}>Limpiar</button>
       </div>
 
-      <table className="tabla-equipos">
-        <thead>
-          <tr>
-            <th>N°</th>
-            <th>Imagen</th>
-            <th>Tipo</th>
-            <th>Marca</th>
-            <th>Modelo</th>
-            <th>Serie</th>
-            <th>Estado</th>
-            {token && <th>Acciones</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {currentItems.map((equipo, index) => (
-            <tr key={equipo.id}>
-              <td>{indexOfFirstItem + index + 1}</td>
-              <td>
-                {equipo.equipo_url ? (
-                  <img 
-                    src={`${API_URL}${equipo.equipo_url}`} 
-                    alt={equipo.tipo} 
-                    className="equipo-thumbnail"
-                    onClick={() => setModalImagenUrl(`${API_URL}${equipo.equipo_url}`)}
-                  />
-                ) : (
-                  <span className="no-image-placeholder">Sin foto</span>
-                )}
-              </td>
-              <td>{equipo.tipo}</td>
-              <td>{equipo.marca}</td>
-              <td>{equipo.modelo}</td>
-              <td>{equipo.serie}</td>
-              <td>{equipo.estado}</td>
-              {token && (
-                <td>
-                  <button onClick={() => iniciarEdicion(equipo)}>Editar</button>
-                  <button onClick={() => eliminarEquipo(equipo.id)}>Eliminar</button>
-                  <button onClick={() => verHistorial(equipo.id)}>Historial</button>
-                </td>
-              )}
+      <div className="tabla-container">
+        <table className="tabla-datos">
+          <thead>
+            <tr>
+              <th>N°</th>
+              <th>Imagen</th>
+              <th>Tipo</th>
+              <th>Marca</th>
+              <th>Modelo</th>
+              <th>Serie</th>
+              <th>Estado</th>
+              {token && <th>Acciones</th>}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {currentItems.map((equipo, index) => (
+              <tr key={equipo.id}>
+                <td>{indexOfFirstItem + index + 1}</td>
+                <td>
+                  {equipo.equipo_url ? (
+                    <img 
+                      src={`${API_URL}${equipo.equipo_url}`} 
+                      alt={equipo.tipo} 
+                      className="equipo-thumbnail"
+                      onClick={() => setModalImagenUrl(`${API_URL}${equipo.equipo_url}`)}
+                    />
+                  ) : (
+                    <span className="no-image-placeholder">Sin foto</span>
+                  )}
+                </td>
+                <td>{equipo.tipo}</td>
+                <td>{equipo.marca}</td>
+                <td>{equipo.modelo}</td>
+                <td>{equipo.serie}</td>
+                <td>{equipo.estado}</td>
+                {token && (
+                  <td>
+                    <button onClick={() => iniciarEdicion(equipo)}>Editar</button>
+                    <button onClick={() => eliminarEquipo(equipo.id)}>Eliminar</button>
+                    <button onClick={() => verHistorial(equipo.id)}>Historial</button>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {totalPages > 1 && (
         <div className="pagination">

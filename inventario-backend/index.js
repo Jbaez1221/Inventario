@@ -25,6 +25,10 @@ app.use("/api/asignaciones", asignacionesRoutes);
 const devolucionesRoutes = require('./routes/devoluciones.routes');
 app.use('/api/devoluciones', devolucionesRoutes);
 
+const solicitudesRoutes = require ('./routes/solicitudes.routes');
+app.use('/api/solicitudes', solicitudesRoutes);
+
+
 
 app.get("/", (req, res) => {
   res.send("API Inventario corriendo ✅");

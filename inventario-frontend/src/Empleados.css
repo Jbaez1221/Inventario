@@ -1,99 +1,102 @@
 .empleados-container {
   padding: 20px;
-  font-family: 'Segoe UI', sans-serif;
+  background-color: #121212;
   color: #fff;
+  font-family: sans-serif;
+
+  margin-left: 220px; /* igual al ancho del sidebar */
+  padding: 20px;
+  box-sizing: border-box;
+
 }
 
 .empleados-container h2 {
   text-align: center;
-  font-size: 26px;
   margin-bottom: 20px;
   color: #ffffff;
 }
 
+/* Formulario */
 .formulario-empleado {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 12px;
-  margin-bottom: 30px;
 }
 
 .formulario-empleado input,
 .formulario-empleado select {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-  background-color: #1a1a1a;
-  color: white;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background-color: #2a2a2a;
+  color: #fff;
 }
 
 .botones {
-  grid-column: span 2;
+  grid-column: 1 / -1;
   display: flex;
   gap: 10px;
-  margin-top: 10px;
 }
 
 .botones button {
-  padding: 10px 18px;
+  padding: 8px 16px;
   background-color: #007bff;
-  border: none;
-  border-radius: 5px;
   color: white;
-  font-weight: 500;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
 }
 
-.botones button:hover {
-  background-color: #0056b3;
+.botones button:nth-child(2) {
+  background-color: #dc3545;
 }
 
+/* Tabla */
 .tabla-empleados {
   width: 100%;
   border-collapse: collapse;
-  background-color: #242424;
+  background-color: #1c1c1c;
 }
 
 .tabla-empleados th,
 .tabla-empleados td {
-  border: 1px solid rgb(20, 19, 19);
+  border: 1px solid #333;
   padding: 10px;
   text-align: center;
 }
 
 .tabla-empleados th {
-  background-color: #000000;
-  color: #eee;
+  background-color: #2d2d2d;
+  color: #fff;
 }
 
-.tabla-empleados tr:nth-child(even) {
-  background-color: #101010;
+.tabla-empleados td {
+  color: #ddd;
 }
 
-.tabla-empleados tr:hover {
-  background-color: #000000;
-}
-
+/* Botones en tabla */
 .tabla-empleados td button {
+  margin: 2px;
   padding: 6px 10px;
-  margin: 0 4px;
   border: none;
   border-radius: 4px;
-  font-size: 13px;
   cursor: pointer;
+  color: white;
 }
 
 .tabla-empleados td button:first-child {
   background-color: #28a745;
-  color: white;
 }
 
 .tabla-empleados td button:last-child {
   background-color: #dc3545;
-  color: white;
 }
 
+/* Modal de Confirmación */
 .modal-confirmacion {
   position: fixed;
   top: 0;
@@ -108,7 +111,7 @@
 }
 
 .modal-contenido {
-  background-color: #222;
+  background-color: #1e1e1e;
   padding: 20px;
   border-radius: 8px;
   width: 320px;
@@ -116,10 +119,15 @@
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
 }
 
+.modal-contenido h3 {
+  margin-bottom: 12px;
+  text-align: center;
+}
+
 .modal-acciones {
-  margin-top: 16px;
   display: flex;
   justify-content: space-between;
+  margin-top: 16px;
 }
 
 .modal-acciones .btn-rojo {
@@ -127,7 +135,7 @@
   color: white;
   padding: 8px 16px;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
 }
 
@@ -136,7 +144,7 @@
   color: white;
   padding: 8px 16px;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
 }
 
@@ -147,5 +155,4 @@
 .modal-acciones .btn-gris:hover {
   background-color: #333;
 }
-
 

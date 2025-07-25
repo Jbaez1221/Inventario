@@ -1,0 +1,136 @@
+.solicitudes-container {
+  padding: 24px;
+  background-color: #121212;
+  color: #fff;
+  font-family: sans-serif;
+  min-height: 100vh;
+
+  margin-left: 220px; /* igual al ancho del sidebar */
+  padding: 20px;
+  box-sizing: border-box;
+
+}
+
+.solicitudes-container h2 {
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+  color: #fff;
+}
+
+/* Formulario */
+.solicitudes-form {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.solicitudes-form input,
+.solicitudes-form select,
+.solicitudes-form textarea {
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background-color: #2a2a2a;
+  color: #fff;
+  font-size: 14px;
+}
+
+.solicitudes-form textarea {
+  grid-column: span 2;
+  resize: vertical;
+  min-height: 70px;
+}
+
+.solicitudes-form button {
+  grid-column: span 2;
+  padding: 10px 16px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.solicitudes-form button:hover {
+  background-color: #0056b3;
+}
+
+/* Tabla de solicitudes */
+.solicitudes-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #1c1c1c;
+  margin-bottom: 30px;
+}
+
+.solicitudes-table th,
+.solicitudes-table td {
+  border: 1px solid #333;
+  padding: 10px;
+  text-align: center;
+}
+
+.solicitudes-table th {
+  background-color: #2d2d2d;
+  color: #fff;
+}
+
+.solicitudes-table td {
+  color: #ddd;
+}
+
+.solicitudes-table tbody tr:hover {
+  background-color: #2a2a2a;
+}
+
+/* Botones de acción */
+.btn-aprobar,
+.btn-rechazar {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  color: white;
+  transition: background-color 0.2s;
+}
+
+/* Botones acción */
+.btn-aprobar {
+  background-color: #16a34a;
+  color: white;
+  padding: 0.4rem 0.75rem;
+  border: none;
+  border-radius: 4px;
+  margin-right: 0.4rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-aprobar:hover {
+  background-color: #15803d;
+}
+
+.btn-rechazar {
+  background-color: #dc2626;
+  color: white;
+  padding: 0.4rem 0.75rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-rechazar:hover {
+  background-color: #b91c1c;
+}

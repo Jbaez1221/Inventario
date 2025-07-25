@@ -12,6 +12,8 @@ import Empleados from "./pages/Empleados";
 import Asignaciones from "./pages/asignaciones";
 import HistorialEquipo from "./pages/HistorialEquipo";
 import Dashboard from "./pages/dashboard";
+import SolicitudesEmpleado from "./pages/solicitudes";
+
 
 function App() {
   return (

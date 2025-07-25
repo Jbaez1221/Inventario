@@ -1,11 +1,26 @@
 .historial-container {
+  padding: 20px;
+  background-color: #121212;
+  color: #fff;
+  font-family: sans-serif;
   max-width: 1400px;
-  margin: 2rem auto;
-  padding: 0 2rem;
+  margin-left: 220px; /* igual al ancho del sidebar */
+  padding: 20px;
+  box-sizing: border-box;
+
+
 }
 
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+/* Filtros */
 .filtros-historial {
   display: flex;
+  flex-wrap: wrap;
   gap: 15px;
   margin-bottom: 24px;
   align-items: center;
@@ -13,23 +28,12 @@
 
 .filtros-historial input[type="text"],
 .filtros-historial input[type="date"] {
-  background-color: #2c2c2c;
+  background-color: #2a2a2a;
   border: 1px solid #444;
-  color: #ffffff;
+  color: #fff;
   padding: 10px;
-  border-radius: 5px;
-  font-family: inherit;
+  border-radius: 4px;
   font-size: 14px;
-}
-
-.filtros-historial input[type="text"] {
-  flex-grow: 1;
-  max-width: 300px;
-}
-
-/* Estiliza el icono del calendario en navegadores compatibles */
-.filtros-historial input[type="date"] {
-  color-scheme: dark;
 }
 
 .filtros-historial input::placeholder {
@@ -38,19 +42,45 @@
 
 .filtros-historial button {
   padding: 10px 20px;
-  background-color: #00d0ff;
+  background-color: #007bff;
   color: #ffffff;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
   transition: background-color 0.2s;
 }
 
 .filtros-historial button:hover {
-  background-color: #ff0000;
+  background-color: #0056b3;
 }
 
+/* Tabla (reutiliza la clase de equipos si deseas) */
+.tabla-historial {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #1c1c1c;
+  margin-top: 20px;
+}
+
+.tabla-historial th,
+.tabla-historial td {
+  border: 1px solid #333;
+  padding: 10px;
+  text-align: center;
+  color: #ddd;
+}
+
+.tabla-historial th {
+  background-color: #2d2d2d;
+  color: #fff;
+}
+
+.tabla-historial tr:hover {
+  background-color: #2a2a2a;
+}
+
+/* Paginación */
 .pagination {
   display: flex;
   justify-content: center;
@@ -61,10 +91,10 @@
 
 .pagination button {
   padding: 8px 16px;
-  background-color: #2c2c2c;
-  color: #888;
+  background-color: #2a2a2a;
+  color: #ccc;
   border: 1px solid #444;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
 }
@@ -75,18 +105,18 @@
 }
 
 .pagination button.active {
-  background-color: #4a4a4a;
-  border-color: #555;
-  color: #ffffff;
+  background-color: #007bff;
+  border-color: #0056b3;
+  color: #fff;
   font-weight: bold;
 }
 
 .pagination button:disabled {
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
-
+/* Modal de devolución */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -101,14 +131,15 @@
 }
 
 .modal-content {
-  background-color: #1f1f1f;
+  background-color: #1e1e1e;
   padding: 30px 40px;
-  border-radius: 12px;
-  width: 100%;
+  border-radius: 8px;
+  width: 90%;
   max-width: 500px;
-  position: relative;
   border: 1px solid #333;
   box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  color: #fff;
+  position: relative;
 }
 
 .modal-close-button {
@@ -126,16 +157,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  line-height: 1;
 }
 
 .modal-content h4 {
   margin-top: 0;
-  margin-bottom: 24px;
-  color: #fff;
-  font-weight: 500;
+  margin-bottom: 20px;
   border-bottom: 1px solid #444;
   padding-bottom: 10px;
+  text-align: center;
 }
 
 .modal-content label {
@@ -150,44 +179,40 @@
   width: 100%;
   padding: 12px;
   margin-bottom: 20px;
-  background-color: #2c2c2c;
+  background-color: #2a2a2a;
   border: 1px solid #444;
-  border-radius: 8px;
+  border-radius: 4px;
   color: #fff;
   font-size: 1rem;
-  box-sizing: border-box;
   resize: vertical;
 }
 
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-.modal-actions .btn-devolver-confirmar,
-.modal-actions .btn-cancelar {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  gap: 10px;
 }
 
 .modal-actions .btn-devolver-confirmar {
-  background-color: #e53935;
+  background-color: #dc3545;
   color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .modal-actions .btn-devolver-confirmar:hover {
-  background-color: #c62828;
+  background-color: #c82333;
 }
 
 .modal-actions .btn-cancelar {
   background-color: #6c757d;
   color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .modal-actions .btn-cancelar:hover {

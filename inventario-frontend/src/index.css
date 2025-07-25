@@ -1,0 +1,5 @@
+.main-content {
+  margin-left: 220px; /* igual al ancho del sidebar */
+  padding: 20px;
+  box-sizing: border-box;
+}

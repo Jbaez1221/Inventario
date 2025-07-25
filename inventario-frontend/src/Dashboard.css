@@ -1,47 +1,64 @@
-.doughnut-container {
-  max-width: 100%;
-  width: 100%;
-  height: 400px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .dashboard-container {
-  padding: 20px;
+  padding: 24px;
   background-color: #121212;
-  color: white;
-  min-height: 100vh;
+  color: #fff;
   font-family: sans-serif;
+  min-height: 100vh;
+
+  margin-left: 220px; /* igual al ancho del sidebar */
+  padding: 20px;
+  box-sizing: border-box;
+
 }
 
 .dashboard-title {
-  font-size: 32px;
+  text-align: center;
+  font-size: 28px;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  color: #ffffff;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
 }
 
+/* Filtro de fechas */
 .filtro-fechas {
-  margin-bottom: 30px;
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 16px;
   align-items: center;
+  margin-bottom: 30px;
 }
 
 .filtro-fechas label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 14px;
+  color: #ccc;
 }
 
 .filtro-fechas input[type="date"] {
-  margin-left: 10px;
-  padding: 6px 10px;
-  background-color: #1f1f1f;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: #2a2a2a;
   color: white;
-  border: 1px solid #555;
-  border-radius: 5px;
+  border: 1px solid #444;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.filtro-fechas input[type="date"]:hover {
+  border-color: #777;
+}
+
+.filtro-fechas input[type="date"]:focus {
+  border-color: #00d0ff;
+  box-shadow: 0 0 5px rgba(0, 208, 255, 0.4);
+}
+
+/* Tarjetas resumen */
 .tarjetas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -52,15 +69,13 @@
 .card {
   background-color: #1f1f1f;
   padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.05);
-  transition: transform 0.3s ease;
-  color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease-in-out;
 }
 
 .card:hover {
-  transform: scale(1.05);
-  color: #ffbb00;
+  transform: scale(1.03);
 }
 
 .card-header {
@@ -71,64 +86,43 @@
 }
 
 .card-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #ffbb00;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ccc;
 }
 
 .card-value {
   font-size: 28px;
   font-weight: bold;
-  color: #ffbb00;
+  color: #00d0ff;
 }
 
+/* Gráficos */
 .chart-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 30px;
 }
 
 .chart-box {
-  background-color: #16182553;
-  padding: 20px;
+  background-color: #1e1e1e;
   border-radius: 12px;
-  box-shadow: 0 0 10px rgb(0, 0, 0);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.05);
 }
 
 .chart-title {
-  font-size: 20px;
-  font-weight: 600;
   text-align: center;
+  font-size: 18px;
+  font-weight: 600;
   margin-bottom: 10px;
   color: #eee;
 }
 
-
-
-.filtro-fechas input[type="date"] {
-  margin-left: 10px;
-  padding: 8px 12px;
-  background-color: #fffff8;
-  color: #000000;
-  border: 1px solid #ffb405;
-  border-radius: 6px;
-  outline: none;
-  font-size: 14px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.filtro-fechas input[type="date"]:hover {
-  border-color: #ffbf00;
-}
-
-.filtro-fechas input[type="date"]:focus {
-  border-color: #ff0000;
-  box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
-}
-.filtro-fechas label {
+/* Contenedor del gráfico doughnut */
+.doughnut-container {
+  width: 100%;
+  height: 380px;
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 10px;
-  font-size: 14px;
 }
-

@@ -3,6 +3,11 @@
   background-color: #121212;
   color: #fff;
   font-family: sans-serif;
+
+  margin-left: 220px; /* igual al ancho del sidebar */
+  padding: 20px;
+  box-sizing: border-box;
+
 }
 
 h2 {

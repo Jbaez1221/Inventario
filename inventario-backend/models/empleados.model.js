@@ -6,26 +6,39 @@ const obtenerEmpleados = async () => {
 };
 
 const crearEmpleado = async (empleado) => {
-  const { nombre_completo, dni, correo, area, cargo, estado, celular } = empleado;
+  const { 
+    nombres, apellidos, dni, correo_institucional, correo_personal, 
+    area, puesto, estado, telefono_coorporativo, telefono_personal, sede 
+  } = empleado;
 
   const result = await db.query(
     `INSERT INTO empleados 
-     (nombre_completo, dni, correo, area, cargo, estado, celular) 
-     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-    [nombre_completo, dni, correo, area, cargo, estado || 'Activo', celular]
+     (nombres, apellidos, dni, correo_institucional, correo_personal, area, puesto, estado, telefono_coorporativo, telefono_personal, sede) 
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+    [
+      nombres, apellidos, dni, correo_institucional, correo_personal, 
+      area, puesto, estado || 'Activo', telefono_coorporativo, telefono_personal, sede
+    ]
   );
 
   return result.rows[0];
 };
 
 const actualizarEmpleado = async (id, empleado) => {
-  const { nombre_completo, dni, correo, area, cargo, estado, celular } = empleado;
+  const { 
+    nombres, apellidos, dni, correo_institucional, correo_personal, 
+    area, puesto, estado, telefono_coorporativo, telefono_personal, sede 
+  } = empleado;
 
   const result = await db.query(
     `UPDATE empleados 
-     SET nombre_completo = $1, dni = $2, correo = $3, area = $4, cargo = $5, estado = $6, celular = $7 
-     WHERE id = $8 RETURNING *`,
-    [nombre_completo, dni, correo, area, cargo, estado, celular, id]
+     SET nombres = $1, apellidos = $2, dni = $3, correo_institucional = $4, correo_personal = $5, 
+         area = $6, puesto = $7, estado = $8, telefono_coorporativo = $9, telefono_personal = $10, sede = $11 
+     WHERE id = $12 RETURNING *`,
+    [
+      nombres, apellidos, dni, correo_institucional, correo_personal, 
+      area, puesto, estado, telefono_coorporativo, telefono_personal, sede, id
+    ]
   );
 
   return result.rows[0];

@@ -632,15 +632,28 @@ h2 {
   }
 
   .sidebar .sidebar-toggle {
-    display: none; /* Ocultar el toggle del sidebar de escritorio */
+    display: none;
   }
 }
 
-/* Móviles pequeños (hasta 480px) */
 @media (max-width: 480px) {
   .tarjetas-grid {
-    grid-template-columns: 1fr; /* 1 tarjeta por fila */
+    grid-template-columns: 1fr;
   }
+}
+
+.tabla-datos .celda-observaciones {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: help;
+}
+
+.tabla-modal-container {
+  overflow-x: auto;
+  width: 100%;
+  margin-bottom: 1rem;
 }
 
 

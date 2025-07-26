@@ -4,6 +4,7 @@ import Equipos from "../pages/Equipos";
 import Asignaciones from "../pages/asignaciones"; // 👈 importar
 import HistorialEquipo from "../pages/HistorialEquipo";
 import EquiposAdmin from "./pages/EquiposAdmin";
+import Solicitudes from "../pages/solicitudes";
 
 const AppRoutes = () => (
   <BrowserRouter>
@@ -12,6 +13,7 @@ const AppRoutes = () => (
       <Route path="/asignaciones" element={<Asignaciones />} /> {/* 👈 ruta */}
       <Route path="/historial/:equipo_id" element={<HistorialEquipo />} />
       <Route path="/equipos-admin" element={<EquiposAdmin />} />
+      <Route path="/solicitudes" element={<Solicitudes />} />
     </Routes>
   </BrowserRouter>
 );

@@ -6,15 +6,22 @@ import { FaPencilAlt, FaTrash } from "react-icons/fa";
 const Empleados = () => {
   const { token } = useAuth();
   const [empleados, setEmpleados] = useState([]);
-  const [form, setForm] = useState({
-    nombre_completo: "",
+  
+  const formInicial = {
+    nombres: "",
+    apellidos: "",
     dni: "",
-    correo: "",
+    correo_institucional: "",
+    correo_personal: "",
     area: "",
-    cargo: "",
+    puesto: "",
     estado: "Activo",
-    celular: ""
-  });
+    telefono_coorporativo: "",
+    telefono_personal: "",
+    sede: "",
+  };
+  const [form, setForm] = useState(formInicial);
+
   const [modoEdicion, setModoEdicion] = useState(false);
   const [empleadoEditandoId, setEmpleadoEditandoId] = useState(null);
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
@@ -39,10 +46,13 @@ const Empleados = () => {
   };
 
   const guardarEmpleado = async () => {
-    const camposRequeridos = ['nombre_completo', 'dni', 'correo', 'area', 'cargo'];
+    const camposRequeridos = [
+      'nombres', 'apellidos', 'dni', 'correo_personal', 
+      'area', 'puesto', 'telefono_coorporativo', 'telefono_personal', 'sede'
+    ];
     for (const campo of camposRequeridos) {
-      if (!form[campo].trim()) {
-        alert(`El campo ${campo.replace('_', ' ')} es obligatorio.`);
+      if (!form[campo] || !form[campo].trim()) {
+        alert(`El campo ${campo.replace(/_/g, ' ')} es obligatorio.`);
         return;
       }
     }
@@ -89,17 +99,14 @@ const Empleados = () => {
   const cancelarEdicion = () => {
     setModoEdicion(false);
     setEmpleadoEditandoId(null);
-    setForm({
-      nombre_completo: "", dni: "", correo: "", area: "",
-      cargo: "", estado: "Activo", celular: ""
-    });
+    setForm(formInicial);
   };
 
   const empleadosFiltrados = empleados.filter((empleado) => {
     const busquedaLower = busqueda.toLowerCase().trim();
     if (!busquedaLower) return true;
     return Object.values(empleado).some(val =>
-      String(val).toLowerCase().includes(busquedaLower)
+      val && String(val).toLowerCase().includes(busquedaLower)
     );
   });
 
@@ -109,16 +116,24 @@ const Empleados = () => {
 
       {token && (
         <div className="formulario">
-          <input name="nombre_completo" value={form.nombre_completo} onChange={handleChange} placeholder="Nombre completo" />
+          <input name="nombres" value={form.nombres} onChange={handleChange} placeholder="Nombres" />
+          <input name="apellidos" value={form.apellidos} onChange={handleChange} placeholder="Apellidos" />
           <input name="dni" value={form.dni} onChange={handleChange} placeholder="DNI" />
-          <input name="correo" type="email" value={form.correo} onChange={handleChange} placeholder="Correo" />
-          <input name="celular" value={form.celular} onChange={handleChange} placeholder="Celular (opcional)" />
+          <input name="correo_personal" type="email" value={form.correo_personal} onChange={handleChange} placeholder="Correo Personal" />
+          <input name="correo_institucional" type="email" value={form.correo_institucional} onChange={handleChange} placeholder="Correo Institucional (Opcional)" />
+          <input name="telefono_personal" value={form.telefono_personal} onChange={handleChange} placeholder="Teléfono Personal" />
+          <input name="telefono_coorporativo" value={form.telefono_coorporativo} onChange={handleChange} placeholder="Teléfono Corporativo" />
           <input name="area" value={form.area} onChange={handleChange} placeholder="Área" />
-          <input name="cargo" value={form.cargo} onChange={handleChange} placeholder="Cargo" />
-          <select name="estado" value={form.estado} onChange={handleChange}>
-            <option value="Activo">Activo</option>
-            <option value="Inactivo">Inactivo</option>
-          </select>
+          <input name="puesto" value={form.puesto} onChange={handleChange} placeholder="Puesto" />
+          <input name="sede" value={form.sede} onChange={handleChange} placeholder="Sede" />
+          
+          {modoEdicion && (
+            <select name="estado" value={form.estado} onChange={handleChange}>
+              <option value="Activo">Activo</option>
+              <option value="Inactivo">Inactivo</option>
+            </select>
+          )}
+
           <div className="botones">
             <button onClick={guardarEmpleado} className="btn-primary">{modoEdicion ? "Actualizar" : "Agregar"}</button>
             {modoEdicion && <button onClick={cancelarEdicion} className="btn-secondary">Cancelar</button>}
@@ -141,12 +156,15 @@ const Empleados = () => {
           <thead>
             <tr>
               <th>N°</th>
-              <th>Nombre</th>
+              <th>Nombre Completo</th>
               <th>DNI</th>
-              <th>Correo</th>
-              <th>Celular</th>
+              <th>Correo Personal</th>
+              <th>Correo Institucional</th>
+              <th>Teléfono Personal</th>
+              <th>Teléfono Corporativo</th>
+              <th>Puesto</th>
               <th>Área</th>
-              <th>Cargo</th>
+              <th>Sede</th>
               <th>Estado</th>
               {token && <th>Acciones</th>}
             </tr>
@@ -154,16 +172,19 @@ const Empleados = () => {
           <tbody>
             {empleadosFiltrados.map((empleado, index) => (
               <tr key={empleado.id}>
-                <td>{index + 1}</td>
-                <td>{empleado.nombre_completo}</td>
-                <td>{empleado.dni}</td>
-                <td>{empleado.correo}</td>
-                <td>{empleado.celular || '—'}</td>
-                <td>{empleado.area}</td>
-                <td>{empleado.cargo}</td>
-                <td>{empleado.estado}</td>
+                <td data-label="N°">{index + 1}</td>
+                <td data-label="Nombre Completo">{`${empleado.nombres} ${empleado.apellidos}`}</td>
+                <td data-label="DNI">{empleado.dni}</td>
+                <td data-label="Correo Personal">{empleado.correo_personal}</td>
+                <td data-label="Correo Institucional">{empleado.correo_institucional || "—"}</td>
+                <td data-label="Teléfono Personal">{empleado.telefono_personal || "—"}</td>
+                <td data-label="Teléfono Corporativo">{empleado.telefono_coorporativo || "—"}</td>
+                <td data-label="Puesto">{empleado.puesto}</td>
+                <td data-label="Área">{empleado.area}</td>
+                <td data-label="Sede">{empleado.sede}</td>
+                <td data-label="Estado">{empleado.estado}</td>
                 {token && (
-                  <td className="acciones">
+                  <td data-label="Acciones" className="acciones">
                     <button onClick={() => handleEditar(empleado)} className="btn-primary btn-icon" title="Editar">
                       <FaPencilAlt />
                     </button>
@@ -183,7 +204,7 @@ const Empleados = () => {
           <div className="modal-content">
             <button className="modal-close-button" onClick={() => setMostrarConfirmacion(false)}>&times;</button>
             <h4>Confirmar Eliminación</h4>
-            <p>¿Estás seguro de eliminar a <strong>{empleadoAEliminar?.nombre_completo}</strong>?</p>
+            <p>¿Estás seguro de eliminar a <strong>{`${empleadoAEliminar?.nombres} ${empleadoAEliminar?.apellidos}`}</strong>?</p>
             <div className="modal-actions">
               <button onClick={() => setMostrarConfirmacion(false)} className="btn-secondary">Cancelar</button>
               <button onClick={eliminarEmpleado} className="btn-danger">Sí, eliminar</button>

@@ -5,7 +5,6 @@ const nodemailer = require("nodemailer");
 const AsignacionModel = require("../models/asignaciones.model");
 const { generarActaPDF } = require('../services/pdf.service');
 const { enviarActaPorCorreo } = require('../services/email.service');
-const db = require('../database');
 
 const listarAsignaciones = async (req, res) => {
   try {
@@ -17,26 +16,13 @@ const listarAsignaciones = async (req, res) => {
 };
 
 const obtenerHistorialPorEquipo = async (req, res) => {
-  const { equipo_id } = req.params;
   try {
-    const result = await db.query(`
-      SELECT 
-        a.fecha_entrega, 
-        a.fecha_devolucion, 
-        a.observaciones,
-        e.nombre_completo AS nombre_empleado,
-        e.cargo,
-        e.area
-      FROM asignaciones a
-      JOIN empleados e ON a.empleado_id = e.id
-      WHERE a.equipo_id = $1
-      ORDER BY a.fecha_entrega DESC
-    `, [equipo_id]);
-
-    res.json(result.rows);
+    const { equipo_id } = req.params;
+    const historial = await AsignacionModel.obtenerHistorialPorEquipo(equipo_id);
+    res.status(200).json(historial);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ mensaje: "Error al obtener historial" });
+    console.error("Error al obtener historial:", error);
+    res.status(500).json({ error: "Error al obtener historial", detalle: error.message });
   }
 };
 
@@ -82,9 +68,9 @@ const registrarAsignacion = async (req, res) => {
 const devolverEquipo = async (req, res) => {
   try {
     const { id } = req.params;
-    const { fecha_devolucion } = req.body;
+    const { fecha_devolucion, observacion_devolucion } = req.body;
 
-    const resultado = await AsignacionModel.devolverEquipo(id, fecha_devolucion);
+    const resultado = await AsignacionModel.devolverEquipo(id, fecha_devolucion, observacion_devolucion);
     res.status(200).json(resultado);
   } catch (error) {
     res.status(500).json({ error: "Error al devolver equipo", detalle: error.message });

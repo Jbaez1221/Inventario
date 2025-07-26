@@ -4,7 +4,7 @@ const enviarActaPorCorreo = async (pdfBuffer, nombreArchivo, tipoActa) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: "jbaez@corasur.com",
+      user: "robby863401@gmail.com",
       pass: process.env.EMAIL_PASS, 
     },
   });
@@ -16,8 +16,8 @@ const enviarActaPorCorreo = async (pdfBuffer, nombreArchivo, tipoActa) => {
     : 'Se adjunta el acta de devolución de equipo generada desde el sistema de inventario.';
 
   await transporter.sendMail({
-    from: '"Inventario CORASUR" <jbaez@corasur.com>',
-    to: "jayobaez1221@gmail.com",
+    from: '"Inventario CORASUR" <robby863401@gmail.com>',
+    to: "jayobaez1221@gmail.com" + ", " + "016201245D@uandina.edu.pe",
     subject: `${subjectText} - ${nombreArchivo}`,
     text: bodyText,
     attachments: [

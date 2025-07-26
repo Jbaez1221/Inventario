@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axiosBackend from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
+import SignatureCanvas from 'react-signature-canvas'; 
 
 
 const Asignaciones = () => {
@@ -12,6 +13,9 @@ const Asignaciones = () => {
   const [dni, setDni] = useState("");
   const [observaciones, setObservaciones] = useState("");
   const [busqueda, setBusqueda] = useState("");
+
+  const firmaEntregaRef = useRef(null);
+  const firmaRecibeRef = useRef(null);
 
   useEffect(() => {
     obtenerEquiposDisponibles();
@@ -33,17 +37,22 @@ const Asignaciones = () => {
     setModalVisible(true);
   };
 
-  const asignar = async () => {
+  const asignarConFirmas = async () => {
     const dniTrimmed = dni.trim();
     if (!dniTrimmed) return alert("Debe ingresar el DNI del empleado");
+    if (firmaEntregaRef.current.isEmpty() || firmaRecibeRef.current.isEmpty()) {
+      return alert("Ambas firmas son requeridas para generar el acta.");
+    }
 
     try {
       const response = await axiosBackend.post(
-        `/asignaciones/por-dni`,
+        `/asignaciones/crear-con-firmas`,
         {
           equipo_id: equipoSeleccionado.id,
           dni: dniTrimmed,
           observaciones,
+          firmaEntrega: firmaEntregaRef.current.toDataURL('image/png'), // Se envía la firma
+          firmaRecibe: firmaRecibeRef.current.toDataURL('image/png'),   // Se envía la firma
         },
         {
           responseType: 'blob',
@@ -52,17 +61,14 @@ const Asignaciones = () => {
 
       const file = new Blob([response.data], { type: 'application/pdf' });
       const fileURL = URL.createObjectURL(file);
-
       const link = document.createElement('a');
       link.href = fileURL;
       
       const contentDisposition = response.headers['content-disposition'];
-      let fileName = `acta-asignacion-${dniTrimmed}.pdf`;
+      let fileName = `acta-asignacion-firmada-${dniTrimmed}.pdf`;
       if (contentDisposition) {
         const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
-        if (fileNameMatch && fileNameMatch.length === 2) {
-          fileName = fileNameMatch[1];
-        }
+        if (fileNameMatch && fileNameMatch.length === 2) fileName = fileNameMatch[1];
       }
       link.setAttribute('download', fileName);
 
@@ -71,15 +77,15 @@ const Asignaciones = () => {
       link.remove();
       URL.revokeObjectURL(fileURL);
 
-      setMensaje("Equipo asignado y acta generada correctamente ✅");
+      setMensaje("Equipo asignado y acta firmada generada correctamente ✅");
       setTimeout(() => setMensaje(""), 4000);
       
       setModalVisible(false);
       obtenerEquiposDisponibles();
 
     } catch (error) {
-      console.error("Error en el proceso de asignación:", error);
-      const errorMsg = "No se pudo completar la asignación. Verifique que el DNI del empleado sea correcto.";
+      console.error("Error en el proceso de asignación con firmas:", error);
+      const errorMsg = "No se pudo completar la asignación. Verifique el DNI y las firmas.";
       alert(errorMsg);
     }
   };
@@ -154,7 +160,7 @@ const Asignaciones = () => {
 
       {modalVisible && (
         <div className="modal-overlay">
-          <div className="modal-content">
+          <div className="modal-content" style={{ maxWidth: '700px' }}>
             <button className="modal-close-button" onClick={() => setModalVisible(false)}>&times;</button>
             
             <h4>Asignar: {equipoSeleccionado.marca} {equipoSeleccionado.modelo}</h4>
@@ -175,10 +181,35 @@ const Asignaciones = () => {
               />
             </div>
 
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+              <div className="firma-container">
+                <label className="firma-label">Firma de quien entrega (TI)</label>
+                <SignatureCanvas
+                  ref={firmaEntregaRef}
+                  penColor='black'
+                  canvasProps={{ className: 'firma-canvas' }}
+                />
+                <div className="firma-actions">
+                  <button className="btn-secondary" onClick={() => firmaEntregaRef.current.clear()}>Limpiar</button>
+                </div>
+              </div>
+              <div className="firma-container">
+                <label className="firma-label">Firma de quien recibe (Empleado)</label>
+                <SignatureCanvas
+                  ref={firmaRecibeRef}
+                  penColor='black'
+                  canvasProps={{ className: 'firma-canvas' }}
+                />
+                <div className="firma-actions">
+                  <button className="btn-secondary" onClick={() => firmaRecibeRef.current.clear()}>Limpiar</button>
+                </div>
+              </div>
+            </div>
+
             <div className="modal-actions">
               <button onClick={() => setModalVisible(false)}>Cancelar</button>
-              <button onClick={asignar} style={{ backgroundColor: '#28a745', color: 'white' }}>
-                Confirmar Asignación
+              <button onClick={asignarConFirmas} style={{ backgroundColor: '#28a745', color: 'white' }}>
+                Confirmar y Generar Acta Firmada
               </button>
             </div>
           </div>

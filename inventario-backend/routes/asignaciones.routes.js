@@ -9,7 +9,7 @@ router.get("/historial/:equipo_id", AsignacionesController.obtenerHistorialPorEq
 
 
 router.put("/:id/devolver", protegerRuta, AsignacionesController.devolverEquipo);
-router.post("/por-dni", protegerRuta, AsignacionesController.asignarEquipoPorDNI);
-router.post("/con-acta", protegerRuta, AsignacionesController.crearAsignacionYGenerarActa);
+router.post("/por-dni", AsignacionesController.asignarEquipoPorDNI);
+router.post("/crear-con-firmas", protegerRuta, AsignacionesController.crearAsignacionConFirmas);
 
 module.exports = router;

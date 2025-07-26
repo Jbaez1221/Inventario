@@ -4,6 +4,7 @@ const PDFDocument = require("pdfkit");
 const nodemailer = require("nodemailer");
 const AsignacionModel = require("../models/asignaciones.model");
 const { generarActaPDF } = require('../services/pdf.service');
+const { generarActaPDFConFirmas } = require('../services/pdf.service');
 const { enviarActaPorCorreo } = require('../services/email.service');
 
 const listarAsignaciones = async (req, res) => {
@@ -106,6 +107,38 @@ const crearAsignacionYGenerarActa = async (req, res) => {
   }
 };
 
+const crearAsignacionConFirmas = async (req, res) => {
+  try {
+    const { dni, equipo_id, observaciones, firmaEntrega, firmaRecibe } = req.body;
+
+    const nuevaAsignacionCompleta = await AsignacionModel.crearAsignacionPorDNI({ dni, equipo_id, observaciones });
+
+    const datosParaPDF = {
+      ...nuevaAsignacionCompleta,
+      observaciones: nuevaAsignacionCompleta.asignacion.observaciones,
+      fecha_entrega: nuevaAsignacionCompleta.asignacion.fecha_entrega,
+      firmaEntrega,
+      firmaRecibe,
+    };
+
+    const nombreArchivo = `Acta-Entrega-Firmada-${datosParaPDF.asignacion.id}.pdf`;
+    
+    const pdfBuffer = await generarActaPDFConFirmas(datosParaPDF, 'entrega');
+
+    enviarActaPorCorreo(pdfBuffer, nombreArchivo, 'entrega').catch(err => {
+        console.error("Fallo al enviar el correo de entrega:", err);
+    });
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${nombreArchivo}`);
+    res.send(pdfBuffer);
+
+  } catch (error) {
+    console.error("Error en el proceso de asignación con firmas:", error);
+    res.status(500).json({ error: "Error en el proceso de asignación con firmas", detalle: error.message });
+  }
+};
+
 module.exports = {
   listarAsignaciones,
   registrarAsignacion,
@@ -113,4 +146,5 @@ module.exports = {
   asignarEquipoPorDNI,
   obtenerHistorialPorEquipo,
   crearAsignacionYGenerarActa,
+  crearAsignacionConFirmas,
 };

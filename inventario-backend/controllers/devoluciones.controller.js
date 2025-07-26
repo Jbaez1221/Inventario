@@ -1,5 +1,5 @@
 const AsignacionModel = require("../models/asignaciones.model");
-const { generarActaPDF } = require('../services/pdf.service');
+const { generarActaPDF, generarActaPDFConFirmas } = require('../services/pdf.service');
 const { enviarActaPorCorreo } = require('../services/email.service');
 
 const devolverEquipoYGenerarActa = async (req, res) => {
@@ -38,4 +38,47 @@ const devolverEquipoYGenerarActa = async (req, res) => {
   }
 };
 
-module.exports = { devolverEquipoYGenerarActa };
+const devolverEquipoConFirmas = async (req, res) => {
+  try {
+    const { asignacion_id } = req.params;
+    const { observacion_devolucion, firmaRecibe, firmaDevuelve } = req.body;
+
+    const resultadoDevolucion = await AsignacionModel.devolverEquipo(
+      asignacion_id, 
+      new Date(),
+      observacion_devolucion
+    );
+
+    const datosParaPDF = {
+      numeroActa: resultadoDevolucion.asignacion.id,
+      empleado: resultadoDevolucion.empleado,
+      equipo: resultadoDevolucion.equipo,
+      observaciones: resultadoDevolucion.asignacion.observaciones, // Obs. de entrega original
+      observacion_devolucion: resultadoDevolucion.asignacion.observacion_devolucion, // Nueva obs. de devolución
+      fecha_devolucion: resultadoDevolucion.asignacion.fecha_devolucion,
+      firmaRecibe,
+      firmaDevuelve,
+    };
+
+    const nombreArchivo = `Acta-Devolucion-Firmada-${datosParaPDF.numeroActa}.pdf`;
+    
+    const pdfBuffer = await generarActaPDFConFirmas(datosParaPDF, 'devolucion');
+
+    enviarActaPorCorreo(pdfBuffer, nombreArchivo, 'devolucion').catch(err => {
+        console.error("Fallo al enviar el correo de devolución:", err);
+    });
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${nombreArchivo}`);
+    res.send(pdfBuffer);
+
+  } catch (error) {
+    console.error("Error en el proceso de devolución con firmas:", error);
+    res.status(500).json({ error: "Error en el proceso de devolución con firmas", detalle: error.message });
+  }
+};
+
+module.exports = {
+  devolverEquipoYGenerarActa,
+  devolverEquipoConFirmas,
+};

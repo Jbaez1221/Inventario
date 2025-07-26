@@ -87,4 +87,92 @@ function generarActaPDF(datos, tipoActa) {
   });
 }
 
-module.exports = { generarActaPDF };
+function generarActaPDFConFirmas(datos, tipoActa) {
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ size: "A4", margin: 50 });
+    const buffers = [];
+    doc.on('data', buffers.push.bind(buffers));
+    doc.on('end', () => resolve(Buffer.concat(buffers)));
+    doc.on('error', reject);
+
+    const pageMargin = 50;
+    const contentWidth = doc.page.width - pageMargin * 2;
+
+    const headerY = 20;
+    const logoPath = path.join(__dirname, '..', 'assets', 'logo.png');
+
+    doc.image(logoPath, pageMargin, headerY, { height: 40 });
+
+    doc.moveDown(2.5);
+    doc.font("Helvetica-Bold").fontSize(14).text(`ÁREA DE SISTEMAS 2025 - ${datos.numeroActa}`, pageMargin, doc.y, { width: contentWidth, align: 'center' });
+    const tituloActa = tipoActa === 'entrega' ? 'ACTA DE ENTREGA DE EQUIPO INFORMÁTICO' : 'ACTA DE DEVOLUCIÓN DE EQUIPO INFORMÁTICO';
+    doc.font("Helvetica-Bold").fontSize(12).text(tituloActa, { align: 'center' });
+
+    doc.moveDown(1.5);
+    const lineY = doc.y;
+    doc.moveTo(pageMargin, lineY).lineTo(doc.page.width - pageMargin, lineY).stroke();
+
+    let y = lineY + 25;
+    const verbo = tipoActa === 'entrega' ? 'recibido' : 'devuelto';
+    const nombreCompletoEmpleado = `${datos.empleado.nombres} ${datos.empleado.apellidos}`;
+    const textoIntro = `Por medio del presente documento, yo ${nombreCompletoEmpleado} identificado con DNI N.° ${datos.empleado.dni}, colaborador de la empresa CORASUR S.A., dejo constancia de haber ${verbo} un equipo informático para el cumplimiento de las funciones y actividades asignadas por la empresa.`;
+    doc.font("Helvetica").fontSize(11).text(textoIntro, pageMargin, y, { align: "justify", width: contentWidth });
+
+    y += 70;
+    const textoEquipo = tipoActa === 'entrega' ? 'Recibo un equipo con las siguientes características:' : 'Devuelvo un equipo con las siguientes características:';
+    doc.font("Helvetica-Bold").text(textoEquipo, pageMargin, y);
+    y += 25;
+
+    const fila = (label, valor) => {
+      doc.font("Helvetica-Bold").text(label, pageMargin + 10, y);
+      doc.font("Helvetica").text(valor || "—", 170, y);
+      y += 20;
+    };
+
+    fila("ID Equipo:", datos.equipo.id?.toString());
+    fila("Equipo:", datos.equipo.tipo);
+    fila("Marca:", datos.equipo.marca);
+    fila("Modelo:", datos.equipo.modelo);
+    fila("IMEI/Serie:", datos.equipo.serie);
+    fila("Memoria:", datos.equipo.memoria);
+    fila("Almacenamiento:", datos.equipo.almacenamiento);
+    fila("Observaciones:", datos.observaciones || "—");
+
+    let firmaY = doc.page.height - 150;
+    const firmaWidth = 180;
+    const firmaHeight = 80;
+    const firmaIzquierdaX = doc.page.width / 4 - firmaWidth / 2 + 20;
+    const firmaDerechaX = (doc.page.width * 3) / 4 - firmaWidth / 2 - 20;
+
+    const esEntrega = tipoActa === 'entrega';
+    const firmaIzquierdaBuffer = Buffer.from((esEntrega ? datos.firmaEntrega : datos.firmaRecibe).split(',')[1], 'base64');
+    const firmaDerechaBuffer = Buffer.from((esEntrega ? datos.firmaRecibe : datos.firmaDevuelve).split(',')[1], 'base64');
+    
+    const firmaIzquierdaLabel = esEntrega ? "Entrega (TI)" : "Recibe (TI)";
+    const firmaDerechaLabel = esEntrega ? "Recibe (Empleado)" : "Devuelve (Empleado)";
+
+    doc.image(firmaIzquierdaBuffer, firmaIzquierdaX, firmaY - firmaHeight, { fit: [firmaWidth, firmaHeight] });
+    doc.image(firmaDerechaBuffer, firmaDerechaX, firmaY - firmaHeight, { fit: [firmaWidth, firmaHeight] });
+
+    doc.lineCap('butt').moveTo(firmaIzquierdaX, firmaY).lineTo(firmaIzquierdaX + firmaWidth, firmaY).stroke();
+    doc.lineCap('butt').moveTo(firmaDerechaX, firmaY).lineTo(firmaDerechaX + firmaWidth, firmaY).stroke();
+    
+    firmaY += 5;
+    doc.font("Helvetica").fontSize(10).text(firmaIzquierdaLabel, firmaIzquierdaX, firmaY, { width: firmaWidth, align: 'center' });
+    doc.text(firmaDerechaLabel, firmaDerechaX, firmaY, { width: firmaWidth, align: 'center' });
+    
+    firmaY += 15;
+    doc.text(`Nombre: JAYO E. BAEZ QUISPE`, firmaIzquierdaX, firmaY);
+    doc.text(`Nombre: ${datos.empleado.nombres} ${datos.empleado.apellidos}`, firmaDerechaX, firmaY);
+    firmaY += 15;
+    doc.text(`DNI: 71422050`, firmaIzquierdaX, firmaY);
+    doc.text(`DNI: ${datos.empleado.dni}`, firmaDerechaX, firmaY);
+
+    doc.end();
+  });
+}
+
+module.exports = { 
+  generarActaPDF,
+  generarActaPDFConFirmas
+};

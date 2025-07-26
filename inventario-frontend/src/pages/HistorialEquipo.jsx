@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axiosBackend from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
+import SignatureCanvas from 'react-signature-canvas';
 
 const HistorialEquipo = () => {
   const { token } = useAuth();
@@ -15,6 +16,9 @@ const HistorialEquipo = () => {
   const [fechaFin, setFechaFin] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(20);
+
+  const firmaRecibeRef = useRef(null);
+  const firmaDevuelveRef = useRef(null);
 
   useEffect(() => {
     obtenerAsignaciones();
@@ -51,13 +55,18 @@ const HistorialEquipo = () => {
     setModalDevolverVisible(true);
   };
 
-  const ejecutarDevolucion = async () => {
+  const ejecutarDevolucionConFirmas = async () => {
+    if (firmaRecibeRef.current.isEmpty() || firmaDevuelveRef.current.isEmpty()) {
+      return alert("Ambas firmas son requeridas para generar el acta de devolución.");
+    }
+
     try {
       const response = await axiosBackend.post(
-        `/devoluciones/${idADevolver}`,
-        { 
-          observaciones: devolucionObservaciones,
-          fecha_devolucion: new Date().toISOString()
+        `/devoluciones/con-firmas/${idADevolver}`,
+        {
+          observacion_devolucion: devolucionObservaciones,
+          firmaRecibe: firmaRecibeRef.current.toDataURL('image/png'),
+          firmaDevuelve: firmaDevuelveRef.current.toDataURL('image/png'),
         },
         {
           responseType: 'blob',
@@ -70,7 +79,7 @@ const HistorialEquipo = () => {
       link.href = fileURL;
 
       const contentDisposition = response.headers['content-disposition'];
-      let fileName = `acta-devolucion-${idADevolver}.pdf`; // Nombre por defecto
+      let fileName = `acta-devolucion-firmada-${idADevolver}.pdf`;
       if (contentDisposition) {
         const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
         if (fileNameMatch && fileNameMatch.length === 2) {
@@ -84,14 +93,13 @@ const HistorialEquipo = () => {
       link.remove();
       URL.revokeObjectURL(fileURL);
 
-      setMensaje("Equipo devuelto y acta generada correctamente ✅");
+      setMensaje("Equipo devuelto y acta firmada generada correctamente ✅");
       setTimeout(() => setMensaje(""), 4000);
       obtenerAsignaciones();
 
     } catch (error) {
-      console.error("Error en el proceso de devolución:", error);
-      const errorMsg = "No se pudo completar la devolución. Verifique los datos.";
-      alert(errorMsg);
+      console.error("Error en el proceso de devolución con firmas:", error);
+      alert("No se pudo completar la devolución. Verifique los datos.");
     } finally {
       setModalDevolverVisible(false);
       setIdADevolver(null);
@@ -214,9 +222,10 @@ const HistorialEquipo = () => {
 
       {modalDevolverVisible && (
         <div className="modal-overlay">
-          <div className="modal-content">
+          <div className="modal-content" style={{ maxWidth: '700px' }}>
             <button className="modal-close-button" onClick={() => setModalDevolverVisible(false)}>&times;</button>
             <h4>Confirmar Devolución de Equipo</h4>
+            
             <div className="formulario" style={{ padding: 0, border: 'none', background: 'none' }}>
               <textarea
                 value={devolucionObservaciones}
@@ -226,12 +235,38 @@ const HistorialEquipo = () => {
                 style={{ gridColumn: '1 / -1' }}
               />
             </div>
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+              <div className="firma-container">
+                <label className="firma-label">Firma de quien recibe (TI)</label>
+                <SignatureCanvas
+                  ref={firmaRecibeRef}
+                  penColor='black'
+                  canvasProps={{ className: 'firma-canvas' }}
+                />
+                <div className="firma-actions">
+                  <button className="btn-secondary" onClick={() => firmaRecibeRef.current.clear()}>Limpiar</button>
+                </div>
+              </div>
+              <div className="firma-container">
+                <label className="firma-label">Firma de quien devuelve (Empleado)</label>
+                <SignatureCanvas
+                  ref={firmaDevuelveRef}
+                  penColor='black'
+                  canvasProps={{ className: 'firma-canvas' }}
+                />
+                <div className="firma-actions">
+                  <button className="btn-secondary" onClick={() => firmaDevuelveRef.current.clear()}>Limpiar</button>
+                </div>
+              </div>
+            </div>
+
             <div className="modal-actions">
               <button className="btn-secondary" onClick={() => setModalDevolverVisible(false)}>
                 Cancelar
               </button>
-              <button className="btn-primary" onClick={ejecutarDevolucion}>
-                Confirmar Devolución
+              <button className="btn-primary" onClick={ejecutarDevolucionConFirmas}>
+                Confirmar y Generar Acta Firmada
               </button>
             </div>
           </div>

@@ -8,7 +8,7 @@ const HistorialEquipo = () => {
   const [mensaje, setMensaje] = useState("");
   const [modalDevolverVisible, setModalDevolverVisible] = useState(false);
   const [idADevolver, setIdADevolver] = useState(null);
-  const [devolucionObservaciones, setDevolucionObservaciones] = useState(""); // Estado para las observaciones de devolución
+  const [devolucionObservaciones, setDevolucionObservaciones] = useState("");
 
   const [busquedaEmpleado, setBusquedaEmpleado] = useState("");
   const [fechaInicio, setFechaInicio] = useState("");
@@ -16,17 +16,23 @@ const HistorialEquipo = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(20);
 
+  useEffect(() => {
+    obtenerAsignaciones();
+  }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [busquedaEmpleado, fechaInicio, fechaFin]);
+
   const obtenerAsignaciones = async () => {
     try {
       const response = await axiosBackend.get("/asignaciones");
       const asignacionesOrdenadas = response.data.sort((a, b) => {
         const aSinDevolver = !a.fecha_devolucion;
         const bSinDevolver = !b.fecha_devolucion;
-
         if (aSinDevolver && !bSinDevolver) return -1;
         if (!aSinDevolver && bSinDevolver) return 1;
-
-        return b.id - a.id;
+        return new Date(b.fecha_entrega) - new Date(a.fecha_entrega);
       });
       setAsignaciones(asignacionesOrdenadas);
     } catch (error) {
@@ -34,14 +40,9 @@ const HistorialEquipo = () => {
     }
   };
 
-  useEffect(() => {
-    obtenerAsignaciones();
-  }, []);
-
   const formatearFecha = (isoDate) => {
-    if (!isoDate) return "";
-    const [a, m, d] = isoDate.split("T")[0].split("-");
-    return `${d}/${m}/${a}`;
+    if (!isoDate) return "—";
+    return new Date(isoDate).toLocaleDateString('es-ES');
   };
 
   const confirmarDevolucion = (id) => {
@@ -51,24 +52,12 @@ const HistorialEquipo = () => {
   };
 
   const ejecutarDevolucion = async () => {
-    const fechaActual = new Date();
-    const anio = fechaActual.getFullYear();
-    const mes = String(fechaActual.getMonth() + 1).padStart(2, '0');
-    const dia = String(fechaActual.getDate()).padStart(2, '0');
-    const hoy = `${anio}-${mes}-${dia}`;
-
     try {
       const response = await axiosBackend.post(
         `/devoluciones/${idADevolver}`,
-        {
-          fecha_devolucion: hoy,
-          observaciones: devolucionObservaciones,
-        },
-        {
-          responseType: 'blob',
-        }
+        { observaciones: devolucionObservaciones },
+        { responseType: 'blob' }
       );
-
       const nombreArchivo = `Acta-Devolucion-${idADevolver}.pdf`;
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
@@ -77,11 +66,9 @@ const HistorialEquipo = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-
       setMensaje("Equipo devuelto y acta generada correctamente ✅");
       setTimeout(() => setMensaje(""), 4000);
       obtenerAsignaciones();
-
     } catch (error) {
       console.error("Error en el proceso de devolución:", error);
       alert("No se pudo completar la devolución.");
@@ -92,14 +79,14 @@ const HistorialEquipo = () => {
   };
 
   const asignacionesFiltradas = asignaciones.filter((a) => {
-    const busquedaLower = busquedaEmpleado.toLowerCase();
-    const matchEmpleado =
+    const busquedaLower = busquedaEmpleado.toLowerCase().trim();
+    const matchEmpleado = !busquedaLower ||
       a.empleado.toLowerCase().includes(busquedaLower) ||
-      (a.empleado_dni && a.empleado_dni.toLowerCase().includes(busquedaLower));
+      (a.empleado_dni && a.empleado_dni.includes(busquedaLower));
 
-    const matchFechaInicio = !fechaInicio || a.fecha_entrega.split('T')[0] === fechaInicio;
-    
-    const matchFechaFin = !fechaFin || (a.fecha_devolucion && a.fecha_devolucion.split('T')[0] === fechaFin);
+    const fechaEntrega = a.fecha_entrega ? a.fecha_entrega.split('T')[0] : null;
+    const matchFechaInicio = !fechaInicio || (fechaEntrega && fechaEntrega >= fechaInicio);
+    const matchFechaFin = !fechaFin || (fechaEntrega && fechaEntrega <= fechaFin);
 
     return matchEmpleado && matchFechaInicio && matchFechaFin;
   });
@@ -108,19 +95,14 @@ const HistorialEquipo = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = asignacionesFiltradas.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(asignacionesFiltradas.length / itemsPerPage);
-
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [busquedaEmpleado, fechaInicio, fechaFin]);
-
   return (
-    <div className="historial-container">
-      <h2 className="historial-titulo">Historial General de Asignaciones</h2>
+    <div>
+      <h2>Historial General de Asignaciones</h2>
       {mensaje && <div className="mensaje-exito">{mensaje}</div>}
 
-      <div className="filtros-historial">
+      <div className="filtros-container">
         <input
           type="text"
           placeholder="Buscar por empleado o DNI..."
@@ -129,17 +111,17 @@ const HistorialEquipo = () => {
         />
         <input
           type="date"
-          title="Filtrar por fecha de entrega"
+          title="Fecha de entrega (desde)"
           value={fechaInicio}
           onChange={(e) => setFechaInicio(e.target.value)}
         />
         <input
           type="date"
-          title="Filtrar por fecha de devolución"
+          title="Fecha de entrega (hasta)"
           value={fechaFin}
           onChange={(e) => setFechaFin(e.target.value)}
         />
-        <button onClick={() => {
+        <button className="btn-secondary" onClick={() => {
           setBusquedaEmpleado("");
           setFechaInicio("");
           setFechaFin("");
@@ -161,7 +143,7 @@ const HistorialEquipo = () => {
             </tr>
           </thead>
           <tbody>
-            {asignacionesFiltradas.length === 0 ? (
+            {currentItems.length === 0 ? (
               <tr>
                 <td colSpan="8">No hay asignaciones que coincidan con los filtros.</td>
               </tr>
@@ -173,18 +155,14 @@ const HistorialEquipo = () => {
                   <td>{a.equipo_serie}</td>
                   <td>{a.equipo_tipo}</td>
                   <td>{formatearFecha(a.fecha_entrega)}</td>
-                  <td>
-                    {a.fecha_devolucion
-                      ? formatearFecha(a.fecha_devolucion)
-                      : "—"}
-                  </td>
+                  <td>{formatearFecha(a.fecha_devolucion)}</td>
                   <td>{a.observaciones || "—"}</td>
                   {token && (
-                    <td>
+                    <td className="acciones">
                       {!a.fecha_devolucion && (
                         <button
                           onClick={() => confirmarDevolucion(a.id)}
-                          className="btn-devolver"
+                          className="btn-primary"
                         >
                           Devolver
                         </button>
@@ -203,15 +181,7 @@ const HistorialEquipo = () => {
           <button onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>
             Anterior
           </button>
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              key={i + 1}
-              onClick={() => paginate(i + 1)}
-              className={currentPage === i + 1 ? 'active' : ''}
-            >
-              {i + 1}
-            </button>
-          ))}
+          <span>Página {currentPage} de {totalPages}</span>
           <button onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>
             Siguiente
           </button>
@@ -222,31 +192,27 @@ const HistorialEquipo = () => {
         <div className="modal-overlay">
           <div className="modal-content">
             <button className="modal-close-button" onClick={() => setModalDevolverVisible(false)}>&times;</button>
-            
             <h4>Confirmar Devolución de Equipo</h4>
-            
-            <label>Observaciones de devolución (opcional):</label>
-            <textarea
-              value={devolucionObservaciones}
-              onChange={(e) => setDevolucionObservaciones(e.target.value)}
-              placeholder="Ej: El equipo se devuelve en buen estado, con cargador."
-              rows="3"
-            />
+            <div className="formulario" style={{ padding: 0, border: 'none', background: 'none' }}>
+              <textarea
+                value={devolucionObservaciones}
+                onChange={(e) => setDevolucionObservaciones(e.target.value)}
+                placeholder="Observaciones de devolución (opcional)"
+                rows="3"
+                style={{ gridColumn: '1 / -1' }}
+              />
+            </div>
             <div className="modal-actions">
-              <button className="btn-devolver-confirmar" onClick={ejecutarDevolucion}>
-                Sí, devolver y generar acta
-              </button>
-              <button
-                className="btn-cancelar"
-                onClick={() => setModalDevolverVisible(false)}
-              >
+              <button className="btn-secondary" onClick={() => setModalDevolverVisible(false)}>
                 Cancelar
+              </button>
+              <button className="btn-primary" onClick={ejecutarDevolucion}>
+                Devolver y Generar Acta
               </button>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 };

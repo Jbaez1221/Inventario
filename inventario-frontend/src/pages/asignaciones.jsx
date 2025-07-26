@@ -107,7 +107,6 @@ const Asignaciones = () => {
           placeholder="Buscar por tipo, marca, modelo, serie..."
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          style={{ flexGrow: 1 }}
         />
         <button onClick={() => setBusqueda("")}>Limpiar</button>
       </div>

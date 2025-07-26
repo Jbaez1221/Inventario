@@ -15,7 +15,9 @@ const Layout = () => {
   };
 
   const closeSidebar = () => {
-    setSidebarOpen(false);
+    if (window.innerWidth <= 1024) {
+      setSidebarOpen(false);
+    }
   };
 
   useEffect(() => {
@@ -32,24 +34,25 @@ const Layout = () => {
   }, []);
 
   useEffect(() => {
-    if (window.innerWidth <= 1024) {
-      closeSidebar();
-    }
+    closeSidebar();
   }, [location]);
+
   return (
-    <div className={`app-container ${isSidebarOpen ? 'sidebar-visible' : ''}`}>
-      {isSidebarOpen && window.innerWidth <= 768 && (
+    <div className="app-container">
+      <button className="mobile-menu-toggle" onClick={toggleSidebar}>
+        <FaBars />
+      </button>
+
+      {isSidebarOpen && window.innerWidth <= 1024 && (
         <div className="mobile-overlay" onClick={closeSidebar}></div>
       )}
 
-      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} closeSidebar={closeSidebar} />
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       
       <main className="content-area">
-        <button className="mobile-menu-toggle" onClick={toggleSidebar}>
-          <FaBars />
-        </button>
         <Outlet />
       </main>
+
       {isLoginModalOpen && <LoginModal />}
     </div>
   );

@@ -30,6 +30,13 @@ const Equipos = () => {
   const fileInputRef = useRef(null);
   const [modalImagenUrl, setModalImagenUrl] = useState("");
 
+  // --- AÑADIDO: Estados para el modal de solicitud de stock ---
+  const [modalSolicitudVisible, setModalSolicitudVisible] = useState(false);
+  const [equipoParaSolicitar, setEquipoParaSolicitar] = useState(null);
+  const [solicitudDni, setSolicitudDni] = useState("");
+  const [solicitudMotivo, setSolicitudMotivo] = useState("");
+  const [mensajeModal, setMensajeModal] = useState("");
+
   useEffect(() => {
     obtenerEquipos();
   }, []);
@@ -149,6 +156,43 @@ const Equipos = () => {
     } catch (error) {
       console.error("Error al cargar historial:", error);
       alert("Error al cargar historial");
+    }
+  };
+
+  // --- AÑADIDO: Funciones para manejar el modal de solicitud ---
+  const abrirModalSolicitud = (equipo) => {
+    setEquipoParaSolicitar(equipo);
+    setModalSolicitudVisible(true);
+  };
+
+  const cerrarModalSolicitud = () => {
+    setModalSolicitudVisible(false);
+    setEquipoParaSolicitar(null);
+    setSolicitudDni("");
+    setSolicitudMotivo("");
+    setMensajeModal("");
+  };
+
+  const enviarSolicitudStock = async () => {
+    if (!solicitudDni.trim() || !solicitudMotivo.trim()) {
+      alert("Debe ingresar su DNI y el motivo de la solicitud.");
+      return;
+    }
+
+    try {
+      await axiosBackend.post('/solicitudes', {
+        dni: solicitudDni,
+        tipo_equipo: equipoParaSolicitar.tipo,
+        marca: equipoParaSolicitar.marca,
+        modelo: equipoParaSolicitar.modelo,
+        motivo: solicitudMotivo,
+        tipo: 'stock', // Se envía el tipo 'stock' como requerido
+      });
+      setMensajeModal("¡Solicitud enviada con éxito! El equipo de TI la revisará pronto.");
+    } catch (error) {
+      const errorMsg = error.response?.data?.error || "No se pudo enviar la solicitud.";
+      console.error("Error al enviar solicitud de stock:", error);
+      setMensajeModal(errorMsg);
     }
   };
 
@@ -275,9 +319,8 @@ const Equipos = () => {
               <th>Marca</th>
               <th>Modelo</th>
               <th>Serie</th>
-              <th>Memoria</th>
-              <th>Almacenamiento</th>
               <th>Estado</th>
+              {/* La columna de Acciones solo se muestra si hay token */}
               {token && <th>Acciones</th>}
             </tr>
           </thead>
@@ -301,20 +344,23 @@ const Equipos = () => {
                 <td data-label="Marca">{equipo.marca}</td>
                 <td data-label="Modelo">{equipo.modelo}</td>
                 <td data-label="Serie">{equipo.serie}</td>
-                <td data-label="Memoria">{equipo.memoria || '—'}</td>
-                <td data-label="Almacenamiento">{equipo.almacenamiento || '—'}</td>
-                <td data-label="Estado">{equipo.estado}</td>
+                
+                {/* CAMBIADO: Lógica dentro de la celda de Estado */}
+                <td data-label="Estado">
+                  {!token && equipo.estado === 'Disponible' ? (
+                    <button className="btn-success" onClick={() => abrirModalSolicitud(equipo)}>
+                      Disponible
+                    </button>
+                  ) : (
+                    equipo.estado
+                  )}
+                </td>
+                
                 {token && (
                   <td data-label="Acciones" className="acciones">
-                    <button onClick={() => iniciarEdicion(equipo)} className="btn-primary btn-icon" title="Editar">
-                      <FaPencilAlt />
-                    </button>
-                    <button onClick={() => eliminarEquipo(equipo.id)} className="btn-danger btn-icon" title="Eliminar">
-                      <FaTrash />
-                    </button>
-                    <button onClick={() => verHistorial(equipo.id)} className="btn-info btn-icon" title="Historial">
-                      <FaHistory />
-                    </button>
+                    <button onClick={() => iniciarEdicion(equipo)} className="btn-primary btn-icon" title="Editar"><FaPencilAlt /></button>
+                    <button onClick={() => eliminarEquipo(equipo.id)} className="btn-danger btn-icon" title="Eliminar"><FaTrash /></button>
+                    <button onClick={() => verHistorial(equipo.id)} className="btn-info btn-icon" title="Historial"><FaHistory /></button>
                   </td>
                 )}
               </tr>
@@ -408,6 +454,50 @@ const Equipos = () => {
             )}
             <div className="modal-actions">
                 <button onClick={() => { setMostrarHistorial(false); setHistorialBusqueda(""); }}>Cerrar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalSolicitudVisible && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <button className="modal-close-button" onClick={cerrarModalSolicitud}>&times;</button>
+            <h4>Solicitar Equipo: {equipoParaSolicitar?.marca} {equipoParaSolicitar?.modelo}</h4>
+            <p>Serie: {equipoParaSolicitar?.serie}</p>
+            
+            {mensajeModal ? (
+              <div className={mensajeModal.startsWith("¡Solicitud enviada") ? "mensaje-exito" : "mensaje-error"}>
+                {mensajeModal}
+              </div>
+            ) : (
+              <div className="formulario" style={{ padding: 0, border: 'none', background: 'none' }}>
+                <input
+                  type="text"
+                  placeholder="Ingresa tu DNI"
+                  value={solicitudDni}
+                  onChange={(e) => setSolicitudDni(e.target.value)}
+                  style={{ gridColumn: '1 / -1' }}
+                />
+                <textarea
+                  value={solicitudMotivo}
+                  onChange={(e) => setSolicitudMotivo(e.target.value)}
+                  placeholder="¿Por qué necesitas este equipo?"
+                  rows="4"
+                  style={{ gridColumn: '1 / -1' }}
+                ></textarea>
+              </div>
+            )}
+
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={cerrarModalSolicitud}>
+                Cerrar
+              </button>
+              {!mensajeModal.startsWith("¡Solicitud enviada") && (
+                <button className="btn-primary" onClick={enviarSolicitudStock}>
+                  Confirmar Solicitud
+                </button>
+              )}
             </div>
           </div>
         </div>

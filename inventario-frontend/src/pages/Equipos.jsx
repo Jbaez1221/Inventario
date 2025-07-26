@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import axiosBackend, { API_URL } from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
+import { FaPencilAlt, FaTrash, FaHistory } from "react-icons/fa";
 
 const Equipos = () => {
   const { token } = useAuth();
@@ -18,12 +19,14 @@ const Equipos = () => {
   const [mostrarHistorial, setMostrarHistorial] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(20);
+  const [itemsPerPage] = useState(10);
   const [historialCurrentPage, setHistorialCurrentPage] = useState(1);
   const historialItemsPerPage = 5;
+  const [historialBusqueda, setHistorialBusqueda] = useState(""); // <-- AÑADIR ESTADO
 
   const fileInputRef = useRef(null);
   const [modalImagenUrl, setModalImagenUrl] = useState("");
+
   useEffect(() => {
     obtenerEquipos();
   }, []);
@@ -31,6 +34,10 @@ const Equipos = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [busqueda]);
+
+  useEffect(() => {
+    setHistorialCurrentPage(1);
+  }, [historialBusqueda]);
 
   const obtenerEquipos = async () => {
     try {
@@ -141,6 +148,14 @@ const Equipos = () => {
     );
   });
 
+  const historialFiltrado = historial.filter((h) => {
+    const busquedaLower = historialBusqueda.toLowerCase().trim();
+    if (!busquedaLower) return true;
+    return Object.values(h).some(val =>
+      String(val).toLowerCase().includes(busquedaLower)
+    );
+  });
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = equiposFiltrados.slice(indexOfFirstItem, indexOfLastItem);
@@ -148,16 +163,16 @@ const Equipos = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const indexOfLastHistorialItem = historialCurrentPage * historialItemsPerPage;
-  const currentHistorialItems = historial.slice(
-    indexOfLastHistorialItem - historialItemsPerPage, 
+  const indexOfFirstHistorialItem = indexOfLastHistorialItem - historialItemsPerPage;
+  const currentHistorialItems = historialFiltrado.slice(
+    indexOfFirstHistorialItem,
     indexOfLastHistorialItem
   );
-  
-  const totalHistorialPages = Math.ceil(historial.length / historialItemsPerPage);
+  const totalHistorialPages = Math.ceil(historialFiltrado.length / historialItemsPerPage);
   const paginateHistorial = (pageNumber) => setHistorialCurrentPage(pageNumber);
 
   return (
-    <div className="equipos-container">
+    <div>
       <h2>Equipos</h2>
       {token && (
         <div className="formulario">
@@ -178,18 +193,19 @@ const Equipos = () => {
           <input name="valor_compra" type="number" value={form.valor_compra} onChange={handleChange} placeholder="Valor compra" />
           <input name="observaciones" value={form.observaciones} onChange={handleChange} placeholder="Observaciones" />
           
-          <div className="form-group-image">
+          <div className="form-group-full-width">
             <label>Imagen del Equipo</label>
             <div className="file-input-wrapper">
-              <label htmlFor="imagen-equipo" className="btn-file-upload">
+              <button type="button" onClick={() => fileInputRef.current.click()}>
                 Seleccionar archivo
-              </label>
+              </button>
               <input
                 id="imagen-equipo"
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
                 ref={fileInputRef}
+                style={{ display: 'none' }}
               />
               {imagenFile && <span className="file-name">{imagenFile.name}</span>}
               {!imagenFile && imagenPreview && <span className="file-name">Imagen actual</span>}
@@ -208,7 +224,7 @@ const Equipos = () => {
         </div>
       )}
       
-      <div className="busqueda-equipos">
+      <div className="filtros-container">
         <input
           type="text"
           placeholder="Buscar en todos los campos..."
@@ -235,8 +251,8 @@ const Equipos = () => {
           <tbody>
             {currentItems.map((equipo, index) => (
               <tr key={equipo.id}>
-                <td>{indexOfFirstItem + index + 1}</td>
-                <td>
+                <td data-label="N°">{indexOfFirstItem + index + 1}</td>
+                <td data-label="Imagen">
                   {equipo.equipo_url ? (
                     <img 
                       src={`${API_URL}${equipo.equipo_url}`} 
@@ -248,16 +264,22 @@ const Equipos = () => {
                     <span className="no-image-placeholder">Sin foto</span>
                   )}
                 </td>
-                <td>{equipo.tipo}</td>
-                <td>{equipo.marca}</td>
-                <td>{equipo.modelo}</td>
-                <td>{equipo.serie}</td>
-                <td>{equipo.estado}</td>
+                <td data-label="Tipo">{equipo.tipo}</td>
+                <td data-label="Marca">{equipo.marca}</td>
+                <td data-label="Modelo">{equipo.modelo}</td>
+                <td data-label="Serie">{equipo.serie}</td>
+                <td data-label="Estado">{equipo.estado}</td>
                 {token && (
-                  <td>
-                    <button onClick={() => iniciarEdicion(equipo)}>Editar</button>
-                    <button onClick={() => eliminarEquipo(equipo.id)}>Eliminar</button>
-                    <button onClick={() => verHistorial(equipo.id)}>Historial</button>
+                  <td data-label="Acciones" className="acciones">
+                    <button onClick={() => iniciarEdicion(equipo)} className="btn-primary btn-icon" title="Editar">
+                      <FaPencilAlt />
+                    </button>
+                    <button onClick={() => eliminarEquipo(equipo.id)} className="btn-danger btn-icon" title="Eliminar">
+                      <FaTrash />
+                    </button>
+                    <button onClick={() => verHistorial(equipo.id)} className="btn-info btn-icon" title="Historial">
+                      <FaHistory />
+                    </button>
                   </td>
                 )}
               </tr>
@@ -283,13 +305,29 @@ const Equipos = () => {
       {mostrarHistorial && (
         <div className="modal-overlay">
           <div className="modal-content" style={{ maxWidth: '800px' }}>
-            <button className="modal-close-button" onClick={() => setMostrarHistorial(false)}>&times;</button>
+            <button className="modal-close-button" onClick={() => { setMostrarHistorial(false); setHistorialBusqueda(""); }}>&times;</button>
             <h3>Historial de Asignación</h3>
-            {historial.length === 0 ? (
-              <p>Este equipo no tiene historial de asignaciones.</p>
+
+            <div className="filtros-container modal-filtros">
+              <input
+                type="text"
+                placeholder="Buscar en el historial..."
+                value={historialBusqueda}
+                onChange={(e) => setHistorialBusqueda(e.target.value)}
+              />
+              <button onClick={() => setHistorialBusqueda("")} className="btn-secondary">Limpiar</button>
+            </div>
+
+            {historialFiltrado.length === 0 ? (
+              <p>
+                {historialBusqueda
+                  ? "No se encontraron registros con ese criterio."
+                  : "Este equipo no tiene historial de asignaciones."
+                }
+              </p>
             ) : (
               <>
-                <table className="tabla-historial">
+                <table className="tabla-datos">
                   <thead>
                     <tr>
                       <th>Empleado</th>
@@ -330,7 +368,7 @@ const Equipos = () => {
               </>
             )}
             <div className="modal-actions">
-                <button className="btn-cancelar" onClick={() => setMostrarHistorial(false)}>Cerrar</button>
+                <button onClick={() => { setMostrarHistorial(false); setHistorialBusqueda(""); }}>Cerrar</button>
             </div>
           </div>
         </div>

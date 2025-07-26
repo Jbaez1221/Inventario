@@ -12,8 +12,7 @@ import Empleados from "./pages/Empleados";
 import Asignaciones from "./pages/asignaciones";
 import HistorialEquipo from "./pages/HistorialEquipo";
 import Dashboard from "./pages/dashboard";
-import SolicitudesEmpleado from "./pages/solicitudes";
-
+import Solicitudes from "./pages/solicitudes";
 
 function App() {
   return (
@@ -27,7 +26,8 @@ function App() {
             <Route path="empleados" element={<Empleados />} />
             <Route path="asignaciones" element={<Asignaciones />} />
             <Route path="historial" element={<HistorialEquipo />} />
-            
+            <Route path="solicitudes" element={<Solicitudes />} />
+
             <Route
               path="dashboard"
               element={

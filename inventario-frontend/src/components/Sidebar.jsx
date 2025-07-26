@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { 
   FaLaptop, FaUsers, FaClipboardList, FaHistory, FaTachometerAlt, 
-  FaSignInAlt, FaSignOutAlt 
+  FaSignInAlt, FaSignOutAlt, FaFileAlt 
 } from 'react-icons/fa';
 import logo from '../assets/logo-corasur.png';
 import "../App.css";
@@ -52,6 +52,10 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
           <NavLink to="/historial" className="nav-link" onClick={handleLinkClick}>
             <FaHistory className="nav-icon" />
             {isOpen && "Historial"}
+          </NavLink>
+          <NavLink to="/solicitudes" className="nav-link" onClick={handleLinkClick}>
+            <FaFileAlt className="nav-icon" />
+            {isOpen && "Solicitudes"}
           </NavLink>
           {token && (
             <NavLink to="/dashboard" className="nav-link" onClick={handleLinkClick}>

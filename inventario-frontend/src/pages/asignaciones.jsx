@@ -37,18 +37,6 @@ const Asignaciones = () => {
     if (!dniTrimmed) return alert("Debe ingresar el DNI del empleado");
 
     try {
-      const empleadoResponse = await axiosBackend.get(`/empleados/por-dni/${dniTrimmed}`);
-      const empleado = empleadoResponse.data;
-      if (!empleado) {
-        alert("Error: No se encontró ningún empleado con el DNI proporcionado.");
-        return;
-      }
-
-      if (empleado.estado === 'Inactivo') {
-        alert("Error: El empleado no está activo y no se le puede asignar un equipo.");
-        return;
-      }
-
       const response = await axiosBackend.post(
         `/asignaciones/por-dni`,
         {
@@ -61,14 +49,26 @@ const Asignaciones = () => {
         }
       );
 
-      const nombreArchivo = `Acta-Entrega-${equipoSeleccionado.marca}-${equipoSeleccionado.serie}.pdf`;
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const file = new Blob([response.data], { type: 'application/pdf' });
+      const fileURL = URL.createObjectURL(file);
+
       const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', nombreArchivo);
+      link.href = fileURL;
+      
+      const contentDisposition = response.headers['content-disposition'];
+      let fileName = `acta-asignacion-${dniTrimmed}.pdf`;
+      if (contentDisposition) {
+        const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
+        if (fileNameMatch && fileNameMatch.length === 2) {
+          fileName = fileNameMatch[1];
+        }
+      }
+      link.setAttribute('download', fileName);
+
       document.body.appendChild(link);
       link.click();
       link.remove();
+      URL.revokeObjectURL(fileURL);
 
       setMensaje("Equipo asignado y acta generada correctamente ✅");
       setTimeout(() => setMensaje(""), 4000);
@@ -78,7 +78,7 @@ const Asignaciones = () => {
 
     } catch (error) {
       console.error("Error en el proceso de asignación:", error);
-      const errorMsg = error.response?.data?.error || "No se pudo completar la asignación. Verifique los datos.";
+      const errorMsg = "No se pudo completar la asignación. Verifique que el DNI del empleado sea correcto.";
       alert(errorMsg);
     }
   };
@@ -86,13 +86,8 @@ const Asignaciones = () => {
   const equiposFiltrados = equiposDisponibles.filter((equipo) => {
     const busquedaLower = busqueda.toLowerCase().trim();
     if (!busquedaLower) return true;
-
-    return (
-      equipo.tipo.toLowerCase().includes(busquedaLower) ||
-      equipo.marca.toLowerCase().includes(busquedaLower) ||
-      equipo.modelo.toLowerCase().includes(busquedaLower) ||
-      equipo.serie.toLowerCase().includes(busquedaLower) ||
-      equipo.ubicacion.toLowerCase().includes(busquedaLower)
+    return Object.values(equipo).some(val =>
+      val && String(val).toLowerCase().includes(busquedaLower)
     );
   });
 
@@ -120,28 +115,30 @@ const Asignaciones = () => {
               <th>Marca</th>
               <th>Modelo</th>
               <th>Serie</th>
-              <th>Ubicación</th>
+              <th>Memoria</th>
+              <th>Almacenamiento</th>
               {token && <th>Acción</th>}
             </tr>
           </thead>
           <tbody>
             {equiposFiltrados.length === 0 ? (
               <tr>
-                <td colSpan={token ? "7" : "6"}>
+                <td colSpan={token ? "8" : "7"}>
                   {busqueda ? "No se encontraron equipos." : "No hay equipos disponibles."}
                 </td>
               </tr>
             ) : (
               equiposFiltrados.map((equipo) => (
                 <tr key={equipo.id}>
-                  <td>{equipo.id}</td>
-                  <td>{equipo.tipo}</td>
-                  <td>{equipo.marca}</td>
-                  <td>{equipo.modelo}</td>
-                  <td>{equipo.serie}</td>
-                  <td>{equipo.ubicacion}</td>
+                  <td data-label="ID">{equipo.id}</td>
+                  <td data-label="Tipo">{equipo.tipo}</td>
+                  <td data-label="Marca">{equipo.marca}</td>
+                  <td data-label="Modelo">{equipo.modelo}</td>
+                  <td data-label="Serie">{equipo.serie}</td>
+                  <td data-label="Memoria">{equipo.memoria || '—'}</td>
+                  <td data-label="Almacenamiento">{equipo.almacenamiento || '—'}</td>
                   {token && (
-                    <td>
+                    <td data-label="Acción">
                       <button onClick={() => abrirFormularioAsignacion(equipo)}>
                         Asignar
                       </button>
@@ -171,7 +168,7 @@ const Asignaciones = () => {
               <textarea
                 value={observaciones}
                 onChange={(e) => setObservaciones(e.target.value)}
-                placeholder="Observaciones (opcional)"
+                placeholder="Observaciones de entrega (opcional)"
                 rows="3"
                 style={{ gridColumn: '1 / -1' }}
               />
@@ -180,7 +177,7 @@ const Asignaciones = () => {
             <div className="modal-actions">
               <button onClick={() => setModalVisible(false)}>Cancelar</button>
               <button onClick={asignar} style={{ backgroundColor: '#28a745', color: 'white' }}>
-                Asignar y Generar Acta
+                Confirmar Asignación
               </button>
             </div>
           </div>

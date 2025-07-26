@@ -1,6 +1,5 @@
 const EmpleadosModel = require("../models/empleados.model");
 
-// Obtener empleados
 const listarEmpleados = async (req, res) => {
   try {
     const empleados = await EmpleadosModel.obtenerEmpleados();
@@ -11,7 +10,6 @@ const listarEmpleados = async (req, res) => {
   }
 };
 
-// Obtener empleados por dni
 
 const obtenerEmpleadoPorDNI = async (req, res) => {
   const { dni } = req.params;
@@ -22,7 +20,7 @@ const obtenerEmpleadoPorDNI = async (req, res) => {
       return res.status(404).json({ error: "Empleado no encontrado" });
     }
 
-    res.json(empleados[0]); // retorna solo el primero
+    res.json(empleados[0]);
   } catch (error) {
     console.error("Error al buscar empleado por DNI:", error);
     res.status(500).json({ error: "Error en el servidor" });

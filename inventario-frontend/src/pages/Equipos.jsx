@@ -6,10 +6,13 @@ import { FaPencilAlt, FaTrash, FaHistory } from "react-icons/fa";
 const Equipos = () => {
   const { token } = useAuth();
   const [equipos, setEquipos] = useState([]);
-  const [form, setForm] = useState({
+  
+  const formInicial = {
     tipo: "", marca: "", modelo: "", serie: "", fecha_ingreso: "",
-    ubicacion: "", estado: "Disponible", garantia_fin: "", valor_compra: "", observaciones: ""
-  });
+    ubicacion: "", estado: "Disponible", garantia_fin: "", valor_compra: "", 
+    observaciones: "", memoria: "", almacenamiento: ""
+  };
+  const [form, setForm] = useState(formInicial);
   
   const [imagenFile, setImagenFile] = useState(null);
   const [imagenPreview, setImagenPreview] = useState("");
@@ -22,7 +25,7 @@ const Equipos = () => {
   const [itemsPerPage] = useState(10);
   const [historialCurrentPage, setHistorialCurrentPage] = useState(1);
   const historialItemsPerPage = 5;
-  const [historialBusqueda, setHistorialBusqueda] = useState(""); // <-- AÑADIR ESTADO
+  const [historialBusqueda, setHistorialBusqueda] = useState("");
 
   const fileInputRef = useRef(null);
   const [modalImagenUrl, setModalImagenUrl] = useState("");
@@ -61,6 +64,24 @@ const Equipos = () => {
   };
 
   const guardarEquipo = async () => {
+    const camposRequeridos = {
+      tipo: "Tipo",
+      marca: "Marca",
+      modelo: "Modelo",
+      serie: "Serie",
+      fecha_ingreso: "Fecha de Ingreso",
+      ubicacion: "Ubicación",
+      garantia_fin: "Fin de Garantía",
+      valor_compra: "Valor de Compra"
+    };
+
+    for (const campo in camposRequeridos) {
+      if (!form[campo] || String(form[campo]).trim() === "") {
+        alert(`El campo "${camposRequeridos[campo]}" es obligatorio.`);
+        return;
+      }
+    }
+
     const formData = new FormData();
     for (const key in form) {
       formData.append(key, form[key]);
@@ -100,10 +121,7 @@ const Equipos = () => {
   const cancelarEdicion = () => {
     setModoEdicion(false);
     setEquipoEditandoId(null);
-    setForm({
-      tipo: "", marca: "", modelo: "", serie: "", fecha_ingreso: "",
-      ubicacion: "", estado: "Disponible", garantia_fin: "", valor_compra: "", observaciones: ""
-    });
+    setForm(formInicial);
     setImagenFile(null);
     setImagenPreview("");
     if (fileInputRef.current) {
@@ -144,7 +162,7 @@ const Equipos = () => {
     const busquedaLower = busqueda.toLowerCase().trim();
     if (!busquedaLower) return true;
     return Object.values(eq).some(val =>
-      String(val).toLowerCase().includes(busquedaLower)
+      val && String(val).toLowerCase().includes(busquedaLower)
     );
   });
 
@@ -152,7 +170,7 @@ const Equipos = () => {
     const busquedaLower = historialBusqueda.toLowerCase().trim();
     if (!busquedaLower) return true;
     return Object.values(h).some(val =>
-      String(val).toLowerCase().includes(busquedaLower)
+      val && String(val).toLowerCase().includes(busquedaLower)
     );
   });
 
@@ -180,6 +198,8 @@ const Equipos = () => {
           <input name="marca" value={form.marca} onChange={handleChange} placeholder="Marca" />
           <input name="modelo" value={form.modelo} onChange={handleChange} placeholder="Modelo" />
           <input name="serie" value={form.serie} onChange={handleChange} placeholder="Serie" />
+          <input name="memoria" value={form.memoria} onChange={handleChange} placeholder="Memoria (e.g., 16GB RAM)" />
+          <input name="almacenamiento" value={form.almacenamiento} onChange={handleChange} placeholder="Almacenamiento (e.g., 512GB SSD)" />
           <input name="fecha_ingreso" type="date" value={form.fecha_ingreso} onChange={handleChange} />
           <input name="ubicacion" value={form.ubicacion} onChange={handleChange} placeholder="Ubicación" />
           {modoEdicion && (
@@ -190,8 +210,19 @@ const Equipos = () => {
             </select>
           )}
           <input name="garantia_fin" type="date" value={form.garantia_fin} onChange={handleChange} />
-          <input name="valor_compra" type="number" value={form.valor_compra} onChange={handleChange} placeholder="Valor compra" />
-          <input name="observaciones" value={form.observaciones} onChange={handleChange} placeholder="Observaciones" />
+          
+          <div className="form-group-full-width">
+            <input name="valor_compra" type="number" value={form.valor_compra} onChange={handleChange} placeholder="Valor de compra" />
+          </div>
+          <div className="form-group-full-width">
+            <textarea 
+              name="observaciones" 
+              value={form.observaciones} 
+              onChange={handleChange} 
+              placeholder="Observaciones"
+              rows="3"
+            />
+          </div>
           
           <div className="form-group-full-width">
             <label>Imagen del Equipo</label>
@@ -244,6 +275,8 @@ const Equipos = () => {
               <th>Marca</th>
               <th>Modelo</th>
               <th>Serie</th>
+              <th>Memoria</th>
+              <th>Almacenamiento</th>
               <th>Estado</th>
               {token && <th>Acciones</th>}
             </tr>
@@ -268,6 +301,8 @@ const Equipos = () => {
                 <td data-label="Marca">{equipo.marca}</td>
                 <td data-label="Modelo">{equipo.modelo}</td>
                 <td data-label="Serie">{equipo.serie}</td>
+                <td data-label="Memoria">{equipo.memoria || '—'}</td>
+                <td data-label="Almacenamiento">{equipo.almacenamiento || '—'}</td>
                 <td data-label="Estado">{equipo.estado}</td>
                 {token && (
                   <td data-label="Acciones" className="acciones">
@@ -327,30 +362,34 @@ const Equipos = () => {
               </p>
             ) : (
               <>
-                <table className="tabla-datos">
-                  <thead>
-                    <tr>
-                      <th>Empleado</th>
-                      <th>Cargo</th>
-                      <th>Área</th>
-                      <th>Fecha Entrega</th>
-                      <th>Fecha Devolución</th>
-                      <th>Observaciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentHistorialItems.map((h, i) => (
-                      <tr key={i}>
-                        <td>{h.nombre_empleado || "—"}</td>
-                        <td>{h.cargo || "—"}</td>
-                        <td>{h.area || "—"}</td>
-                        <td>{formatearFecha(h.fecha_entrega)}</td>
-                        <td>{formatearFecha(h.fecha_devolucion)}</td>
-                        <td>{h.observaciones || "—"}</td>
+                <div className="tabla-modal-container">
+                  <table className="tabla-datos">
+                    <thead>
+                      <tr>
+                        <th>Empleado</th>
+                        <th>Puesto</th>
+                        <th>Área</th>
+                        <th>Fecha Entrega</th>
+                        <th>Fecha Devolución</th>
+                        <th>Obs. Entrega</th>
+                        <th>Obs. Devolución</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {currentHistorialItems.map((h, i) => (
+                        <tr key={i}>
+                          <td>{h.empleado || "—"}</td>
+                          <td>{h.puesto || "—"}</td>
+                          <td>{h.area || "—"}</td>
+                          <td>{formatearFecha(h.fecha_entrega)}</td>
+                          <td>{formatearFecha(h.fecha_devolucion)}</td>
+                          <td className="celda-observaciones" title={h.observaciones}>{h.observaciones || "—"}</td>
+                          <td className="celda-observaciones" title={h.observacion_devolucion}>{h.observacion_devolucion || "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
 
                 {totalHistorialPages > 1 && (
                   <div className="pagination modal-pagination">

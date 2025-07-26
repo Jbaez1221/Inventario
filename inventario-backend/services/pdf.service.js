@@ -33,7 +33,8 @@ function generarActaPDF(datos, tipoActa) {
 
     let y = lineY + 25;
     const verbo = tipoActa === 'entrega' ? 'recibido' : 'devuelto';
-    const textoIntro = `Por medio del presente documento, yo ${datos.empleado.nombre_completo} identificado con DNI N.° ${datos.empleado.dni}, colaborador de la empresa CORASUR S.A., dejo constancia de haber ${verbo} un equipo informático para el cumplimiento de las funciones y actividades asignadas por la empresa.`;
+    const nombreCompletoEmpleado = `${datos.empleado.nombres} ${datos.empleado.apellidos}`;
+    const textoIntro = `Por medio del presente documento, yo ${nombreCompletoEmpleado} identificado con DNI N.° ${datos.empleado.dni}, colaborador de la empresa CORASUR S.A., dejo constancia de haber ${verbo} un equipo informático para el cumplimiento de las funciones y actividades asignadas por la empresa.`;
     doc.font("Helvetica").fontSize(11).text(textoIntro, pageMargin, y, { align: "justify", width: contentWidth });
 
     y += 70;
@@ -52,6 +53,8 @@ function generarActaPDF(datos, tipoActa) {
     fila("Marca:", datos.equipo.marca);
     fila("Modelo:", datos.equipo.modelo);
     fila("IMEI/Serie:", datos.equipo.serie);
+    fila("Memoria:", datos.equipo.memoria);
+    fila("Almacenamiento:", datos.equipo.almacenamiento);
     fila("Observaciones:", datos.observaciones || "—");
 
     y = doc.page.height - 150;
@@ -71,7 +74,7 @@ function generarActaPDF(datos, tipoActa) {
 
     y += 20;
     doc.text(`Nombre: JAYO E. BAEZ QUISPE`, firmaRecibeX, y);
-    doc.text(`Nombre: ${datos.empleado.nombre_completo}`, firmaDevuelveX, y);
+    doc.text(`Nombre: ${nombreCompletoEmpleado}`, firmaDevuelveX, y);
     y += 15;
     doc.text(`DNI: 71422050`, firmaRecibeX, y);
     doc.text(`DNI: ${datos.empleado.dni}`, firmaDevuelveX, y);

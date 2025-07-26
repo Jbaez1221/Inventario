@@ -55,23 +55,43 @@ const HistorialEquipo = () => {
     try {
       const response = await axiosBackend.post(
         `/devoluciones/${idADevolver}`,
-        { observaciones: devolucionObservaciones },
-        { responseType: 'blob' }
+        { 
+          observaciones: devolucionObservaciones,
+          fecha_devolucion: new Date().toISOString()
+        },
+        {
+          responseType: 'blob',
+        }
       );
-      const nombreArchivo = `Acta-Devolucion-${idADevolver}.pdf`;
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+
+      const file = new Blob([response.data], { type: 'application/pdf' });
+      const fileURL = URL.createObjectURL(file);
       const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', nombreArchivo);
+      link.href = fileURL;
+
+      const contentDisposition = response.headers['content-disposition'];
+      let fileName = `acta-devolucion-${idADevolver}.pdf`; // Nombre por defecto
+      if (contentDisposition) {
+        const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
+        if (fileNameMatch && fileNameMatch.length === 2) {
+          fileName = fileNameMatch[1];
+        }
+      }
+      link.setAttribute('download', fileName);
+
       document.body.appendChild(link);
       link.click();
       link.remove();
+      URL.revokeObjectURL(fileURL);
+
       setMensaje("Equipo devuelto y acta generada correctamente ✅");
       setTimeout(() => setMensaje(""), 4000);
       obtenerAsignaciones();
+
     } catch (error) {
       console.error("Error en el proceso de devolución:", error);
-      alert("No se pudo completar la devolución.");
+      const errorMsg = "No se pudo completar la devolución. Verifique los datos.";
+      alert(errorMsg);
     } finally {
       setModalDevolverVisible(false);
       setIdADevolver(null);
@@ -81,7 +101,7 @@ const HistorialEquipo = () => {
   const asignacionesFiltradas = asignaciones.filter((a) => {
     const busquedaLower = busquedaEmpleado.toLowerCase().trim();
     const matchEmpleado = !busquedaLower ||
-      a.empleado.toLowerCase().includes(busquedaLower) ||
+      (a.empleado && a.empleado.toLowerCase().includes(busquedaLower)) ||
       (a.empleado_dni && a.empleado_dni.includes(busquedaLower));
 
     const fechaEntrega = a.fecha_entrega ? a.fecha_entrega.split('T')[0] : null;
@@ -134,11 +154,11 @@ const HistorialEquipo = () => {
             <tr>
               <th>Empleado</th>
               <th>Área</th>
-              <th>Serie</th>
-              <th>Tipo</th>
+              <th>Equipo (Serie)</th>
               <th>Fecha entrega</th>
               <th>Fecha devolución</th>
-              <th>Observaciones</th>
+              <th>Obs. Entrega</th>
+              <th>Obs. Devolución</th>
               {token && <th>Acción</th>}
             </tr>
           </thead>
@@ -150,15 +170,19 @@ const HistorialEquipo = () => {
             ) : (
               currentItems.map((a) => (
                 <tr key={a.id}>
-                  <td>{a.empleado}</td>
-                  <td>{a.empleado_area || "—"}</td>
-                  <td>{a.equipo_serie}</td>
-                  <td>{a.equipo_tipo}</td>
-                  <td>{formatearFecha(a.fecha_entrega)}</td>
-                  <td>{formatearFecha(a.fecha_devolucion)}</td>
-                  <td>{a.observaciones || "—"}</td>
+                  <td data-label="Empleado">{a.empleado} ({a.empleado_dni})</td>
+                  <td data-label="Área">{a.empleado_area || "—"}</td>
+                  <td data-label="Equipo (Serie)">{`${a.equipo_tipo} ${a.equipo_marca} (${a.equipo_serie})`}</td>
+                  <td data-label="Fecha entrega">{formatearFecha(a.fecha_entrega)}</td>
+                  <td data-label="Fecha devolución">{formatearFecha(a.fecha_devolucion)}</td>
+                  <td data-label="Obs. Entrega" className="celda-observaciones" title={a.observaciones}>
+                    {a.observaciones || "—"}
+                  </td>
+                  <td data-label="Obs. Devolución" className="celda-observaciones" title={a.observacion_devolucion}>
+                    {a.observacion_devolucion || "—"}
+                  </td>
                   {token && (
-                    <td className="acciones">
+                    <td data-label="Acción" className="acciones">
                       {!a.fecha_devolucion && (
                         <button
                           onClick={() => confirmarDevolucion(a.id)}
@@ -207,7 +231,7 @@ const HistorialEquipo = () => {
                 Cancelar
               </button>
               <button className="btn-primary" onClick={ejecutarDevolucion}>
-                Devolver y Generar Acta
+                Confirmar Devolución
               </button>
             </div>
           </div>

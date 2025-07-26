@@ -9,8 +9,9 @@ const obtenerAsignaciones = async () => {
       a.fecha_devolucion, 
       a.observaciones, 
       a.acta_pdf,
-      a.equipo_id,                    
-      e.nombre_completo AS empleado,
+      a.equipo_id,
+      a.observacion_devolucion,
+      e.nombres || ' ' || e.apellidos AS empleado,
       e.dni AS empleado_dni,
       e.area AS empleado_area,
       eq.serie AS equipo_serie, 
@@ -53,7 +54,7 @@ const crearAsignacion = async (asignacion) => {
   };
 };
 
-const devolverEquipo = async (asignacion_id, fecha_devolucion, observaciones) => {
+const devolverEquipo = async (asignacion_id, fecha_devolucion, observacion_devolucion) => {
   const asignacionRes = await db.query("SELECT equipo_id FROM asignaciones WHERE id = $1", [asignacion_id]);
   if (asignacionRes.rows.length === 0) {
     throw new Error("Asignación no encontrada");
@@ -61,8 +62,9 @@ const devolverEquipo = async (asignacion_id, fecha_devolucion, observaciones) =>
   const equipo_id = asignacionRes.rows[0].equipo_id;
 
   const result = await db.query(
-    `UPDATE asignaciones SET fecha_devolucion = $1, observaciones = $2 WHERE id = $3 RETURNING *`,
-    [fecha_devolucion, observaciones, asignacion_id]
+    // Actualizado para usar el nuevo campo 'observacion_devolucion'
+    `UPDATE asignaciones SET fecha_devolucion = $1, observacion_devolucion = $2 WHERE id = $3 RETURNING *`,
+    [fecha_devolucion, observacion_devolucion, asignacion_id]
   );
   const asignacionActualizada = result.rows[0];
 
@@ -84,8 +86,10 @@ const devolverEquipo = async (asignacion_id, fecha_devolucion, observaciones) =>
 
 const obtenerHistorialPorEquipo = async (equipo_id) => {
   const result = await db.query(`
-    SELECT a.id, a.fecha_entrega, a.fecha_devolucion, a.observaciones,
-           e.nombre_completo AS empleado
+    SELECT a.id, a.fecha_entrega, a.fecha_devolucion, a.observaciones, a.observacion_devolucion,
+           e.nombres || ' ' || e.apellidos AS empleado,
+           e.puesto,
+           e.area -- Corregido: estaba duplicado 'e.puesto'
     FROM asignaciones a
     JOIN empleados e ON a.empleado_id = e.id
     WHERE a.equipo_id = $1

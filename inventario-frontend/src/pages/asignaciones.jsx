@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axiosBackend from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
 
+
 const Asignaciones = () => {
   const { token } = useAuth();
   const [mensaje, setMensaje] = useState("");

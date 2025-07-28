@@ -1,9 +1,20 @@
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/uploads/');
+    let folder = 'otros';
+    if (req.baseUrl) {
+      if (req.baseUrl.includes('equipos')) folder = 'equipos';
+      else if (req.baseUrl.includes('asignaciones')) folder = 'asignaciones';
+      else if (req.baseUrl.includes('devoluciones')) folder = 'devoluciones'; // <-- cambia aquí
+    }
+    const uploadPath = path.join('public', 'uploads', folder);
+
+    fs.mkdirSync(uploadPath, { recursive: true });
+
+    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -25,4 +36,8 @@ const upload = multer({
   limits: { fileSize: 1024 * 1024 * 5 }
 });
 
-module.exports = upload;
+function getRelativeUrl(filePath) {
+  return filePath.replace(/^public\//, '');
+}
+
+module.exports = { upload, getRelativeUrl };

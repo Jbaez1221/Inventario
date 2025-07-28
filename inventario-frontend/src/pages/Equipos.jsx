@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import axiosBackend, { API_URL } from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
-import { FaPencilAlt, FaTrash, FaHistory } from "react-icons/fa";
+import { FaPencilAlt, FaTrash, FaHistory, FaEye } from "react-icons/fa";
 
 const Equipos = () => {
   const { token } = useAuth();
@@ -9,8 +9,8 @@ const Equipos = () => {
   
   const formInicial = {
     tipo: "", marca: "", modelo: "", serie: "", fecha_ingreso: "",
-    ubicacion: "", estado: "Disponible", garantia_fin: "", valor_compra: "", 
-    observaciones: "", memoria: "", almacenamiento: ""
+    ubicacion: "", estado: "Disponible", valor_compra: "", 
+    observaciones: "", memoria: "", almacenamiento: "", garantia: ""
   };
   const [form, setForm] = useState(formInicial);
   
@@ -30,12 +30,14 @@ const Equipos = () => {
   const fileInputRef = useRef(null);
   const [modalImagenUrl, setModalImagenUrl] = useState("");
 
-  // --- AÑADIDO: Estados para el modal de solicitud de stock ---
   const [modalSolicitudVisible, setModalSolicitudVisible] = useState(false);
   const [equipoParaSolicitar, setEquipoParaSolicitar] = useState(null);
   const [solicitudDni, setSolicitudDni] = useState("");
   const [solicitudMotivo, setSolicitudMotivo] = useState("");
   const [mensajeModal, setMensajeModal] = useState("");
+
+  const [modalEquipoVisible, setModalEquipoVisible] = useState(false);
+  const [equipoVisualizar, setEquipoVisualizar] = useState(null);
 
   useEffect(() => {
     obtenerEquipos();
@@ -78,7 +80,7 @@ const Equipos = () => {
       serie: "Serie",
       fecha_ingreso: "Fecha de Ingreso",
       ubicacion: "Ubicación",
-      garantia_fin: "Fin de Garantía",
+      garantia: "Años de Garantía",
       valor_compra: "Valor de Compra"
     };
 
@@ -116,7 +118,7 @@ const Equipos = () => {
     setForm({
       ...equipo,
       fecha_ingreso: formatearFechaLocal(equipo.fecha_ingreso),
-      garantia_fin: formatearFechaLocal(equipo.garantia_fin)
+      garantia: equipo.garantia || ""
     });
     setEquipoEditandoId(equipo.id);
     setModoEdicion(true);
@@ -159,7 +161,6 @@ const Equipos = () => {
     }
   };
 
-  // --- AÑADIDO: Funciones para manejar el modal de solicitud ---
   const abrirModalSolicitud = (equipo) => {
     setEquipoParaSolicitar(equipo);
     setModalSolicitudVisible(true);
@@ -186,7 +187,7 @@ const Equipos = () => {
         marca: equipoParaSolicitar.marca,
         modelo: equipoParaSolicitar.modelo,
         motivo: solicitudMotivo,
-        tipo: 'stock', // Se envía el tipo 'stock' como requerido
+        tipo: 'stock',
       });
       setMensajeModal("¡Solicitud enviada con éxito! El equipo de TI la revisará pronto.");
     } catch (error) {
@@ -200,6 +201,13 @@ const Equipos = () => {
     if (!isoDate) return "—";
     const date = new Date(isoDate);
     return date.toLocaleDateString('es-ES');
+  };
+
+  const calcularFinGarantia = (fechaIngreso, aniosGarantia) => {
+    if (!fechaIngreso || !aniosGarantia) return "—";
+    const fecha = new Date(fechaIngreso);
+    fecha.setFullYear(fecha.getFullYear() + parseInt(aniosGarantia));
+    return fecha.toLocaleDateString('es-ES');
   };
 
   const equiposFiltrados = equipos.filter((eq) => {
@@ -253,8 +261,14 @@ const Equipos = () => {
               <option value="Baja">Baja</option>
             </select>
           )}
-          <input name="garantia_fin" type="date" value={form.garantia_fin} onChange={handleChange} />
-          
+          <input
+            name="garantia"
+            type="number"
+            min="0"
+            value={form.garantia || ""}
+            onChange={handleChange}
+            placeholder="Años de garantía"
+          />
           <div className="form-group-full-width">
             <input name="valor_compra" type="number" value={form.valor_compra} onChange={handleChange} placeholder="Valor de compra" />
           </div>
@@ -268,7 +282,7 @@ const Equipos = () => {
             />
           </div>
           
-          <div className="form-group-full-width">
+          <div className="form-group-full-width" style={{ gridColumn: '1 / -1' }}>
             <label>Imagen del Equipo</label>
             <div className="file-input-wrapper">
               <button type="button" onClick={() => fileInputRef.current.click()}>
@@ -318,9 +332,7 @@ const Equipos = () => {
               <th>Tipo</th>
               <th>Marca</th>
               <th>Modelo</th>
-              <th>Serie</th>
               <th>Estado</th>
-              {/* La columna de Acciones solo se muestra si hay token */}
               {token && <th>Acciones</th>}
             </tr>
           </thead>
@@ -331,10 +343,10 @@ const Equipos = () => {
                 <td data-label="Imagen">
                   {equipo.equipo_url ? (
                     <img 
-                      src={`${API_URL}${equipo.equipo_url}`} 
+                      src={`${API_URL}/${equipo.equipo_url}`} 
                       alt={equipo.tipo} 
                       className="equipo-thumbnail"
-                      onClick={() => setModalImagenUrl(`${API_URL}${equipo.equipo_url}`)}
+                      onClick={() => setModalImagenUrl(`${API_URL}/${equipo.equipo_url}`)}
                     />
                   ) : (
                     <span className="no-image-placeholder">Sin foto</span>
@@ -343,9 +355,6 @@ const Equipos = () => {
                 <td data-label="Tipo">{equipo.tipo}</td>
                 <td data-label="Marca">{equipo.marca}</td>
                 <td data-label="Modelo">{equipo.modelo}</td>
-                <td data-label="Serie">{equipo.serie}</td>
-                
-                {/* CAMBIADO: Lógica dentro de la celda de Estado */}
                 <td data-label="Estado">
                   {!token && equipo.estado === 'Disponible' ? (
                     <button className="btn-success" onClick={() => abrirModalSolicitud(equipo)}>
@@ -355,9 +364,11 @@ const Equipos = () => {
                     equipo.estado
                   )}
                 </td>
-                
                 {token && (
                   <td data-label="Acciones" className="acciones">
+                    <button onClick={() => setEquipoVisualizar(equipo) || setModalEquipoVisible(true)} className="btn-info btn-icon" title="Visualizar">
+                      <FaEye />
+                    </button>
                     <button onClick={() => iniciarEdicion(equipo)} className="btn-primary btn-icon" title="Editar"><FaPencilAlt /></button>
                     <button onClick={() => eliminarEquipo(equipo.id)} className="btn-danger btn-icon" title="Eliminar"><FaTrash /></button>
                     <button onClick={() => verHistorial(equipo.id)} className="btn-info btn-icon" title="Historial"><FaHistory /></button>
@@ -508,6 +519,84 @@ const Equipos = () => {
           <div className="modal-content-image" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close-button" onClick={() => setModalImagenUrl("")}>&times;</button>
             <img src={modalImagenUrl} alt="Vista ampliada del equipo" />
+          </div>
+        </div>
+      )}
+
+      {modalEquipoVisible && equipoVisualizar && (
+        <div className="modal-overlay">
+          <div className="modal-content equipo-modal-card">
+            <button className="modal-close-button" onClick={() => setModalEquipoVisible(false)}>&times;</button>
+            <h3 style={{ textAlign: "left", marginBottom: 18, color: "#fff", fontWeight: 700 }}>Detalle del Equipo</h3>
+            <div>
+              {equipoVisualizar.equipo_url ? (
+                <img
+                  src={`${API_URL}/${equipoVisualizar.equipo_url}`}
+                  alt={equipoVisualizar.tipo}
+                />
+              ) : (
+                <span className="no-image-placeholder">Sin foto</span>
+              )}
+            </div>
+            <table className="equipo-modal-table">
+              <tbody>
+                <tr>
+                  <td>Tipo:</td>
+                  <td>{equipoVisualizar.tipo}</td>
+                </tr>
+                <tr>
+                  <td>Marca:</td>
+                  <td>{equipoVisualizar.marca}</td>
+                </tr>
+                <tr>
+                  <td>Modelo:</td>
+                  <td>{equipoVisualizar.modelo}</td>
+                </tr>
+                <tr>
+                  <td>Serie:</td>
+                  <td>{equipoVisualizar.serie}</td>
+                </tr>
+                <tr>
+                  <td>Memoria:</td>
+                  <td>{equipoVisualizar.memoria}</td>
+                </tr>
+                <tr>
+                  <td>Almacenamiento:</td>
+                  <td>{equipoVisualizar.almacenamiento}</td>
+                </tr>
+                <tr>
+                  <td>Ubicación:</td>
+                  <td>{equipoVisualizar.ubicacion}</td>
+                </tr>
+                <tr>
+                  <td>Estado:</td>
+                  <td>{equipoVisualizar.estado}</td>
+                </tr>
+                <tr>
+                  <td>Valor de compra:</td>
+                  <td>{equipoVisualizar.valor_compra}</td>
+                </tr>
+                <tr>
+                  <td>Fecha de ingreso:</td>
+                  <td>{formatearFecha(equipoVisualizar.fecha_ingreso)}</td>
+                </tr>
+                <tr>
+                  <td>Años de garantía:</td>
+                  <td>{equipoVisualizar.garantia || "—"}</td>
+                </tr>
+                <tr>
+                  <td>Fin de garantía (aprox):</td>
+                  <td>{calcularFinGarantia(equipoVisualizar.fecha_ingreso, equipoVisualizar.garantia)}</td>
+                </tr>
+                <tr>
+                  <td>Observaciones:</td>
+                  <td>{equipoVisualizar.observaciones || "—"}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div className="modal-actions">
+              <button onClick={() => setModalEquipoVisible(false)}>Cerrar</button>
+            </div>
           </div>
         </div>
       )}

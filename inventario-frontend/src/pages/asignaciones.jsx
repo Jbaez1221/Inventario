@@ -3,7 +3,6 @@ import axiosBackend from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
 import SignatureCanvas from 'react-signature-canvas'; 
 
-
 const Asignaciones = () => {
   const { token } = useAuth();
   const [mensaje, setMensaje] = useState("");
@@ -13,7 +12,9 @@ const Asignaciones = () => {
   const [dni, setDni] = useState("");
   const [observaciones, setObservaciones] = useState("");
   const [busqueda, setBusqueda] = useState("");
-
+  const [imagenFile, setImagenFile] = useState(null);
+  const [imagenPreview, setImagenPreview] = useState("");
+  const fileInputRef = useRef(null);
   const firmaEntregaRef = useRef(null);
   const firmaRecibeRef = useRef(null);
 
@@ -34,7 +35,18 @@ const Asignaciones = () => {
     setEquipoSeleccionado(equipo);
     setDni("");
     setObservaciones("");
+    setImagenFile(null);
+    setImagenPreview("");
     setModalVisible(true);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImagenFile(file);
+      setImagenPreview(URL.createObjectURL(file));
+    }
   };
 
   const asignarConFirmas = async () => {
@@ -44,26 +56,27 @@ const Asignaciones = () => {
       return alert("Ambas firmas son requeridas para generar el acta.");
     }
 
+    const formData = new FormData();
+    formData.append("dni", dniTrimmed);
+    formData.append("equipo_id", equipoSeleccionado.id);
+    formData.append("observaciones", observaciones);
+    if (imagenFile) {
+      formData.append("imagen_entrada", imagenFile);
+    }
+    formData.append("firmaEntrega", firmaEntregaRef.current.toDataURL('image/png'));
+    formData.append("firmaRecibe", firmaRecibeRef.current.toDataURL('image/png'));
+
     try {
       const response = await axiosBackend.post(
         `/asignaciones/crear-con-firmas`,
-        {
-          equipo_id: equipoSeleccionado.id,
-          dni: dniTrimmed,
-          observaciones,
-          firmaEntrega: firmaEntregaRef.current.toDataURL('image/png'), // Se envía la firma
-          firmaRecibe: firmaRecibeRef.current.toDataURL('image/png'),   // Se envía la firma
-        },
-        {
-          responseType: 'blob',
-        }
+        formData,
+        { responseType: 'blob' }
       );
 
       const file = new Blob([response.data], { type: 'application/pdf' });
       const fileURL = URL.createObjectURL(file);
       const link = document.createElement('a');
       link.href = fileURL;
-      
       const contentDisposition = response.headers['content-disposition'];
       let fileName = `acta-asignacion-firmada-${dniTrimmed}.pdf`;
       if (contentDisposition) {
@@ -71,7 +84,6 @@ const Asignaciones = () => {
         if (fileNameMatch && fileNameMatch.length === 2) fileName = fileNameMatch[1];
       }
       link.setAttribute('download', fileName);
-
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -79,14 +91,11 @@ const Asignaciones = () => {
 
       setMensaje("Equipo asignado y acta firmada generada correctamente ✅");
       setTimeout(() => setMensaje(""), 4000);
-      
       setModalVisible(false);
       obtenerEquiposDisponibles();
-
     } catch (error) {
       console.error("Error en el proceso de asignación con firmas:", error);
-      const errorMsg = "No se pudo completar la asignación. Verifique el DNI y las firmas.";
-      alert(errorMsg);
+      alert("No se pudo completar la asignación. Verifique el DNI, las firmas y la imagen.");
     }
   };
 
@@ -162,9 +171,7 @@ const Asignaciones = () => {
         <div className="modal-overlay">
           <div className="modal-content" style={{ maxWidth: '700px' }}>
             <button className="modal-close-button" onClick={() => setModalVisible(false)}>&times;</button>
-            
             <h4>Asignar: {equipoSeleccionado.marca} {equipoSeleccionado.modelo}</h4>
-            
             <div className="formulario" style={{ padding: 0, border: 'none', background: 'none' }}>
               <input
                 type="text"
@@ -179,8 +186,29 @@ const Asignaciones = () => {
                 rows="3"
                 style={{ gridColumn: '1 / -1' }}
               />
+              <div className="form-group-full-width">
+                <label>Imagen de entrega (opcional)</label>
+                <div className="file-input-wrapper">
+                  <button type="button" onClick={() => fileInputRef.current.click()}>
+                    Seleccionar archivo
+                  </button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handleImageChange}
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                  />
+                  {imagenFile && <span className="file-name">{imagenFile.name}</span>}
+                </div>
+                {imagenPreview && (
+                  <div className="image-preview">
+                    <img src={imagenPreview} alt="Vista previa de entrega" />
+                  </div>
+                )}
+              </div>
             </div>
-
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
               <div className="firma-container">
                 <label className="firma-label">Firma de quien entrega (TI)</label>
@@ -205,7 +233,6 @@ const Asignaciones = () => {
                 </div>
               </div>
             </div>
-
             <div className="modal-actions">
               <button onClick={() => setModalVisible(false)}>Cancelar</button>
               <button onClick={asignarConFirmas} style={{ backgroundColor: '#28a745', color: 'white' }}>

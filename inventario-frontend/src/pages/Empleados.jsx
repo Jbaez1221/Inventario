@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import axiosBackend from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
-import { FaPencilAlt, FaTrash } from "react-icons/fa";
+import { FaPencilAlt, FaTrash, FaEye } from "react-icons/fa";
 
 const Empleados = () => {
   const { token } = useAuth();
   const [empleados, setEmpleados] = useState([]);
-  
+  const [empleadoVisualizar, setEmpleadoVisualizar] = useState(null);
+  const [modalEmpleadoVisible, setModalEmpleadoVisible] = useState(false);
+
   const formInicial = {
     nombres: "",
     apellidos: "",
@@ -48,7 +50,7 @@ const Empleados = () => {
   const guardarEmpleado = async () => {
     const camposRequeridos = [
       'nombres', 'apellidos', 'dni', 'correo_personal', 
-      'area', 'puesto', 'telefono_coorporativo', 'telefono_personal', 'sede'
+      'area', 'puesto', 'telefono_personal', 'sede'
     ];
     for (const campo of camposRequeridos) {
       if (!form[campo] || !form[campo].trim()) {
@@ -157,11 +159,6 @@ const Empleados = () => {
             <tr>
               <th>N°</th>
               <th>Nombre Completo</th>
-              <th>DNI</th>
-              <th>Correo Personal</th>
-              <th>Correo Institucional</th>
-              <th>Teléfono Personal</th>
-              <th>Teléfono Corporativo</th>
               <th>Puesto</th>
               <th>Área</th>
               <th>Sede</th>
@@ -174,17 +171,19 @@ const Empleados = () => {
               <tr key={empleado.id}>
                 <td data-label="N°">{index + 1}</td>
                 <td data-label="Nombre Completo">{`${empleado.nombres} ${empleado.apellidos}`}</td>
-                <td data-label="DNI">{empleado.dni}</td>
-                <td data-label="Correo Personal">{empleado.correo_personal}</td>
-                <td data-label="Correo Institucional">{empleado.correo_institucional || "—"}</td>
-                <td data-label="Teléfono Personal">{empleado.telefono_personal || "—"}</td>
-                <td data-label="Teléfono Corporativo">{empleado.telefono_coorporativo || "—"}</td>
                 <td data-label="Puesto">{empleado.puesto}</td>
                 <td data-label="Área">{empleado.area}</td>
                 <td data-label="Sede">{empleado.sede}</td>
                 <td data-label="Estado">{empleado.estado}</td>
                 {token && (
                   <td data-label="Acciones" className="acciones">
+                    <button
+                      onClick={() => { setEmpleadoVisualizar(empleado); setModalEmpleadoVisible(true); }}
+                      className="btn-info btn-icon"
+                      title="Visualizar"
+                    >
+                      <FaEye />
+                    </button>
                     <button onClick={() => handleEditar(empleado)} className="btn-primary btn-icon" title="Editar">
                       <FaPencilAlt />
                     </button>
@@ -198,6 +197,62 @@ const Empleados = () => {
           </tbody>
         </table>
       </div>
+
+      {modalEmpleadoVisible && empleadoVisualizar && (
+        <div className="modal-overlay">
+          <div className="modal-content equipo-modal-card" style={{ maxWidth: 420 }}>
+            <button className="modal-close-button" onClick={() => setModalEmpleadoVisible(false)}>&times;</button>
+            <h3 style={{ textAlign: "left", marginBottom: 18, color: "#fff", fontWeight: 700 }}>Detalle del Empleado</h3>
+            <table className="equipo-modal-table">
+              <tbody>
+                <tr>
+                  <td>Nombre Completo:</td>
+                  <td>{empleadoVisualizar.nombres} {empleadoVisualizar.apellidos}</td>
+                </tr>
+                <tr>
+                  <td>DNI:</td>
+                  <td>{empleadoVisualizar.dni}</td>
+                </tr>
+                <tr>
+                  <td>Correo Personal:</td>
+                  <td>{empleadoVisualizar.correo_personal}</td>
+                </tr>
+                <tr>
+                  <td>Correo Institucional:</td>
+                  <td>{empleadoVisualizar.correo_institucional || "—"}</td>
+                </tr>
+                <tr>
+                  <td>Teléfono Personal:</td>
+                  <td>{empleadoVisualizar.telefono_personal || "—"}</td>
+                </tr>
+                <tr>
+                  <td>Teléfono Corporativo:</td>
+                  <td>{empleadoVisualizar.telefono_coorporativo || "—"}</td>
+                </tr>
+                <tr>
+                  <td>Puesto:</td>
+                  <td>{empleadoVisualizar.puesto}</td>
+                </tr>
+                <tr>
+                  <td>Área:</td>
+                  <td>{empleadoVisualizar.area}</td>
+                </tr>
+                <tr>
+                  <td>Sede:</td>
+                  <td>{empleadoVisualizar.sede}</td>
+                </tr>
+                <tr>
+                  <td>Estado:</td>
+                  <td>{empleadoVisualizar.estado}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div className="modal-actions">
+              <button onClick={() => setModalEmpleadoVisible(false)}>Cerrar</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {mostrarConfirmacion && (
         <div className="modal-overlay">

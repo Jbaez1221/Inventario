@@ -1,6 +1,7 @@
 const AsignacionModel = require("../models/asignaciones.model");
 const { generarActaPDF, generarActaPDFConFirmas } = require('../services/pdf.service');
 const { enviarActaPorCorreo } = require('../services/email.service');
+const { getRelativeUrl } = require("../middleware/multer.config");
 
 const devolverEquipoYGenerarActa = async (req, res) => {
   const { asignacion_id } = req.params;
@@ -24,7 +25,7 @@ const devolverEquipoYGenerarActa = async (req, res) => {
     const nombreArchivo = `Acta-Devolucion-${datosParaPDF.numeroActa}.pdf`;
     const pdfBuffer = await generarActaPDF(datosParaPDF, 'devolución');
 
-    enviarActaPorCorreo(pdfBuffer, nombreArchivo, 'devolucion').catch(err => {
+    enviarActaPorCorreo(pdfBuffer, nombreArchivo, 'devolucion', datosParaPDF.empleado).catch(err => {
         console.error("Fallo al enviar el correo de devolución:", err);
     });
 
@@ -43,18 +44,24 @@ const devolverEquipoConFirmas = async (req, res) => {
     const { asignacion_id } = req.params;
     const { observacion_devolucion, firmaRecibe, firmaDevuelve } = req.body;
 
+    let imagen_salida_url = null;
+    if (req.file) {
+      imagen_salida_url = getRelativeUrl(req.file.path);
+    }
+
     const resultadoDevolucion = await AsignacionModel.devolverEquipo(
       asignacion_id, 
       new Date(),
-      observacion_devolucion
+      observacion_devolucion,
+      imagen_salida_url
     );
 
     const datosParaPDF = {
       numeroActa: resultadoDevolucion.asignacion.id,
       empleado: resultadoDevolucion.empleado,
       equipo: resultadoDevolucion.equipo,
-      observaciones: resultadoDevolucion.asignacion.observaciones, // Obs. de entrega original
-      observacion_devolucion: resultadoDevolucion.asignacion.observacion_devolucion, // Nueva obs. de devolución
+      observaciones: resultadoDevolucion.asignacion.observaciones,
+      observacion_devolucion: resultadoDevolucion.asignacion.observacion_devolucion,
       fecha_devolucion: resultadoDevolucion.asignacion.fecha_devolucion,
       firmaRecibe,
       firmaDevuelve,
@@ -64,7 +71,7 @@ const devolverEquipoConFirmas = async (req, res) => {
     
     const pdfBuffer = await generarActaPDFConFirmas(datosParaPDF, 'devolucion');
 
-    enviarActaPorCorreo(pdfBuffer, nombreArchivo, 'devolucion').catch(err => {
+    enviarActaPorCorreo(pdfBuffer, nombreArchivo, 'devolucion', datosParaPDF.empleado).catch(err => {
         console.error("Fallo al enviar el correo de devolución:", err);
     });
 

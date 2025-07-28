@@ -8,12 +8,12 @@ const obtenerEquipos = async () => {
 const crearEquipo = async (equipo) => {
   let {
     tipo, marca, modelo, serie, fecha_ingreso,
-    ubicacion, garantia_fin, valor_compra, observaciones, equipo_url,
+    ubicacion, garantia, valor_compra, observaciones, equipo_url,
     memoria, almacenamiento
   } = equipo;
 
   fecha_ingreso = fecha_ingreso || null;
-  garantia_fin = garantia_fin || null;
+  garantia = garantia || null;
   valor_compra = valor_compra || null;
 
   const estadoCreacion = 'Disponible';
@@ -21,13 +21,13 @@ const crearEquipo = async (equipo) => {
   const result = await db.query(
     `INSERT INTO equipos (
       tipo, marca, modelo, serie, fecha_ingreso,
-      ubicacion, estado, garantia_fin, valor_compra, observaciones, equipo_url,
-      memoria, almacenamiento
+      ubicacion, estado, valor_compra, observaciones, equipo_url,
+      memoria, almacenamiento, garantia
     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
     RETURNING *`,
     [
       tipo, marca, modelo, serie, fecha_ingreso, ubicacion, estadoCreacion, 
-      garantia_fin, valor_compra, observaciones, equipo_url, memoria, almacenamiento
+      valor_compra, observaciones, equipo_url, memoria, almacenamiento, garantia
     ]
   );
 
@@ -47,23 +47,23 @@ const obtenerEquiposAsignados = async () => {
 const actualizarEquipo = async (id, equipo) => {
   let {
     tipo, marca, modelo, serie, fecha_ingreso,
-    ubicacion, estado, garantia_fin, valor_compra, observaciones, equipo_url,
+    ubicacion, estado, garantia, valor_compra, observaciones, equipo_url,
     memoria, almacenamiento
   } = equipo;
 
   fecha_ingreso = fecha_ingreso || null;
-  garantia_fin = garantia_fin || null;
+  garantia = garantia || null;
   valor_compra = valor_compra || null;
 
   const result = await db.query(
     `UPDATE equipos SET
       tipo = $1, marca = $2, modelo = $3, serie = $4, fecha_ingreso = $5,
-      ubicacion = $6, estado = $7, garantia_fin = $8, valor_compra = $9,
-      observaciones = $10, equipo_url = $11, memoria = $12, almacenamiento = $13
+      ubicacion = $6, estado = $7, valor_compra = $8,
+      observaciones = $9, equipo_url = $10, memoria = $11, almacenamiento = $12, garantia = $13
     WHERE id = $14 RETURNING *`,
     [
       tipo, marca, modelo, serie, fecha_ingreso, ubicacion, estado, 
-      garantia_fin, valor_compra, observaciones, equipo_url, memoria, almacenamiento, id
+      valor_compra, observaciones, equipo_url, memoria, almacenamiento, garantia, id
     ]
   );
 

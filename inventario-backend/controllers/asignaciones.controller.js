@@ -6,6 +6,7 @@ const AsignacionModel = require("../models/asignaciones.model");
 const { generarActaPDF } = require('../services/pdf.service');
 const { generarActaPDFConFirmas } = require('../services/pdf.service');
 const { enviarActaPorCorreo } = require('../services/email.service');
+const { getRelativeUrl } = require("../middleware/multer.config"); // Agrega esta línea
 
 const listarAsignaciones = async (req, res) => {
   try {
@@ -42,8 +43,8 @@ const asignarEquipoPorDNI = async (req, res) => {
     const nombreArchivo = `Acta-Entrega-${datosParaPDF.numeroActa}.pdf`;
     const pdfBuffer = await generarActaPDF(datosParaPDF, 'entrega');
 
-    enviarActaPorCorreo(pdfBuffer, nombreArchivo, 'entrega').catch(err => {
-        console.error("Fallo al enviar el correo de entrega por DNI:", err);
+    enviarActaPorCorreo(pdfBuffer, nombreArchivo, 'entrega', datosParaPDF.empleado).catch(err => {
+        console.error("Fallo al enviar el correo de entrega:", err);
     });
 
     res.setHeader('Content-Type', 'application/pdf');
@@ -59,6 +60,11 @@ const asignarEquipoPorDNI = async (req, res) => {
 const registrarAsignacion = async (req, res) => {
   try {
     const asignacion = req.body;
+
+    if (req.file) {
+      asignacion.imagen_entrada_url = getRelativeUrl(req.file.path);
+    }
+
     const nueva = await AsignacionModel.crearAsignacion(asignacion);
     res.status(201).json(nueva);
   } catch (error) {
@@ -111,7 +117,17 @@ const crearAsignacionConFirmas = async (req, res) => {
   try {
     const { dni, equipo_id, observaciones, firmaEntrega, firmaRecibe } = req.body;
 
-    const nuevaAsignacionCompleta = await AsignacionModel.crearAsignacionPorDNI({ dni, equipo_id, observaciones });
+    let imagen_entrada_url = null;
+    if (req.file) {
+      imagen_entrada_url = getRelativeUrl(req.file.path);
+    }
+
+    const nuevaAsignacionCompleta = await AsignacionModel.crearAsignacionPorDNI({
+      dni,
+      equipo_id,
+      observaciones,
+      imagen_entrada_url
+    });
 
     const datosParaPDF = {
       ...nuevaAsignacionCompleta,

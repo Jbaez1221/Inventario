@@ -1,4 +1,5 @@
 const EquipoModel = require("../models/equipos.model");
+const { getRelativeUrl } = require("../middleware/multer.config");
 
 const listarEquipos = async (req, res) => {
   try {
@@ -15,7 +16,7 @@ const registrarEquipo = async (req, res) => {
     const equipoData = req.body;
     
     if (req.file) {
-      equipoData.equipo_url = `/uploads/${req.file.filename}`;
+      equipoData.equipo_url = getRelativeUrl(req.file.path);
     }
 
     const nuevo = await EquipoModel.crearEquipo(equipoData);
@@ -52,7 +53,7 @@ const editarEquipo = async (req, res) => {
     const equipoData = req.body;
 
     if (req.file) {
-      equipoData.equipo_url = `/uploads/${req.file.filename}`;
+      equipoData.equipo_url = getRelativeUrl(req.file.path);
     }
 
     const actualizado = await EquipoModel.actualizarEquipo(id, equipoData);

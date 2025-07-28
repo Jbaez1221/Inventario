@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const EquiposController = require("../controllers/equipos.controller");
 const { protegerRuta } = require('../middleware/auth.middleware');
-const upload = require('../middleware/multer.config');
+const { upload } = require('../middleware/multer.config');
 
 router.get("/", EquiposController.listarEquipos);
 router.get("/disponibles", EquiposController.listarEquiposDisponibles);

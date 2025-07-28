@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import axiosBackend from "../api/axios";
+import axiosBackend, { API_URL } from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
 import SignatureCanvas from 'react-signature-canvas';
 
@@ -19,6 +19,10 @@ const HistorialEquipo = () => {
 
   const firmaRecibeRef = useRef(null);
   const firmaDevuelveRef = useRef(null);
+  const [modalImagenUrl, setModalImagenUrl] = useState("");
+  const [imagenSalidaFile, setImagenSalidaFile] = useState(null);
+  const [imagenSalidaPreview, setImagenSalidaPreview] = useState("");
+  const fileInputSalidaRef = useRef(null);
 
   useEffect(() => {
     obtenerAsignaciones();
@@ -55,22 +59,32 @@ const HistorialEquipo = () => {
     setModalDevolverVisible(true);
   };
 
+  const handleImageSalidaChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImagenSalidaFile(file);
+      setImagenSalidaPreview(URL.createObjectURL(file));
+    }
+  };
+
   const ejecutarDevolucionConFirmas = async () => {
     if (firmaRecibeRef.current.isEmpty() || firmaDevuelveRef.current.isEmpty()) {
       return alert("Ambas firmas son requeridas para generar el acta de devolución.");
     }
 
     try {
+      const formData = new FormData();
+      formData.append("observacion_devolucion", devolucionObservaciones);
+      formData.append("firmaRecibe", firmaRecibeRef.current.toDataURL('image/png'));
+      formData.append("firmaDevuelve", firmaDevuelveRef.current.toDataURL('image/png'));
+      if (imagenSalidaFile) {
+        formData.append("imagen_salida", imagenSalidaFile);
+      }
+
       const response = await axiosBackend.post(
         `/devoluciones/con-firmas/${idADevolver}`,
-        {
-          observacion_devolucion: devolucionObservaciones,
-          firmaRecibe: firmaRecibeRef.current.toDataURL('image/png'),
-          firmaDevuelve: firmaDevuelveRef.current.toDataURL('image/png'),
-        },
-        {
-          responseType: 'blob',
-        }
+        formData,
+        { responseType: 'blob' }
       );
 
       const file = new Blob([response.data], { type: 'application/pdf' });
@@ -103,6 +117,8 @@ const HistorialEquipo = () => {
     } finally {
       setModalDevolverVisible(false);
       setIdADevolver(null);
+      setImagenSalidaFile(null);
+      setImagenSalidaPreview("");
     }
   };
 
@@ -167,13 +183,15 @@ const HistorialEquipo = () => {
               <th>Fecha devolución</th>
               <th>Obs. Entrega</th>
               <th>Obs. Devolución</th>
+              <th>Imagen Entrega</th>
+              <th>Imagen Devolución</th>
               {token && <th>Acción</th>}
             </tr>
           </thead>
           <tbody>
             {currentItems.length === 0 ? (
               <tr>
-                <td colSpan="8">No hay asignaciones que coincidan con los filtros.</td>
+                <td colSpan="10">No hay asignaciones que coincidan con los filtros.</td>
               </tr>
             ) : (
               currentItems.map((a) => (
@@ -188,6 +206,32 @@ const HistorialEquipo = () => {
                   </td>
                   <td data-label="Obs. Devolución" className="celda-observaciones" title={a.observacion_devolucion}>
                     {a.observacion_devolucion || "—"}
+                  </td>
+                  <td data-label="Imagen Entrega">
+                    {a.imagen_entrada_url ? (
+                      <img
+                        src={`${API_URL}${a.imagen_entrada_url.startsWith('/') ? '' : '/'}${a.imagen_entrada_url}`}
+                        alt="Imagen entrega"
+                        className="equipo-thumbnail"
+                        onClick={() => setModalImagenUrl(`${API_URL}${a.imagen_entrada_url.startsWith('/') ? '' : '/'}${a.imagen_entrada_url}`)}
+                        style={{ cursor: "pointer" }}
+                      />
+                    ) : (
+                      <span className="no-image-placeholder">Sin foto</span>
+                    )}
+                  </td>
+                  <td data-label="Imagen Devolución">
+                    {a.imagen_salida_url ? (
+                      <img
+                        src={`${API_URL}/${a.imagen_salida_url}`}
+                        alt="Imagen devolución"
+                        className="equipo-thumbnail"
+                        onClick={() => setModalImagenUrl(`${API_URL}/${a.imagen_salida_url}`)}
+                        style={{ cursor: "pointer" }}
+                      />
+                    ) : (
+                      <span className="no-image-placeholder">Sin foto</span>
+                    )}
                   </td>
                   {token && (
                     <td data-label="Acción" className="acciones">
@@ -234,6 +278,28 @@ const HistorialEquipo = () => {
                 rows="3"
                 style={{ gridColumn: '1 / -1' }}
               />
+              <div className="form-group-full-width">
+                <label>Imagen de devolución (opcional)</label>
+                <div className="file-input-wrapper">
+                  <button type="button" onClick={() => fileInputSalidaRef.current.click()}>
+                    Seleccionar archivo
+                  </button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handleImageSalidaChange}
+                    ref={fileInputSalidaRef}
+                    style={{ display: 'none' }}
+                  />
+                  {imagenSalidaFile && <span className="file-name">{imagenSalidaFile.name}</span>}
+                </div>
+                {imagenSalidaPreview && (
+                  <div className="image-preview">
+                    <img src={imagenSalidaPreview} alt="Vista previa devolución" />
+                  </div>
+                )}
+              </div>
             </div>
 
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
@@ -269,6 +335,15 @@ const HistorialEquipo = () => {
                 Confirmar y Generar Acta Firmada
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {modalImagenUrl && (
+        <div className="modal-overlay" onClick={() => setModalImagenUrl("")}>
+          <div className="modal-content-image" onClick={e => e.stopPropagation()}>
+            <button className="modal-close-button" onClick={() => setModalImagenUrl("")}>&times;</button>
+            <img src={modalImagenUrl} alt="Vista ampliada" />
           </div>
         </div>
       )}

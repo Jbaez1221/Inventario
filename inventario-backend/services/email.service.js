@@ -49,4 +49,43 @@ const enviarActaPorCorreo = async (pdfBuffer, nombreArchivo, tipoActa, empleado)
   });
 };
 
-module.exports = { enviarActaPorCorreo };
+const enviarNotificacionSolicitud = async ({ empleado, estado, motivoRechazo = "" }) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: "robby863401@gmail.com",
+      pass: process.env.EMAIL_PASS, 
+    },
+  });
+
+  let correoEmpleado = null;
+  if (empleado) {
+    if (empleado.correo_institucional && empleado.correo_institucional.trim() !== "") {
+      correoEmpleado = empleado.correo_institucional.trim();
+    } else if (empleado.correo_personal && empleado.correo_personal.trim() !== "") {
+      correoEmpleado = empleado.correo_personal.trim();
+    }
+  }
+
+  if (!correoEmpleado) return;
+
+  const subjectText = estado === "aprobada"
+    ? "Solicitud de equipo aprobada"
+    : "Solicitud de equipo rechazada";
+
+  let bodyText = estado === "aprobada"
+    ? "Su solicitud de equipo ha sido aprobada. Pronto nos comunicaremos para la entrega."
+    : `Su solicitud de equipo ha sido rechazada.\nMotivo: ${motivoRechazo}`;
+
+  await transporter.sendMail({
+    from: '"Inventario CORASUR" <robby863401@gmail.com>',
+    to: correoEmpleado,
+    subject: subjectText,
+    text: bodyText,
+  });
+};
+
+module.exports = {
+  enviarActaPorCorreo,
+  enviarNotificacionSolicitud
+};

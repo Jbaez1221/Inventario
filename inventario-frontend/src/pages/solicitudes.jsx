@@ -1,18 +1,24 @@
 import { useEffect, useState } from "react";
 import axiosBackend from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
+import { FaSearch } from "react-icons/fa";
 
 const Solicitudes = () => {
   const { token } = useAuth();
-  
+
   const [dni, setDni] = useState("");
   const [tipoEquipo, setTipoEquipo] = useState("");
   const [marca, setMarca] = useState("");
   const [modelo, setModelo] = useState("");
   const [motivo, setMotivo] = useState("");
-  
+
   const [solicitudes, setSolicitudes] = useState([]);
   const [mensaje, setMensaje] = useState("");
+  const [modalRechazoVisible, setModalRechazoVisible] = useState(false);
+  const [solicitudRechazoId, setSolicitudRechazoId] = useState(null);
+  const [motivoRechazo, setMotivoRechazo] = useState("");
+  const [modalMotivoVisible, setModalMotivoVisible] = useState(false);
+  const [modalMotivoTexto, setModalMotivoTexto] = useState("");
 
   useEffect(() => {
     if (token) {
@@ -58,8 +64,34 @@ const Solicitudes = () => {
   };
 
   const cambiarEstado = async (id, estado) => {
+    if (estado === "rechazada") {
+      setSolicitudRechazoId(id);
+      setMotivoRechazo("");
+      setModalRechazoVisible(true);
+      return;
+    }
     try {
-      await axiosBackend.put(`/solicitudes/${id}`, { estado });
+      await axiosBackend.put(`/solicitudes/${id}/estado`, { estado });
+      obtenerSolicitudes();
+    } catch (err) {
+      console.error("Error al actualizar estado:", err);
+      alert("No se pudo cambiar el estado de la solicitud.");
+    }
+  };
+
+  const confirmarRechazo = async () => {
+    if (!motivoRechazo.trim()) {
+      alert("Debe ingresar un motivo para rechazar la solicitud.");
+      return;
+    }
+    try {
+      await axiosBackend.put(`/solicitudes/${solicitudRechazoId}/estado`, {
+        estado: "rechazada",
+        motivo_rechazo: motivoRechazo,
+      });
+      setModalRechazoVisible(false);
+      setSolicitudRechazoId(null);
+      setMotivoRechazo("");
       obtenerSolicitudes();
     } catch (err) {
       console.error("Error al actualizar estado:", err);
@@ -87,7 +119,7 @@ const Solicitudes = () => {
                 <th>Empleado</th>
                 <th>Área</th>
                 <th>Puesto</th>
-                <th>Tipo de Solicitud</th> {/* CAMBIADO: Nueva columna */}
+                <th>Tipo de Solicitud</th>
                 <th>Equipo Solicitado</th>
                 <th>Marca / Modelo</th>
                 <th>Motivo</th>
@@ -108,7 +140,44 @@ const Solicitudes = () => {
                   </td>
                   <td data-label="Equipo Solicitado">{s.tipo_equipo}</td>
                   <td data-label="Marca / Modelo">{s.marca} / {s.modelo}</td>
-                  <td data-label="Motivo" className="celda-observaciones" title={s.motivo}>{s.motivo}</td>
+                  <td data-label="Motivo" className="celda-observaciones" title={s.motivo}>
+                    {(s.motivo && s.motivo.length > 40)
+                      ? (
+                        <>
+                          {s.motivo.slice(0, 40)}...
+                          <button
+                            className="btn-icon btn-info"
+                            style={{ marginLeft: 6 }}
+                            title="Ver todo"
+                            onClick={() => {
+                              setModalMotivoTexto(s.motivo);
+                              setModalMotivoVisible(true);
+                            }}
+                          >
+                            <FaSearch />
+                          </button>
+                        </>
+                      )
+                      : (
+                        <>
+                          {s.motivo || "—"}
+                          {s.motivo && (
+                            <button
+                              className="btn-icon btn-info"
+                              style={{ marginLeft: 6 }}
+                              title="Ver todo"
+                              onClick={() => {
+                                setModalMotivoTexto(s.motivo);
+                                setModalMotivoVisible(true);
+                              }}
+                            >
+                              <FaSearch />
+                            </button>
+                          )}
+                        </>
+                      )
+                    }
+                  </td>
                   <td data-label="Estado">
                     <span className={`estado-solicitud estado-${s.estado}`}>{s.estado}</span>
                   </td>
@@ -119,7 +188,14 @@ const Solicitudes = () => {
                         <button className="btn-success" onClick={() => cambiarEstado(s.id, "aprobada")}>
                           Aprobar
                         </button>
-                        <button className="btn-danger" onClick={() => cambiarEstado(s.id, "rechazada")}>
+                        <button
+                          className="btn-danger"
+                          onClick={() => {
+                            setSolicitudRechazoId(s.id);
+                            setMotivoRechazo("");
+                            setModalRechazoVisible(true);
+                          }}
+                        >
                           Rechazar
                         </button>
                       </>
@@ -132,6 +208,41 @@ const Solicitudes = () => {
             </tbody>
           </table>
         </div>
+
+        {modalRechazoVisible && (
+          <div className="modal-overlay">
+            <div className="modal-content" style={{ maxWidth: 400 }}>
+              <button className="modal-close-button" onClick={() => setModalRechazoVisible(false)}>&times;</button>
+              <h3>Motivo de Rechazo</h3>
+              <textarea
+                value={motivoRechazo}
+                onChange={e => setMotivoRechazo(e.target.value)}
+                placeholder="Ingrese el motivo del rechazo"
+                rows={4}
+                style={{ width: "100%", marginBottom: 16 }}
+              />
+              <div className="modal-actions">
+                <button className="btn-secondary" onClick={() => setModalRechazoVisible(false)}>Cancelar</button>
+                <button className="btn-danger" onClick={confirmarRechazo}>Rechazar Solicitud</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {modalMotivoVisible && (
+          <div className="modal-overlay">
+            <div className="modal-content" style={{ maxWidth: 500 }}>
+              <button className="modal-close-button" onClick={() => setModalMotivoVisible(false)}>&times;</button>
+              <h3>Motivo de la Solicitud</h3>
+              <div style={{ whiteSpace: "pre-wrap", margin: "18px 0" }}>
+                {modalMotivoTexto}
+              </div>
+              <div className="modal-actions">
+                <button className="btn-secondary" onClick={() => setModalMotivoVisible(false)}>Cerrar</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

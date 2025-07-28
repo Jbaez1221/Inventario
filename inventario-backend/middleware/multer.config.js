@@ -37,7 +37,8 @@ const upload = multer({
 });
 
 function getRelativeUrl(filePath) {
-  return filePath.replace(/^public\//, '');
+  let relative = filePath.replace(/^public[\\/]/, '');
+  return relative.replace(/\\/g, '/');
 }
 
 module.exports = { upload, getRelativeUrl };

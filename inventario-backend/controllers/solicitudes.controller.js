@@ -1,5 +1,6 @@
 const SolicitudModel = require('../models/solicitudes.model');
 const db = require('../database');
+const { enviarNotificacionSolicitud } = require('../services/email.service');
 
 const getSolicitudes = async (req, res) => {
   try {
@@ -44,13 +45,29 @@ const crearSolicitud = async (req, res) => {
 const cambiarEstado = async (req, res) => {
   try {
     const { id } = req.params;
-    const { estado } = req.body;
+    const { estado, motivo_rechazo } = req.body;
 
     if (!["aprobada", "rechazada", "atendida"].includes(estado)) {
       return res.status(400).json({ error: "Estado inválido" });
     }
 
+    // Cambia el estado en la BD (sin guardar motivo de rechazo)
     const solicitudActualizada = await SolicitudModel.cambiarEstado(id, estado);
+
+    // Obtener el empleado para notificación
+    const empleadoRes = await db.query(
+      `SELECT * FROM empleados WHERE id = $1`,
+      [solicitudActualizada.empleado_id]
+    );
+    const empleado = empleadoRes.rows[0];
+
+    // Enviar notificación por correo
+    await enviarNotificacionSolicitud({
+      empleado,
+      estado,
+      motivoRechazo: estado === "rechazada" ? motivo_rechazo : ""
+    });
+
     res.status(200).json(solicitudActualizada);
   } catch (error) {
     console.error("Error al cambiar el estado:", error);

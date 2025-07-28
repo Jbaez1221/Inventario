@@ -20,7 +20,7 @@ function generarActaPDF(datos, tipoActa) {
     const headerY = 20;
     const logoPath = path.join(__dirname, '..', 'assets', 'logo.png');
 
-    doc.image(logoPath, pageMargin, headerY, { height: 40 });
+    doc.image(logoPath, pageMargin, headerY, { width: 120 });
 
     doc.moveDown(2.5);
     doc.font("Helvetica-Bold").fontSize(14).text(`ÁREA DE SISTEMAS 2025 - ${datos.numeroActa}`, pageMargin, doc.y, { width: contentWidth, align: 'center' });
@@ -56,6 +56,17 @@ function generarActaPDF(datos, tipoActa) {
     fila("Memoria:", datos.equipo.memoria);
     fila("Almacenamiento:", datos.equipo.almacenamiento);
     fila("Observaciones:", datos.observaciones || "—");
+    if (tipoActa === 'devolucion' && datos.observacion_devolucion) {
+      doc.font("Helvetica-Bold").text("Observación de devolución:", pageMargin + 10, y);
+      y += 18;
+      const obsDevY = doc.font("Helvetica").text(
+        datos.observacion_devolucion || "—",
+        pageMargin + 10,
+        y,
+        { width: contentWidth - 20, align: "justify" }
+      ).y;
+      y = obsDevY + 10;
+    }
 
     y = doc.page.height - 150;
     const firmaWidth = 180;
@@ -101,7 +112,7 @@ function generarActaPDFConFirmas(datos, tipoActa) {
     const headerY = 20;
     const logoPath = path.join(__dirname, '..', 'assets', 'logo.png');
 
-    doc.image(logoPath, pageMargin, headerY, { height: 40 });
+    doc.image(logoPath, pageMargin, headerY, { width: 120 });
 
     doc.moveDown(2.5);
     doc.font("Helvetica-Bold").fontSize(14).text(`ÁREA DE SISTEMAS 2025 - ${datos.numeroActa}`, pageMargin, doc.y, { width: contentWidth, align: 'center' });
@@ -137,6 +148,17 @@ function generarActaPDFConFirmas(datos, tipoActa) {
     fila("Memoria:", datos.equipo.memoria);
     fila("Almacenamiento:", datos.equipo.almacenamiento);
     fila("Observaciones:", datos.observaciones || "—");
+    if (tipoActa === 'devolucion' && datos.observacion_devolucion) {
+      doc.font("Helvetica-Bold").text("Observación de devolución:", pageMargin + 10, y);
+      y += 18; // Espacio debajo de la etiqueta
+      const obsDevY = doc.font("Helvetica").text(
+        datos.observacion_devolucion || "—",
+        pageMargin + 10,
+        y,
+        { width: contentWidth - 20, align: "justify" }
+      ).y;
+      y = obsDevY + 10;
+    }
 
     let firmaY = doc.page.height - 150;
     const firmaWidth = 180;

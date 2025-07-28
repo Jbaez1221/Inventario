@@ -129,15 +129,18 @@ const crearAsignacionConFirmas = async (req, res) => {
       imagen_entrada_url
     });
 
+    const numeroActa = nuevaAsignacionCompleta.asignacion.id;
+
     const datosParaPDF = {
       ...nuevaAsignacionCompleta,
+      numeroActa,
       observaciones: nuevaAsignacionCompleta.asignacion.observaciones,
       fecha_entrega: nuevaAsignacionCompleta.asignacion.fecha_entrega,
       firmaEntrega,
       firmaRecibe,
     };
 
-    const nombreArchivo = `Acta-Entrega-Firmada-${datosParaPDF.asignacion.id}.pdf`;
+    const nombreArchivo = `Acta-Entrega-Firmada-${numeroActa}.pdf`;
     
     const pdfBuffer = await generarActaPDFConFirmas(datosParaPDF, 'entrega');
 

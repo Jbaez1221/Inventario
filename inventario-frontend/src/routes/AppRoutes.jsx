@@ -1,7 +1,6 @@
-// src/routes/AppRoutes.jsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Equipos from "../pages/Equipos";
-import Asignaciones from "../pages/asignaciones"; // 👈 importar
+import Asignaciones from "../pages/asignaciones";
 import HistorialEquipo from "../pages/HistorialEquipo";
 import EquiposAdmin from "./pages/EquiposAdmin";
 import Solicitudes from "../pages/solicitudes";

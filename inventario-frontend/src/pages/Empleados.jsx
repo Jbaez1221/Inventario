@@ -162,6 +162,9 @@ const Empleados = () => {
               <th>Puesto</th>
               <th>Área</th>
               <th>Sede</th>
+              <th>Correo Corporativo</th>
+              <th>Teléfono Corporativo</th>
+              <th>Teléfono Personal</th>
               <th>Estado</th>
               {token && <th>Acciones</th>}
             </tr>
@@ -174,6 +177,9 @@ const Empleados = () => {
                 <td data-label="Puesto">{empleado.puesto}</td>
                 <td data-label="Área">{empleado.area}</td>
                 <td data-label="Sede">{empleado.sede}</td>
+                <td data-label="Correo Corporativo">{empleado.correo_institucional || "—"}</td>
+                <td data-label="Teléfono Corporativo">{empleado.telefono_coorporativo || "—"}</td>
+                <td data-label="Teléfono Personal">{empleado.telefono_personal || "—"}</td>
                 <td data-label="Estado">{empleado.estado}</td>
                 {token && (
                   <td data-label="Acciones" className="acciones">

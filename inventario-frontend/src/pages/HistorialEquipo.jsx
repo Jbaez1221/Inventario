@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import axiosBackend, { API_URL } from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
 import SignatureCanvas from 'react-signature-canvas';
+import { FaSearch } from "react-icons/fa";
 
 const HistorialEquipo = () => {
   const { token } = useAuth();
@@ -23,6 +24,10 @@ const HistorialEquipo = () => {
   const [imagenSalidaFile, setImagenSalidaFile] = useState(null);
   const [imagenSalidaPreview, setImagenSalidaPreview] = useState("");
   const fileInputSalidaRef = useRef(null);
+
+  const [modalObsVisible, setModalObsVisible] = useState(false);
+  const [modalObsTexto, setModalObsTexto] = useState("");
+  const [modalObsTitulo, setModalObsTitulo] = useState("");
 
   useEffect(() => {
     obtenerAsignaciones();
@@ -147,12 +152,15 @@ const HistorialEquipo = () => {
       {mensaje && <div className="mensaje-exito">{mensaje}</div>}
 
       <div className="filtros-container">
-        <input
-          type="text"
-          placeholder="Buscar por empleado o DNI..."
-          value={busquedaEmpleado}
-          onChange={(e) => setBusquedaEmpleado(e.target.value)}
-        />
+        <div className="filtro-busqueda">
+          <FaSearch className="icono-busqueda" />
+          <input
+            type="text"
+            placeholder="Buscar por empleado o DNI..."
+            value={busquedaEmpleado}
+            onChange={(e) => setBusquedaEmpleado(e.target.value)}
+          />
+        </div>
         <input
           type="date"
           title="Fecha de entrega (desde)"
@@ -202,10 +210,46 @@ const HistorialEquipo = () => {
                   <td data-label="Fecha entrega">{formatearFecha(a.fecha_entrega)}</td>
                   <td data-label="Fecha devolución">{formatearFecha(a.fecha_devolucion)}</td>
                   <td data-label="Obs. Entrega" className="celda-observaciones" title={a.observaciones}>
-                    {a.observaciones || "—"}
+                    {(a.observaciones && a.observaciones.length > 40)
+                      ? (
+                        <>
+                          {a.observaciones.slice(0, 40)}...
+                          <button
+                            className="btn-icon btn-info"
+                            style={{ marginLeft: 6 }}
+                            title="Ver todo"
+                            onClick={() => {
+                              setModalObsTitulo("Observaciones de Entrega");
+                              setModalObsTexto(a.observaciones);
+                              setModalObsVisible(true);
+                            }}
+                          >
+                            <FaSearch />
+                          </button>
+                        </>
+                      )
+                      : (a.observaciones || "—")}
                   </td>
                   <td data-label="Obs. Devolución" className="celda-observaciones" title={a.observacion_devolucion}>
-                    {a.observacion_devolucion || "—"}
+                    {(a.observacion_devolucion && a.observacion_devolucion.length > 40)
+                      ? (
+                        <>
+                          {a.observacion_devolucion.slice(0, 40)}...
+                          <button
+                            className="btn-icon btn-info"
+                            style={{ marginLeft: 6 }}
+                            title="Ver todo"
+                            onClick={() => {
+                              setModalObsTitulo("Observaciones de Devolución");
+                              setModalObsTexto(a.observacion_devolucion);
+                              setModalObsVisible(true);
+                            }}
+                          >
+                            <FaSearch />
+                          </button>
+                        </>
+                      )
+                      : (a.observacion_devolucion || "—")}
                   </td>
                   <td data-label="Imagen Entrega">
                     {a.imagen_entrada_url ? (
@@ -344,6 +388,21 @@ const HistorialEquipo = () => {
           <div className="modal-content-image" onClick={e => e.stopPropagation()}>
             <button className="modal-close-button" onClick={() => setModalImagenUrl("")}>&times;</button>
             <img src={modalImagenUrl} alt="Vista ampliada" />
+          </div>
+        </div>
+      )}
+
+      {modalObsVisible && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: 500 }}>
+            <button className="modal-close-button" onClick={() => setModalObsVisible(false)}>&times;</button>
+            <h3>{modalObsTitulo}</h3>
+            <div className="modal-obs-texto">
+              {modalObsTexto}
+            </div>
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={() => setModalObsVisible(false)}>Cerrar</button>
+            </div>
           </div>
         </div>
       )}

@@ -45,10 +45,12 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
             <FaUsers className="nav-icon" />
             {isOpen && "Empleados"}
           </NavLink>
-          <NavLink to="/asignaciones" className="nav-link" onClick={handleLinkClick}>
-            <FaClipboardList className="nav-icon" />
-            {isOpen && "Asignaciones"}
-          </NavLink>
+          {token && (
+            <NavLink to="/asignaciones" className="nav-link" onClick={handleLinkClick}>
+              <FaClipboardList className="nav-icon" />
+              {isOpen && "Asignaciones"}
+            </NavLink>
+          )}
           <NavLink to="/historial" className="nav-link" onClick={handleLinkClick}>
             <FaHistory className="nav-icon" />
             {isOpen && "Historial"}

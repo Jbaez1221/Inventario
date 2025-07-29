@@ -449,10 +449,12 @@ const Equipos = () => {
                           <td>{formatearFecha(h.fecha_entrega)}</td>
                           <td>{formatearFecha(h.fecha_devolucion)}</td>
                           <td className="celda-observaciones" title={h.observaciones}>
-                            {(h.observaciones && h.observaciones.length > 40)
+                            {h.observaciones
                               ? (
                                 <>
-                                  {h.observaciones.slice(0, 40)}...
+                                  {h.observaciones.length > 40
+                                    ? `${h.observaciones.slice(0, 40)}...`
+                                    : h.observaciones}
                                   <button
                                     className="btn-icon btn-info"
                                     style={{ marginLeft: 6 }}
@@ -467,13 +469,15 @@ const Equipos = () => {
                                   </button>
                                 </>
                               )
-                              : (h.observaciones || "—")}
+                              : "—"}
                           </td>
                           <td className="celda-observaciones" title={h.observacion_devolucion}>
-                            {(h.observacion_devolucion && h.observacion_devolucion.length >= 40)
+                            {h.observacion_devolucion
                               ? (
                                 <>
-                                  {h.observacion_devolucion.slice(0, 40)}...
+                                  {h.observacion_devolucion.length > 40
+                                    ? `${h.observacion_devolucion.slice(0, 40)}...`
+                                    : h.observacion_devolucion}
                                   <button
                                     className="btn-icon btn-info"
                                     style={{ marginLeft: 6 }}
@@ -488,7 +492,7 @@ const Equipos = () => {
                                   </button>
                                 </>
                               )
-                              : (h.observacion_devolucion || "—")}
+                              : "—"}
                           </td>
                         </tr>
                       ))}

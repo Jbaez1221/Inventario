@@ -210,7 +210,7 @@ const HistorialEquipo = () => {
                   <td data-label="Fecha entrega">{formatearFecha(a.fecha_entrega)}</td>
                   <td data-label="Fecha devolución">{formatearFecha(a.fecha_devolucion)}</td>
                   <td data-label="Obs. Entrega" className="celda-observaciones" title={a.observaciones}>
-                    {(a.observaciones && a.observaciones.length > 40)
+                    {(a.observaciones && a.observaciones.length >= 40)
                       ? (
                         <>
                           {a.observaciones.slice(0, 40)}...
@@ -231,7 +231,7 @@ const HistorialEquipo = () => {
                       : (a.observaciones || "—")}
                   </td>
                   <td data-label="Obs. Devolución" className="celda-observaciones" title={a.observacion_devolucion}>
-                    {(a.observacion_devolucion && a.observacion_devolucion.length > 40)
+                    {(a.observacion_devolucion && a.observacion_devolucion.length >= 40)
                       ? (
                         <>
                           {a.observacion_devolucion.slice(0, 40)}...

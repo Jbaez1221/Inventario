@@ -470,7 +470,7 @@ const Equipos = () => {
                               : (h.observaciones || "—")}
                           </td>
                           <td className="celda-observaciones" title={h.observacion_devolucion}>
-                            {(h.observacion_devolucion && h.observacion_devolucion.length > 40)
+                            {(h.observacion_devolucion && h.observacion_devolucion.length >= 40)
                               ? (
                                 <>
                                   {h.observacion_devolucion.slice(0, 40)}...
@@ -651,22 +651,10 @@ const Equipos = () => {
 
       {modalObsVisible && (
         <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: 500 }}>
+          <div className="modal-content">
             <button className="modal-close-button" onClick={() => setModalObsVisible(false)}>&times;</button>
             <h3>{modalObsTitulo}</h3>
-            <div
-              className="modal-obs-texto"
-              style={{
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-                overflowWrap: "break-word",
-                maxHeight: "40vh",
-                overflowY: "auto",
-                margin: "18px 0",
-                fontSize: "1rem",
-                lineHeight: 1.5,
-              }}
-            >
+            <div className="modal-obs-texto">
               {modalObsTexto}
             </div>
             <div className="modal-actions">

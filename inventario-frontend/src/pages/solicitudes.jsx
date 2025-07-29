@@ -20,11 +20,18 @@ const Solicitudes = () => {
   const [modalMotivoVisible, setModalMotivoVisible] = useState(false);
   const [modalMotivoTexto, setModalMotivoTexto] = useState("");
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+
   useEffect(() => {
     if (token) {
       obtenerSolicitudes();
     }
   }, [token]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [solicitudes]);
 
   const obtenerSolicitudes = async () => {
     try {
@@ -107,6 +114,18 @@ const Solicitudes = () => {
     });
   };
 
+  const solicitudesOrdenadas = [...solicitudes].sort((a, b) => {
+    if (a.estado === "pendiente" && b.estado !== "pendiente") return -1;
+    if (a.estado !== "pendiente" && b.estado === "pendiente") return 1;
+    return 0;
+  });
+
+  const totalPages = Math.ceil(solicitudesOrdenadas.length / itemsPerPage);
+  const paginatedSolicitudes = solicitudesOrdenadas.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   if (token) {
     return (
       <div>
@@ -129,7 +148,7 @@ const Solicitudes = () => {
               </tr>
             </thead>
             <tbody>
-              {solicitudes.map((s) => (
+              {paginatedSolicitudes.map((s) => (
                 <tr key={s.id}>
                   <td data-label="ID">{s.id}</td>
                   <td data-label="Empleado">{s.empleado_nombre || `(ID: ${s.empleado_id})`}</td>
@@ -241,6 +260,26 @@ const Solicitudes = () => {
                 <button className="btn-secondary" onClick={() => setModalMotivoVisible(false)}>Cerrar</button>
               </div>
             </div>
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Anterior
+            </button>
+            <span style={{ margin: "0 12px" }}>
+              Página {currentPage} de {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Siguiente
+            </button>
           </div>
         )}
       </div>

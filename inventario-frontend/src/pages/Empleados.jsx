@@ -29,6 +29,8 @@ const Empleados = () => {
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
   const [empleadoAEliminar, setEmpleadoAEliminar] = useState(null);
   const [busqueda, setBusqueda] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   useEffect(() => {
     obtenerEmpleados();
@@ -112,6 +114,16 @@ const Empleados = () => {
     );
   });
 
+  const totalPages = Math.ceil(empleadosFiltrados.length / itemsPerPage);
+  const paginatedEmpleados = empleadosFiltrados.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [busqueda]);
+
   return (
     <div>
       <h2>Empleados</h2>
@@ -170,9 +182,9 @@ const Empleados = () => {
             </tr>
           </thead>
           <tbody>
-            {empleadosFiltrados.map((empleado, index) => (
+            {paginatedEmpleados.map((empleado, index) => (
               <tr key={empleado.id}>
-                <td data-label="N°">{index + 1}</td>
+                <td data-label="N°">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                 <td data-label="Nombre Completo">{`${empleado.nombres} ${empleado.apellidos}`}</td>
                 <td data-label="Puesto">{empleado.puesto}</td>
                 <td data-label="Área">{empleado.area}</td>
@@ -203,6 +215,27 @@ const Empleados = () => {
           </tbody>
         </table>
       </div>
+
+      {/* PAGINACIÓN */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Anterior
+          </button>
+          <span style={{ margin: "0 12px" }}>
+            Página {currentPage} de {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Siguiente
+          </button>
+        </div>
+      )}
 
       {modalEmpleadoVisible && empleadoVisualizar && (
         <div className="modal-overlay">

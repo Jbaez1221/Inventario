@@ -99,7 +99,7 @@ const crearAsignacionYGenerarActa = async (req, res) => {
     const nombreArchivo = `Acta-Entrega-${datosParaPDF.numeroActa}.pdf`;
     const pdfBuffer = await generarActaPDF(datosParaPDF, 'entrega');
 
-    enviarActaPorCorreo(pdfBuffer, nombreArchivo, 'entrega').catch(err => {
+    enviarActaPorCorreo(pdfBuffer, nombreArchivo, 'entrega', datosParaPDF.empleado).catch(err => {
         console.error("Fallo al enviar el correo de entrega:", err);
     });
 
@@ -141,10 +141,9 @@ const crearAsignacionConFirmas = async (req, res) => {
     };
 
     const nombreArchivo = `Acta-Entrega-Firmada-${numeroActa}.pdf`;
-    
     const pdfBuffer = await generarActaPDFConFirmas(datosParaPDF, 'entrega');
 
-    enviarActaPorCorreo(pdfBuffer, nombreArchivo, 'entrega').catch(err => {
+    enviarActaPorCorreo(pdfBuffer, nombreArchivo, 'entrega', datosParaPDF.empleado).catch(err => {
         console.error("Fallo al enviar el correo de entrega:", err);
     });
 

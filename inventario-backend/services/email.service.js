@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 
 const enviarActaPorCorreo = async (pdfBuffer, nombreArchivo, tipoActa, empleado) => {
+
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {

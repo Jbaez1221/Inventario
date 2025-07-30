@@ -182,13 +182,14 @@ function generarActaPDFConFirmas(datos, tipoActa) {
     firmaY += 5;
     doc.font("Helvetica").fontSize(10).text(firmaIzquierdaLabel, firmaIzquierdaX, firmaY, { width: firmaWidth, align: 'center' });
     doc.text(firmaDerechaLabel, firmaDerechaX, firmaY, { width: firmaWidth, align: 'center' });
-    
+
     firmaY += 15;
-    doc.text(`Nombre: JAYO E. BAEZ QUISPE`, firmaIzquierdaX, firmaY);
-    doc.text(`Nombre: ${datos.empleado.nombres} ${datos.empleado.apellidos}`, firmaDerechaX, firmaY);
-    firmaY += 15;
-    doc.text(`DNI: 71422050`, firmaIzquierdaX, firmaY);
-    doc.text(`DNI: ${datos.empleado.dni}`, firmaDerechaX, firmaY);
+
+    let nombreIzqY = doc.text(`Nombre: JAYO E. BAEZ QUISPE`, firmaIzquierdaX, firmaY, { width: firmaWidth, align: 'center' }).y;
+    doc.text(`DNI: 71422050`, firmaIzquierdaX, nombreIzqY + 5, { width: firmaWidth, align: 'center' });
+
+    let nombreDerY = doc.text(`Nombre: ${datos.empleado.nombres} ${datos.empleado.apellidos}`, firmaDerechaX, firmaY, { width: firmaWidth, align: 'center' }).y;
+    doc.text(`DNI: ${datos.empleado.dni}`, firmaDerechaX, nombreDerY + 5, { width: firmaWidth, align: 'center' });
 
     doc.end();
   });

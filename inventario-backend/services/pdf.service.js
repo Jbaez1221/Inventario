@@ -150,7 +150,7 @@ function generarActaPDFConFirmas(datos, tipoActa) {
     fila("Observaciones:", datos.observaciones || "—");
     if (tipoActa === 'devolucion' && datos.observacion_devolucion) {
       doc.font("Helvetica-Bold").text("Observación de devolución:", pageMargin + 10, y);
-      y += 18; // Espacio debajo de la etiqueta
+      y += 18;
       const obsDevY = doc.font("Helvetica").text(
         datos.observacion_devolucion || "—",
         pageMargin + 10,
@@ -190,6 +190,18 @@ function generarActaPDFConFirmas(datos, tipoActa) {
 
     let nombreDerY = doc.text(`Nombre: ${datos.empleado.nombres} ${datos.empleado.apellidos}`, firmaDerechaX, firmaY, { width: firmaWidth, align: 'center' }).y;
     doc.text(`DNI: ${datos.empleado.dni}`, firmaDerechaX, nombreDerY + 5, { width: firmaWidth, align: 'center' });
+
+    const yFecha = Math.max(nombreIzqY + 25, nombreDerY + 25);
+    const fecha = tipoActa === 'entrega' ? datos.fecha_entrega : datos.fecha_devolucion;
+    const fechaFormateada = fecha
+      ? new Date(fecha).toLocaleDateString("es-PE", { timeZone: 'America/Lima' })
+      : "—";
+    doc.font("Helvetica").fontSize(10).text(
+      `Fecha: ${fechaFormateada}`,
+      0,
+      yFecha,
+      { align: 'center', width: doc.page.width }
+    );
 
     doc.end();
   });

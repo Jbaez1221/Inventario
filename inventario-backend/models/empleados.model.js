@@ -1,7 +1,14 @@
 const db = require("../database");
 
 const obtenerEmpleados = async () => {
-  const result = await db.query("SELECT * FROM empleados ORDER BY id ASC");
+  const result = await db.query(`
+    SELECT e.*, 
+      EXISTS (
+        SELECT 1 FROM asignaciones a WHERE a.empleado_id = e.id
+      ) AS tiene_asignaciones
+    FROM empleados e
+    ORDER BY e.id ASC
+  `);
   return result.rows;
 };
 
@@ -53,10 +60,19 @@ const buscarPorDni = async (dni) => {
   return result.rows;
 };
 
+const tieneAsignaciones = async (empleadoId) => {
+  const result = await db.query(
+    "SELECT COUNT(*) FROM asignaciones WHERE empleado_id = $1",
+    [empleadoId]
+  );
+  return parseInt(result.rows[0].count, 10) > 0;
+};
+
 module.exports = {
   obtenerEmpleados,
   crearEmpleado,
   actualizarEmpleado,
   eliminarEmpleado,
-  buscarPorDni, 
+  buscarPorDni,
+  tieneAsignaciones,
 };

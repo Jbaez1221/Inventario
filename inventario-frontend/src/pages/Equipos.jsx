@@ -624,6 +624,16 @@ const Equipos = () => {
                   <td>Estado:</td>
                   <td>{equipoVisualizar.estado}</td>
                 </tr>
+                {equipoVisualizar.estado === "Asignado" && equipoVisualizar.empleado_nombres && (
+                  <tr>
+                    <td>Asignado a:</td>
+                    <td>
+                      {equipoVisualizar.empleado_nombres} {equipoVisualizar.empleado_apellidos}
+                      <br />
+                      <strong>DNI:</strong> {equipoVisualizar.empleado_dni}
+                    </td>
+                  </tr>
+                )}
                 <tr>
                   <td>Valor de compra:</td>
                   <td>{equipoVisualizar.valor_compra}</td>

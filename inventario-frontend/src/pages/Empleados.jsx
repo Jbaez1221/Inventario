@@ -70,8 +70,8 @@ const Empleados = () => {
       cancelarEdicion();
       obtenerEmpleados();
     } catch (err) {
-      console.error("Error al guardar empleado:", err);
-      alert("Error al guardar empleado");
+      const msg = err?.response?.data?.error || "Error al guardar empleado";
+      alert(msg);
     }
   };
 
@@ -88,8 +88,8 @@ const Empleados = () => {
       setEmpleadoAEliminar(null);
       obtenerEmpleados();
     } catch (err) {
-      console.error("Error al eliminar empleado:", err);
-      alert("Error al eliminar");
+      const msg = err?.response?.data?.error || "Error al eliminar";
+      alert(msg);
     }
   };
 
@@ -202,10 +202,22 @@ const Empleados = () => {
                     >
                       <FaEye />
                     </button>
-                    <button onClick={() => handleEditar(empleado)} className="btn-primary btn-icon" title="Editar">
+                    <button
+                      onClick={() => handleEditar(empleado)}
+                      className="btn-primary btn-icon"
+                      title="Editar"
+                      disabled={empleado.tiene_asignaciones}
+                      style={empleado.tiene_asignaciones ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+                    >
                       <FaPencilAlt />
                     </button>
-                    <button onClick={() => confirmarEliminacion(empleado)} className="btn-danger btn-icon" title="Eliminar">
+                    <button
+                      onClick={() => confirmarEliminacion(empleado)}
+                      className="btn-danger btn-icon"
+                      title="Eliminar"
+                      disabled={empleado.tiene_asignaciones}
+                      style={empleado.tiene_asignaciones ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+                    >
                       <FaTrash />
                     </button>
                   </td>
@@ -216,7 +228,6 @@ const Empleados = () => {
         </table>
       </div>
 
-      {/* PAGINACIÓN */}
       {totalPages > 1 && (
         <div className="pagination">
           <button

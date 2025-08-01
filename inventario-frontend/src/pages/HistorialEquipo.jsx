@@ -16,7 +16,7 @@ const HistorialEquipo = () => {
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(20);
+  const [itemsPerPage] = useState(10);
 
   const firmaRecibeRef = useRef(null);
   const firmaDevuelveRef = useRef(null);
@@ -209,11 +209,13 @@ const HistorialEquipo = () => {
                   <td data-label="Equipo (Serie)">{`${a.equipo_tipo} ${a.equipo_marca} (${a.equipo_serie})`}</td>
                   <td data-label="Fecha entrega">{formatearFecha(a.fecha_entrega)}</td>
                   <td data-label="Fecha devolución">{formatearFecha(a.fecha_devolucion)}</td>
-                  <td data-label="Obs. Entrega" className="celda-observaciones" title={a.observaciones}>
-                    {(a.observaciones && a.observaciones.length >= 40)
+                  <td data-label="Obs. Entrega" className="celda-observaciones">
+                    {a.observaciones
                       ? (
                         <>
-                          {a.observaciones.slice(0, 40)}...
+                          {a.observaciones.length > 40
+                            ? `${a.observaciones.slice(0, 40)}...`
+                            : a.observaciones}
                           <button
                             className="btn-icon btn-info"
                             style={{ marginLeft: 6 }}
@@ -228,13 +230,15 @@ const HistorialEquipo = () => {
                           </button>
                         </>
                       )
-                      : (a.observaciones || "—")}
+                      : "—"}
                   </td>
-                  <td data-label="Obs. Devolución" className="celda-observaciones" title={a.observacion_devolucion}>
-                    {(a.observacion_devolucion && a.observacion_devolucion.length >= 40)
+                  <td data-label="Obs. Devolución" className="celda-observaciones">
+                    {a.observacion_devolucion
                       ? (
                         <>
-                          {a.observacion_devolucion.slice(0, 40)}...
+                          {a.observacion_devolucion.length > 40
+                            ? `${a.observacion_devolucion.slice(0, 40)}...`
+                            : a.observacion_devolucion}
                           <button
                             className="btn-icon btn-info"
                             style={{ marginLeft: 6 }}
@@ -249,7 +253,7 @@ const HistorialEquipo = () => {
                           </button>
                         </>
                       )
-                      : (a.observacion_devolucion || "—")}
+                      : "—"}
                   </td>
                   <td data-label="Imagen Entrega">
                     {a.imagen_entrada_url ? (

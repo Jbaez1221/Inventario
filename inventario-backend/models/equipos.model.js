@@ -1,7 +1,17 @@
 const db = require("../database");
 
 const obtenerEquipos = async () => {
-  const result = await db.query("SELECT * FROM equipos ORDER BY id");
+  const result = await db.query(`
+    SELECT 
+      e.*, 
+      emp.nombres AS empleado_nombres,
+      emp.apellidos AS empleado_apellidos,
+      emp.dni AS empleado_dni
+    FROM equipos e
+    LEFT JOIN asignaciones a ON a.equipo_id = e.id AND a.fecha_devolucion IS NULL
+    LEFT JOIN empleados emp ON emp.id = a.empleado_id
+    ORDER BY e.id
+  `);
   return result.rows;
 };
 
@@ -40,7 +50,17 @@ const obtenerEquiposDisponibles = async () => {
 };
 
 const obtenerEquiposAsignados = async () => {
-  const result = await db.query("SELECT * FROM equipos WHERE estado = 'Asignado'");
+  const result = await db.query(`
+    SELECT 
+      e.*, 
+      emp.nombres AS empleado_nombres,
+      emp.apellidos AS empleado_apellidos,
+      emp.dni AS empleado_dni
+    FROM equipos e
+    LEFT JOIN asignaciones a ON a.equipo_id = e.id AND a.fecha_devolucion IS NULL
+    LEFT JOIN empleados emp ON emp.id = a.empleado_id
+    WHERE e.estado = 'Asignado'
+  `);
   return result.rows;
 };
 

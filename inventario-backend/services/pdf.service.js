@@ -24,7 +24,7 @@ function generarActaPDF(datos, tipoActa) {
 
     doc.moveDown(2.5);
     doc.font("Helvetica-Bold").fontSize(14).text(`ÁREA DE SISTEMAS 2025 - ${datos.numeroActa}`, pageMargin, doc.y, { width: contentWidth, align: 'center' });
-    const tituloActa = tipoActa === 'entrega' ? 'ACTA DE ENTREGA DE EQUIPO INFORMÁTICO' : 'ACTA DE DEVOLUCIÓN DE EQUIPO INFORMÁTICO';
+    const tituloActa = tipoActa === 'entrega' ? 'ACTA DE ENTREGA DE EQUIPO' : 'ACTA DE DEVOLUCIÓN DE EQUIPO';
     doc.font("Helvetica-Bold").fontSize(12).text(tituloActa, { align: 'center' });
 
     doc.moveDown(1.5);
@@ -34,7 +34,7 @@ function generarActaPDF(datos, tipoActa) {
     let y = lineY + 25;
     const verbo = tipoActa === 'entrega' ? 'recibido' : 'devuelto';
     const nombreCompletoEmpleado = `${datos.empleado.nombres} ${datos.empleado.apellidos}`;
-    const textoIntro = `Por medio del presente documento, yo ${nombreCompletoEmpleado} identificado con DNI N.° ${datos.empleado.dni}, colaborador de la empresa CORASUR S.A., dejo constancia de haber ${verbo} un equipo informático para el cumplimiento de las funciones y actividades asignadas por la empresa.`;
+    const textoIntro = `Por medio del presente documento, yo ${nombreCompletoEmpleado} identificado con DNI N.° ${datos.empleado.dni}, colaborador de la empresa CORASUR S.A., dejo constancia de haber ${verbo} un equipo para el cumplimiento de las funciones y actividades asignadas por la empresa.`;
     doc.font("Helvetica").fontSize(11).text(textoIntro, pageMargin, y, { align: "justify", width: contentWidth });
 
     y += 70;
@@ -84,7 +84,7 @@ function generarActaPDF(datos, tipoActa) {
     doc.text(firmaDerechaLabel, firmaDevuelveX, y, { width: firmaWidth, align: 'center' });
 
     y += 20;
-    doc.text(`Nombre: JAYO E. BAEZ QUISPE`, firmaRecibeX, y);
+    doc.text(`Nombre: JAYO ERNESTO BAEZ QUISPE`, firmaRecibeX, y);
     doc.text(`Nombre: ${nombreCompletoEmpleado}`, firmaDevuelveX, y);
     y += 15;
     doc.text(`DNI: 71422050`, firmaRecibeX, y);
@@ -116,7 +116,7 @@ function generarActaPDFConFirmas(datos, tipoActa) {
 
     doc.moveDown(2.5);
     doc.font("Helvetica-Bold").fontSize(14).text(`ÁREA DE SISTEMAS 2025 - ${datos.numeroActa}`, pageMargin, doc.y, { width: contentWidth, align: 'center' });
-    const tituloActa = tipoActa === 'entrega' ? 'ACTA DE ENTREGA DE EQUIPO INFORMÁTICO' : 'ACTA DE DEVOLUCIÓN DE EQUIPO INFORMÁTICO';
+    const tituloActa = tipoActa === 'entrega' ? 'ACTA DE ENTREGA DE EQUIPO' : 'ACTA DE DEVOLUCIÓN DE EQUIPO';
     doc.font("Helvetica-Bold").fontSize(12).text(tituloActa, { align: 'center' });
 
     doc.moveDown(1.5);
@@ -126,7 +126,7 @@ function generarActaPDFConFirmas(datos, tipoActa) {
     let y = lineY + 25;
     const verbo = tipoActa === 'entrega' ? 'recibido' : 'devuelto';
     const nombreCompletoEmpleado = `${datos.empleado.nombres} ${datos.empleado.apellidos}`;
-    const textoIntro = `Por medio del presente documento, yo ${nombreCompletoEmpleado} identificado con DNI N.° ${datos.empleado.dni}, colaborador de la empresa CORASUR S.A., dejo constancia de haber ${verbo} un equipo informático para el cumplimiento de las funciones y actividades asignadas por la empresa.`;
+    const textoIntro = `Por medio del presente documento, yo ${nombreCompletoEmpleado} identificado con DNI N.° ${datos.empleado.dni}, colaborador de la empresa CORASUR S.A., dejo constancia de haber ${verbo} un equipo para el cumplimiento de las funciones y actividades asignadas por la empresa.`;
     doc.font("Helvetica").fontSize(11).text(textoIntro, pageMargin, y, { align: "justify", width: contentWidth });
 
     y += 70;
@@ -185,7 +185,7 @@ function generarActaPDFConFirmas(datos, tipoActa) {
 
     firmaY += 15;
 
-    let nombreIzqY = doc.text(`Nombre: JAYO E. BAEZ QUISPE`, firmaIzquierdaX, firmaY, { width: firmaWidth, align: 'center' }).y;
+    let nombreIzqY = doc.text(`Nombre: JAYO ERNESTO BAEZ QUISPE`, firmaIzquierdaX, firmaY, { width: firmaWidth, align: 'center' }).y;
     doc.text(`DNI: 71422050`, firmaIzquierdaX, nombreIzqY + 5, { width: firmaWidth, align: 'center' });
 
     let nombreDerY = doc.text(`Nombre: ${datos.empleado.nombres} ${datos.empleado.apellidos}`, firmaDerechaX, firmaY, { width: firmaWidth, align: 'center' }).y;

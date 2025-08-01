@@ -5,7 +5,7 @@ const enviarActaPorCorreo = async (pdfBuffer, nombreArchivo, tipoActa, empleado)
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: "robby863401@gmail.com",
+      user: "inventariocorasur@gmail.com",
       pass: process.env.EMAIL_PASS, 
     },
   });
@@ -26,8 +26,8 @@ const enviarActaPorCorreo = async (pdfBuffer, nombreArchivo, tipoActa, empleado)
   }
 
   const correosFijos = [
-    "jayobaez1221@gmail.com",
-    "016201245D@uandina.edu.pe"
+    "jbaez@corasur.com",
+    "kaguayo@corasur.com"
   ];
 
   let destinatarios = correosFijos.join(", ");
@@ -36,7 +36,7 @@ const enviarActaPorCorreo = async (pdfBuffer, nombreArchivo, tipoActa, empleado)
   }
 
   await transporter.sendMail({
-    from: '"Inventario CORASUR" <robby863401@gmail.com>',
+    from: '"Inventario CORASUR" <inventariocorasur@gmail.com>',
     to: destinatarios,
     subject: `${subjectText} - ${nombreArchivo}`,
     text: bodyText,
@@ -54,7 +54,7 @@ const enviarNotificacionSolicitud = async ({ empleado, estado, motivoRechazo = "
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: "robby863401@gmail.com",
+      user: "inventariocorasur@gmail.com",
       pass: process.env.EMAIL_PASS, 
     },
   });
@@ -79,7 +79,7 @@ const enviarNotificacionSolicitud = async ({ empleado, estado, motivoRechazo = "
     : `Su solicitud de equipo ha sido rechazada.\nMotivo: ${motivoRechazo}`;
 
   await transporter.sendMail({
-    from: '"Inventario CORASUR" <robby863401@gmail.com>',
+    from: '"Inventario CORASUR" <inventariocorasur@gmail.com>',
     to: correoEmpleado,
     subject: subjectText,
     text: bodyText,

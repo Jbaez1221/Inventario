@@ -4,7 +4,9 @@ import { useAuth } from "../hooks/useAuth";
 import { FaPencilAlt, FaTrash, FaEye } from "react-icons/fa";
 
 const Empleados = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  const rol = user?.user?.rol;
+
   const [empleados, setEmpleados] = useState([]);
   const [empleadoVisualizar, setEmpleadoVisualizar] = useState(null);
   const [modalEmpleadoVisible, setModalEmpleadoVisible] = useState(false);
@@ -128,7 +130,7 @@ const Empleados = () => {
     <div>
       <h2>Empleados</h2>
 
-      {token && (
+      {token && (rol === "admin" || rol === "rrhh") && (
         <div className="formulario">
           <input name="nombres" value={form.nombres} onChange={handleChange} placeholder="Nombres" />
           <input name="apellidos" value={form.apellidos} onChange={handleChange} placeholder="Apellidos" />
@@ -178,7 +180,7 @@ const Empleados = () => {
               <th>Teléfono Corporativo</th>
               <th>Teléfono Personal</th>
               <th>Estado</th>
-              {token && <th>Acciones</th>}
+              {token && (rol === "admin" || rol === "rrhh") && <th>Acciones</th>}
             </tr>
           </thead>
           <tbody>
@@ -193,7 +195,8 @@ const Empleados = () => {
                 <td data-label="Teléfono Corporativo">{empleado.telefono_coorporativo || "—"}</td>
                 <td data-label="Teléfono Personal">{empleado.telefono_personal || "—"}</td>
                 <td data-label="Estado">{empleado.estado}</td>
-                {token && (
+                {/* Solo admin y rrhh pueden ver acciones */}
+                {token && (rol === "admin" || rol === "rrhh") && (
                   <td data-label="Acciones" className="acciones">
                     <button
                       onClick={() => { setEmpleadoVisualizar(empleado); setModalEmpleadoVisible(true); }}

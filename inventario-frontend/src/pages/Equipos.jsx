@@ -4,7 +4,9 @@ import { useAuth } from "../hooks/useAuth";
 import { FaPencilAlt, FaTrash, FaHistory, FaEye, FaSearch } from "react-icons/fa";
 
 const Equipos = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  const rol = user?.user?.rol;
+
   const [equipos, setEquipos] = useState([]);
   
   const formInicial = {
@@ -252,7 +254,7 @@ const Equipos = () => {
   return (
     <div>
       <h2>Equipos</h2>
-      {token && (
+      {token && (rol === "admin" || rol === "sistemas") && (
         <div className="formulario">
           <input name="tipo" value={form.tipo} onChange={handleChange} placeholder="Tipo" />
           <input name="marca" value={form.marca} onChange={handleChange} placeholder="Marca" />
@@ -341,7 +343,7 @@ const Equipos = () => {
               <th>Marca</th>
               <th>Modelo</th>
               <th>Estado</th>
-              {token && <th>Acciones</th>}
+              {(token && (rol === "admin" || rol === "sistemas")) && <th>Acciones</th>}
             </tr>
           </thead>
           <tbody>
@@ -372,7 +374,7 @@ const Equipos = () => {
                     equipo.estado
                   )}
                 </td>
-                {token && (
+                {(token && (rol === "admin" || rol === "sistemas")) && (
                   <td data-label="Acciones" className="acciones">
                     <button onClick={() => setEquipoVisualizar(equipo) || setModalEquipoVisible(true)} className="btn-info btn-icon" title="Visualizar">
                       <FaEye />

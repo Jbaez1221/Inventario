@@ -170,13 +170,13 @@ h2 {
   display: flex;
   align-items: center;
   gap: 15px;
-  color: #ccc;
+  color: #e0e0e0;
   text-decoration: none;
   padding: 12px 25px;
   margin: 4px 10px;
   border-radius: 8px;
   white-space: nowrap;
-  transition: background-color 0.2s, color 0.2s;
+  transition: background 0.2s, color 0.2s;
   background: none;
   border: none;
   width: calc(100% - 20px);
@@ -846,6 +846,55 @@ h2 {
 .modal-content::-webkit-scrollbar-thumb:hover,
 .equipo-modal-card::-webkit-scrollbar-thumb:hover {
   background: #666;
+}
+
+.sidebar-group-title {
+  font-weight: bold;
+  color: #e0e0e0;
+  cursor: pointer;
+  padding: 10px 25px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+  background: #232323;
+  border-radius: 8px;
+  margin: 4px 10px 0 10px;
+  transition: background 0.2s, color 0.2s;
+  letter-spacing: 0.02em;
+}
+
+.sidebar-group-title:hover {
+  background: #292929;
+  color: #fff;
+}
+
+.sidebar-group-items {
+  padding-left: 18px;
+  border-left: 2px solid #444;
+  margin-bottom: 6px;
+}
+
+.sidebar .nav-link {
+  color: #e0e0e0;
+  background: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  background-color: #292929;
+  color: #fff;
+}
+
+.sidebar .nav-link .nav-icon {
+  color: #bdbdbd;
+  transition: color 0.2s;
+}
+
+.sidebar .nav-link.active .nav-icon,
+.sidebar .nav-link:hover .nav-icon {
+  color: #fff;
 }
 
 

@@ -10,6 +10,8 @@ import Asignaciones from "./pages/asignaciones";
 import HistorialEquipo from "./pages/HistorialEquipo";
 import Dashboard from "./pages/dashboard";
 import Solicitudes from "./pages/solicitudes";
+import Roles from "./pages/Roles";
+import Usuarios from "./pages/Usuarios";
 
 function App() {
   return (
@@ -37,6 +39,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="roles"
+              element={
+                <ProtectedRoute>
+                  <Roles />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="usuarios"
+              element={
+                <ProtectedRoute>
+                  <Usuarios />
                 </ProtectedRoute>
               }
             />

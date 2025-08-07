@@ -4,7 +4,9 @@ import { useAuth } from "../hooks/useAuth";
 import SignatureCanvas from 'react-signature-canvas'; 
 
 const Asignaciones = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  const rol = user?.user?.rol;
+
   const [mensaje, setMensaje] = useState("");
   const [equiposDisponibles, setEquiposDisponibles] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -106,6 +108,10 @@ const Asignaciones = () => {
       val && String(val).toLowerCase().includes(busquedaLower)
     );
   });
+
+  if (!token || (rol !== "admin" && rol !== "sistemas")) {
+    return <div>No tienes permisos para ver esta sección.</div>;
+  }
 
   return (
     <div>

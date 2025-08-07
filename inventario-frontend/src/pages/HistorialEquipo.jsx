@@ -5,7 +5,8 @@ import SignatureCanvas from 'react-signature-canvas';
 import { FaSearch } from "react-icons/fa";
 
 const HistorialEquipo = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  const rol = user?.user?.rol;
   const [asignaciones, setAsignaciones] = useState([]);
   const [mensaje, setMensaje] = useState("");
   const [modalDevolverVisible, setModalDevolverVisible] = useState(false);
@@ -281,7 +282,7 @@ const HistorialEquipo = () => {
                       <span className="no-image-placeholder">Sin foto</span>
                     )}
                   </td>
-                  {token && (
+                  {token && (rol === "admin" || rol === "sistemas") && (
                     <td data-label="Acción" className="acciones">
                       {!a.fecha_devolucion && (
                         <button
@@ -312,7 +313,7 @@ const HistorialEquipo = () => {
         </div>
       )}
 
-      {modalDevolverVisible && (
+      {modalDevolverVisible && (token && (rol === "admin" || rol === "sistemas")) && (
         <div className="modal-overlay">
           <div className="modal-content" style={{ maxWidth: '700px' }}>
             <button className="modal-close-button" onClick={() => setModalDevolverVisible(false)}>&times;</button>

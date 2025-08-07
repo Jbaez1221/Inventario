@@ -4,7 +4,8 @@ import { useAuth } from "../hooks/useAuth";
 import { FaSearch } from "react-icons/fa";
 
 const Solicitudes = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  const rol = user?.user?.rol;
 
   const [dni, setDni] = useState("");
   const [tipoEquipo, setTipoEquipo] = useState("");
@@ -24,10 +25,10 @@ const Solicitudes = () => {
   const itemsPerPage = 20;
 
   useEffect(() => {
-    if (token) {
+    if (token && (rol === "admin" || rol === "sistemas")) {
       obtenerSolicitudes();
     }
-  }, [token]);
+  }, [token, rol]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -126,7 +127,7 @@ const Solicitudes = () => {
     currentPage * itemsPerPage
   );
 
-  if (token) {
+  if (token && (rol === "admin" || rol === "sistemas")) {
     return (
       <div>
         <h2>Gestionar Solicitudes de Equipos</h2>

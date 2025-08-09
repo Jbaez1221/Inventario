@@ -13,13 +13,13 @@ const listarEmpleados = async (req, res) => {
 const obtenerEmpleadoPorDNI = async (req, res) => {
   const { dni } = req.params;
   try {
-    const empleados = await EmpleadosModel.buscarPorDni(dni);
+    const empleado = await EmpleadosModel.buscarPorDni(dni);
 
-    if (empleados.length === 0) {
+    if (!empleado) {
       return res.status(404).json({ error: "Empleado no encontrado" });
     }
 
-    res.json(empleados[0]);
+    res.json(empleado);
   } catch (error) {
     console.error("Error al buscar empleado por DNI:", error);
     res.status(500).json({ error: "Error en el servidor" });
@@ -28,9 +28,16 @@ const obtenerEmpleadoPorDNI = async (req, res) => {
 
 const registrarEmpleado = async (req, res) => {
   try {
+    const { dni, nombres, apellidos } = req.body;
+    if (!dni || !nombres || !apellidos) {
+      return res.status(400).json({ error: "DNI, nombres y apellidos son obligatorios." });
+    }
     const nuevoEmpleado = await EmpleadosModel.crearEmpleado(req.body);
     res.status(201).json(nuevoEmpleado);
   } catch (error) {
+    if (error.code === '23505') {
+      return res.status(400).json({ error: "El DNI ya está registrado en el sistema." });
+    }
     console.error("Error al crear empleado:", error);
     res.status(500).json({ error: "Error al crear empleado" });
   }

@@ -1,38 +1,34 @@
 import { useEffect, useState, useCallback } from "react";
 import axiosBackend from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
-import { FaPlus, FaEdit, FaTrash, FaTimes } from "react-icons/fa";
+import { FaPlus, FaTrash, FaTimes } from "react-icons/fa";
 
 const Usuarios = () => {
-  const { token, user } = useAuth();
+  const { user } = useAuth();
   const [usuarios, setUsuarios] = useState([]);
   const [roles, setRoles] = useState([]);
-  const [form, setForm] = useState({ username: "", password: "", rol_id: "" });
+  const [form, setForm] = useState({ dni: "", rol_id: "" });
   const [modoEdicion, setModoEdicion] = useState(false);
-  const [usuarioEditandoId, setUsuarioEditandoId] = useState(null);
   const [mensaje, setMensaje] = useState("");
+  const [passwordGenerada, setPasswordGenerada] = useState("");
 
   const obtenerUsuarios = useCallback(async () => {
     try {
-      const res = await axiosBackend.get("/usuarios", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await axiosBackend.get("/usuarios");
       setUsuarios(res.data);
     } catch {
       setMensaje("Error al cargar usuarios");
     }
-  }, [token]);
+  }, []);
 
   const obtenerRoles = useCallback(async () => {
     try {
-      const res = await axiosBackend.get("/roles", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await axiosBackend.get("/roles");
       setRoles(res.data);
     } catch {
       setMensaje("Error al cargar roles");
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     obtenerUsuarios();
@@ -44,53 +40,33 @@ const Usuarios = () => {
   };
 
   const guardarUsuario = async () => {
-    if (!form.username.trim() || (!modoEdicion && !form.password) || !form.rol_id) {
-      setMensaje("Todos los campos son obligatorios.");
+    if (!form.dni.trim() || !form.rol_id) {
+      setMensaje("DNI y rol son obligatorios.");
       return;
     }
     try {
-      if (modoEdicion) {
-        await axiosBackend.put(`/usuarios/${usuarioEditandoId}`, {
-          username: form.username,
-          password: form.password || undefined,
-          rol_id: form.rol_id
-        }, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-      } else {
-        await axiosBackend.post("/usuarios", form, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-      }
+      const res = await axiosBackend.post("/usuarios", form);
+      setPasswordGenerada(res.data.password_generada || "");
+      setMensaje("Usuario creado correctamente.");
       cancelarEdicion();
       obtenerUsuarios();
-      setMensaje("");
     } catch (err) {
       setMensaje(err.response?.data?.error || "Error al guardar usuario");
     }
   };
 
-  const iniciarEdicion = (usuario) => {
-    setForm({ username: usuario.username, password: "", rol_id: roles.find(r => r.nombre === usuario.rol)?.id || "" });
-    setUsuarioEditandoId(usuario.id);
-    setModoEdicion(true);
-    setMensaje("");
-    window.scrollTo(0, 0);
-  };
 
   const cancelarEdicion = () => {
     setModoEdicion(false);
-    setUsuarioEditandoId(null);
-    setForm({ username: "", password: "", rol_id: "" });
+    setForm({ dni: "", rol_id: "" });
     setMensaje("");
+    setPasswordGenerada("");
   };
 
   const eliminarUsuario = async (id) => {
     if (!window.confirm("¿Está seguro de que desea eliminar este usuario?")) return;
     try {
-      await axiosBackend.delete(`/usuarios/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axiosBackend.delete(`/usuarios/${id}`);
       obtenerUsuarios();
       setMensaje("");
     } catch (err) {
@@ -106,20 +82,19 @@ const Usuarios = () => {
     <div>
       <h2>Gestión de Usuarios</h2>
       {mensaje && <div className="mensaje-error">{mensaje}</div>}
+      {passwordGenerada && (
+        <div className="mensaje-info">
+          <b>Contraseña generada:</b> {passwordGenerada}
+        </div>
+      )}
 
       <div className="formulario">
         <input
-          name="username"
-          value={form.username}
+          name="dni"
+          value={form.dni}
           onChange={handleChange}
-          placeholder="Nombre de usuario"
-        />
-        <input
-          name="password"
-          type="password"
-          value={form.password}
-          onChange={handleChange}
-          placeholder={modoEdicion ? "Nueva contraseña (opcional)" : "Contraseña"}
+          placeholder="DNI del empleado"
+          maxLength={8}
         />
         <select
           name="rol_id"
@@ -132,8 +107,8 @@ const Usuarios = () => {
           ))}
         </select>
         <div className="botones">
-          <button onClick={guardarUsuario} className="btn-primary btn-icon" title={modoEdicion ? "Actualizar" : "Agregar"}>
-            {modoEdicion ? <FaEdit /> : <FaPlus />}
+          <button onClick={guardarUsuario} className="btn-primary btn-icon" title="Agregar">
+            <FaPlus />
           </button>
           {modoEdicion && (
             <button onClick={cancelarEdicion} className="btn-secondary btn-icon" title="Cancelar">
@@ -160,13 +135,6 @@ const Usuarios = () => {
                 <td>{usuario.username}</td>
                 <td>{usuario.rol}</td>
                 <td className="acciones">
-                  <button
-                    onClick={() => iniciarEdicion(usuario)}
-                    className="btn-primary btn-icon"
-                    title="Editar"
-                  >
-                    <FaEdit />
-                  </button>
                   <button
                     onClick={() => eliminarUsuario(usuario.id)}
                     className="btn-danger btn-icon"

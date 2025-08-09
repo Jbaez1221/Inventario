@@ -6,12 +6,18 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 import Equipos from "./pages/Equipos";
 import Empleados from "./pages/Empleados";
+import GestionarEmpleado from "./pages/GestionarEmpleado";
 import Asignaciones from "./pages/asignaciones";
 import HistorialEquipo from "./pages/HistorialEquipo";
 import Dashboard from "./pages/dashboard";
 import Solicitudes from "./pages/solicitudes";
 import Roles from "./pages/Roles";
 import Usuarios from "./pages/Usuarios";
+import CrearTicketPublico from "./pages/CrearTicketPublico";
+import EstadoTicketPublico from "./pages/EstadoTicketPublico";
+import BuscarSolucionesTickets from "./pages/BuscarSolucionesTickets";
+import TicketsGestion from "./pages/TicketsGestion";
+import TicketDetalle from "./pages/TicketDetalle";
 
 function App() {
   return (
@@ -23,6 +29,8 @@ function App() {
 
             <Route path="equipos" element={<Equipos />} />
             <Route path="empleados" element={<Empleados />} />
+            <Route path="empleados/gestionar" element={<GestionarEmpleado />} />
+            <Route path="empleados/gestionar/:id" element={<GestionarEmpleado />} />
             <Route
               path="asignaciones"
               element={
@@ -55,6 +63,26 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Usuarios />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="tickets/crear" element={<CrearTicketPublico />} />
+            <Route path="tickets/estado" element={<EstadoTicketPublico />} />
+            <Route path="tickets/soluciones" element={<BuscarSolucionesTickets />} />
+
+            <Route
+              path="tickets"
+              element={
+                <ProtectedRoute>
+                  <TicketsGestion />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="tickets/:id"
+              element={
+                <ProtectedRoute>
+                  <TicketDetalle />
                 </ProtectedRoute>
               }
             />

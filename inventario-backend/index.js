@@ -56,6 +56,9 @@ app.use('/api/roles', rolesRoutes);
 const usuariosRoutes = require('./routes/usuarios.routes');
 app.use('/api/usuarios', usuariosRoutes);
 
+const ticketsRoutes = require("./routes/tickets.routes");
+app.use("/api/tickets", ticketsRoutes);
+
 app.get("/", (req, res) => {
   res.send("API Inventario corriendo ✅");
 });

@@ -11,11 +11,12 @@ const listarUsuarios = async (req, res) => {
 
 const crearUsuario = async (req, res) => {
   try {
-    const { username, password, rol_id } = req.body;
-    const usuario = await UsuariosModel.crearUsuario({ username, password, rol_id });
+    const { dni, rol_id } = req.body;
+    const usuario = await UsuariosModel.crearUsuario({ dni, rol_id });
     res.status(201).json(usuario);
   } catch (error) {
-    res.status(500).json({ error: 'Error al crear usuario' });
+    console.error("Error al crear usuario:", error);
+    res.status(500).json({ error: error.message || 'Error al crear usuario' });
   }
 };
 

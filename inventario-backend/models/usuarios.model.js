@@ -1,13 +1,31 @@
 const db = require('../database');
 const bcrypt = require('bcryptjs');
 
-const crearUsuario = async ({ username, password, rol_id }) => {
-  const passwordHash = await bcrypt.hash(password, 10);
-  const result = await db.query(
-    `INSERT INTO usuarios (username, password, rol_id) VALUES ($1, $2, $3) RETURNING *`,
-    [username, passwordHash, rol_id]
+const crearUsuario = async ({ dni, rol_id }) => {
+  if (!dni) throw new Error("DNI es requerido para crear usuario enlazado a empleado");
+
+  const empleadoResult = await db.query(
+    "SELECT id, nombres, apellidos, correo_institucional, correo_personal FROM empleados WHERE dni = $1",
+    [dni]
   );
-  return result.rows[0];
+  if (empleadoResult.rows.length === 0) {
+    throw new Error("No existe un empleado con ese DNI");
+  }
+  const empleado = empleadoResult.rows[0];
+
+  const username = empleado.correo_institucional || empleado.correo_personal;
+  if (!username) throw new Error("El empleado no tiene correo registrado");
+
+  const nombreLetra = empleado.nombres ? empleado.nombres[0].toUpperCase() : '';
+  const apellidoLetra = empleado.apellidos ? empleado.apellidos[0].toUpperCase() : '';
+  const passwordPlano = `${dni}${nombreLetra}${apellidoLetra}`;
+  const passwordHash = await bcrypt.hash(passwordPlano, 10);
+
+  const result = await db.query(
+    `INSERT INTO usuarios (username, password, rol_id, empleado_id) VALUES ($1, $2, $3, $4) RETURNING *`,
+    [username, passwordHash, rol_id, empleado.id]
+  );
+  return { ...result.rows[0], password_generada: passwordPlano };
 };
 
 const obtenerUsuarios = async () => {

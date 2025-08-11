@@ -58,6 +58,20 @@ export default function TicketDetalle({ ticket, onClose, onUpdate }) {
             : "Sin asignar"}
         </div>
         <div><b>Descripción:</b> {detalle.observacion_inicial}</div>
+        {(user?.user?.rol === "sistemas" || user?.user?.rol === "admin") &&
+          !detalle.personal_asignado_id && (
+            <div style={{ margin: "12px 0" }}>
+              <AsignarPersonalTicket
+                ticketId={detalle.id}
+                onAsignado={async () => {
+                  const res = await axiosBackend.get(`/tickets/${detalle.id}`);
+                  setDetalle(res.data);
+                  if (onUpdate) onUpdate();
+                }}
+                modal={false}
+              />
+            </div>
+          )}
         <div><b>Comentario de Asignación:</b> {detalle.comentarios_asignacion || "—"}</div>
         {esTecnicoAsignado &&
           (detalle.estado === "En espera" || detalle.estado === "En proceso") &&

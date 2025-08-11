@@ -46,10 +46,6 @@ const registrarEmpleado = async (req, res) => {
 const actualizarEmpleado = async (req, res) => {
   const { id } = req.params;
   try {
-    const tiene = await EmpleadosModel.tieneAsignaciones(id);
-    if (tiene) {
-      return res.status(400).json({ error: "No se puede editar: el empleado tiene asignaciones activas." });
-    }
     const actualizado = await EmpleadosModel.actualizarEmpleado(id, req.body);
     if (!actualizado) {
       return res.status(404).json({ error: "Empleado no encontrado" });
@@ -64,10 +60,6 @@ const actualizarEmpleado = async (req, res) => {
 const eliminarEmpleado = async (req, res) => {
   const { id } = req.params;
   try {
-    const tiene = await EmpleadosModel.tieneAsignaciones(id);
-    if (tiene) {
-      return res.status(400).json({ error: "No se puede eliminar: el empleado tiene asignaciones activas." });
-    }
     await EmpleadosModel.eliminarEmpleado(id);
     res.json({ mensaje: "Empleado eliminado correctamente" });
   } catch (error) {

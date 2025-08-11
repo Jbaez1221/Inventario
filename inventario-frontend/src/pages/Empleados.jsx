@@ -14,6 +14,11 @@ const CAMPOS_MODAL = [
   "CENTRO DE ESTUDIOS", "AÑO DE EGRESO", "CONTACTO DE REFERENCIA", "TALLA"
 ];
 
+const MAPEO_CAMPOS = {
+  "ASIGNACION FAMILIAR": "asignacion_familiar",
+  "RENOVACIÓN": "renovacion",
+};
+
 const Empleados = () => {
   const { token, user } = useAuth();
   const rol = user?.user?.rol;
@@ -150,7 +155,18 @@ const Empleados = () => {
                 {CAMPOS_MODAL.map((campo) => (
                   <tr key={campo}>
                     <td style={{ fontWeight: 600 }}>{campo}:</td>
-                    <td>{empleadoVisualizar[campo] ?? "—"}</td>
+                    <td>
+                      {(() => {
+                        const key = MAPEO_CAMPOS[campo] || campo;
+                        let valor = empleadoVisualizar[key];
+                        if (key === "asignacion_familiar" || key === "renovacion") {
+                          if (valor === true) return "Sí";
+                          if (valor === false) return "No";
+                          return "—";
+                        }
+                        return valor ?? "—";
+                      })()}
+                    </td>
                   </tr>
                 ))}
               </tbody>

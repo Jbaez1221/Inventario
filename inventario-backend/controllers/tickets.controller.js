@@ -100,7 +100,6 @@ const cambiarEstadoTicket = async (req, res) => {
     const ticket = await TicketsModel.cambiarEstadoTicket(req.params.id, estado, solucion_aplicada, satisfaccion);
     if (!ticket) return res.status(404).json({ error: "Ticket no encontrado" });
 
-    // Usa el empleado_id del usuario autenticado
     const empleadoId = req.user?.empleado_id || null;
     await TicketsModel.agregarHistorial(req.params.id, empleadoId, "Cambio de estado", `Estado: ${estado}`);
 

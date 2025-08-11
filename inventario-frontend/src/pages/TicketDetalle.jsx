@@ -73,6 +73,11 @@ export default function TicketDetalle({ ticket, onClose, onUpdate }) {
             </div>
           )}
         <div><b>Comentario de Asignación:</b> {detalle.comentarios_asignacion || "—"}</div>
+        {detalle.estado === "Cerrado" && (
+          <div>
+            <b>Solución aplicada:</b> {detalle.solucion_aplicada || "—"}
+          </div>
+        )}
         {esTecnicoAsignado &&
           (detalle.estado === "En espera" || detalle.estado === "En proceso") &&
           !detalle.comentarios_asignacion && (

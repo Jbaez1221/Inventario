@@ -99,10 +99,15 @@ const cambiarEstadoTicket = async (req, res) => {
     const { estado, solucion_aplicada, satisfaccion } = req.body;
     const ticket = await TicketsModel.cambiarEstadoTicket(req.params.id, estado, solucion_aplicada, satisfaccion);
     if (!ticket) return res.status(404).json({ error: "Ticket no encontrado" });
-    await TicketsModel.agregarHistorial(req.params.id, req.user?.id || null, "Cambio de estado", `Estado: ${estado}`);
+
+    // Usa el empleado_id del usuario autenticado
+    const empleadoId = req.user?.empleado_id || null;
+    await TicketsModel.agregarHistorial(req.params.id, empleadoId, "Cambio de estado", `Estado: ${estado}`);
+
     res.json(ticket);
   } catch (error) {
-    res.status(500).json({ error: "Error al cambiar estado del ticket" });
+    console.error("Error al cambiar estado del ticket:", error);
+    res.status(500).json({ error: error.message || "Error al cambiar estado del ticket" });
   }
 };
 

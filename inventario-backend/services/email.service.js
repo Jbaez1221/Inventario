@@ -86,7 +86,47 @@ const enviarNotificacionSolicitud = async ({ empleado, estado, motivoRechazo = "
   });
 };
 
+const enviarNotificacionTicketAsignado = async ({ tecnico, ticket }) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: "robby863401@gmail.com",
+      pass: process.env.EMAIL_PASS, 
+    },
+  });
+
+  let correo = tecnico.correo_institucional || tecnico.correo_personal;
+  if (!correo) return;
+  await transporter.sendMail({
+    from: '"Inventario CORASUR" <robby863401@gmail.com>',
+    to: correo,
+    subject: `Nuevo ticket asignado: ${ticket.codigo}`,
+    text: `Se te ha asignado el ticket ${ticket.codigo}.\nPrioridad: ${ticket.prioridad}\nDescripción: ${ticket.observacion_inicial || "Sin descripción"}`
+  });
+};
+
+const enviarNotificacionComentarioAsignacion = async ({ solicitante, ticket, comentario }) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: "robby863401@gmail.com",
+      pass: process.env.EMAIL_PASS, 
+    },
+  });
+
+  let correo = solicitante.correo_institucional || solicitante.correo_personal;
+  if (!correo) return;
+  await transporter.sendMail({
+    from: '"Inventario CORASUR" <robby863401@gmail.com>',
+    to: correo,
+    subject: `Comentario sobre tu ticket ${ticket.codigo}`,
+    text: `Comentario del área de soporte:\n${comentario}\n\nTicket: ${ticket.codigo}\nEstado: ${ticket.estado}`
+  });
+};
+
 module.exports = {
   enviarActaPorCorreo,
-  enviarNotificacionSolicitud
+  enviarNotificacionSolicitud,
+  enviarNotificacionTicketAsignado,
+  enviarNotificacionComentarioAsignacion
 };

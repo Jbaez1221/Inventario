@@ -21,7 +21,7 @@ function calcularTiempo(fecha) {
 function adaptarEmpleado(e) {
   const apellidos_nombres = `${e.apellidos || ''} ${e.nombres || ''}`.trim();
   const edad = calcularTiempo(e.fecha_nacimiento);
-  const tiempo_servicio = calcularTiempo(e.fecha_inicio_contrato);
+  const tiempo_servicio = calcularTiempo(e.fecha_ingreso);
 
   return {
     id: e.id,
@@ -86,6 +86,7 @@ function adaptarEmpleado(e) {
     "FECHA FIN DE CONTRATO": e.fecha_fin_contrato,
     fecha_fin_contrato: e.fecha_fin_contrato,
     "TIEMPO DE SERVICIO": tiempo_servicio,
+    tiempo_servicio,
     "PERIODO DE PRUEBA": e.periodo_prueba,
     periodo_prueba: e.periodo_prueba,
     "PERIODO DE CONTRATO": e.periodo_contrato,
@@ -143,10 +144,6 @@ const crearEmpleado = async (empleado) => {
     "renovacion", "grado_estudios", "centro_estudios", "anio_egreso", "contacto_referencia", "talla"
   ];
 
-  if ('renovacion' in empleado) {
-    empleado.renovacion = empleado.renovacion === true || empleado.renovacion === 'true' || empleado.renovacion === 1;
-  }
-
   const valores = campos.map(c => empleado[c]);
   const placeholders = campos.map((_, i) => `$${i + 1}`).join(', ');
 
@@ -166,10 +163,6 @@ const actualizarEmpleado = async (id, empleado) => {
     "tipo_contrato", "fecha_inicio_contrato", "fecha_fin_contrato", "periodo_prueba", "periodo_contrato",
     "renovacion", "grado_estudios", "centro_estudios", "anio_egreso", "contacto_referencia", "talla"
   ];
-
-  if ('renovacion' in empleado) {
-    empleado.renovacion = empleado.renovacion === true || empleado.renovacion === 'true' || empleado.renovacion === 1;
-  }
 
   const set = campos.map((c, i) => `${c} = $${i + 1}`).join(', ');
   const valores = campos.map(c => empleado[c]);
@@ -195,6 +188,11 @@ const tieneAsignaciones = async (empleadoId) => {
   return parseInt(result.rows[0].count, 10) > 0;
 };
 
+const obtenerEmpleadoPorId = async (id) => {
+  const result = await db.query("SELECT * FROM empleados WHERE id = $1", [id]);
+  return result.rows[0] || null;
+};
+
 module.exports = {
   obtenerEmpleados,
   buscarPorDni,
@@ -202,4 +200,5 @@ module.exports = {
   actualizarEmpleado,
   eliminarEmpleado,
   tieneAsignaciones,
+  obtenerEmpleadoPorId,
 };

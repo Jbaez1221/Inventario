@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "../api/axios";
+import axiosBackend from "../api/axios";
 
 export default function EstadoTicketPublico() {
   const [codigo, setCodigo] = useState("");
@@ -12,11 +12,11 @@ export default function EstadoTicketPublico() {
     setResultado(null);
     setBuscando(true);
     try {
-      const res = await axios.get("/tickets/publico/buscar-por-codigo", {
+      const res = await axiosBackend.get("/tickets/publico/buscar-por-codigo", {
         params: { codigo }
       });
       setResultado(res.data);
-    } catch {
+    } catch{
       setResultado({ error: "No se encontró el ticket o el código es incorrecto." });
     }
     setBuscando(false);
@@ -27,70 +27,168 @@ export default function EstadoTicketPublico() {
     setResultado(null);
     setBuscando(true);
     try {
-      const res = await axios.get("/tickets/publico/buscar-por-dni", {
+      const res = await axiosBackend.get("/tickets/publico/buscar-por-dni", {
         params: { dni }
       });
-      const ticketsNoCerrados = (res.data || []).filter(t => t.estado !== "Cerrado");
-      setResultado(ticketsNoCerrados);
-    } catch {
-      setResultado({ error: "No se encontraron tickets para ese DNI." });
+      
+      if (!res.data || res.data.length === 0) {
+        setResultado({ error: "No se encontraron tickets para ese DNI." });
+      } else {
+        const ticketsNoCerrados = res.data.filter(t => t.estado !== "Cerrado");
+        setResultado(ticketsNoCerrados);
+      }
+    } catch{
+      setResultado({ error: "Error al buscar tickets. Verifique el DNI." });
     }
     setBuscando(false);
   };
 
   return (
-    <div className="formulario" style={{ maxWidth: 500 }}>
-      <h2>Consultar Estado de Ticket</h2>
-      <form onSubmit={handleBuscarPorCodigo} style={{ marginBottom: 16 }}>
-        <input
-          value={codigo}
-          onChange={e => setCodigo(e.target.value)}
-          placeholder="Código de Ticket"
-          required
-        />
-        <button type="submit" className="btn-primary" disabled={buscando}>Buscar por Código</button>
-      </form>
-      <form onSubmit={handleBuscarPorDni}>
-        <input
-          value={dni}
-          onChange={e => setDni(e.target.value)}
-          placeholder="DNI"
-          required
-        />
-        <button type="submit" className="btn-primary" disabled={buscando}>Buscar por DNI</button>
-      </form>
+    <div className="consulta-ticket-container">
+      <div className="consulta-ticket-header">
+        <h2>Consultar Estado de Ticket</h2>
+        <p>Ingrese el código del ticket o su DNI para consultar el estado</p>
+      </div>
+      
+      <div className="consulta-forms-grid">
+        <div className="consulta-form-card">
+          <h3>Buscar por Código</h3>
+          <form onSubmit={handleBuscarPorCodigo}>
+            <input
+              type="text"
+              value={codigo}
+              onChange={e => setCodigo(e.target.value)}
+              placeholder="TCK-CORASUR-2025-00001"
+              required
+            />
+            <button type="submit" className="btn-primary" disabled={buscando}>
+              {buscando ? "Buscando..." : "Buscar Ticket"}
+            </button>
+          </form>
+        </div>
+        
+        <div className="consulta-form-card">
+          <h3>Buscar por DNI</h3>
+          <form onSubmit={handleBuscarPorDni}>
+            <input
+              type="text"
+              value={dni}
+              onChange={e => setDni(e.target.value)}
+              placeholder="12345678"
+              required
+            />
+            <button type="submit" className="btn-primary" disabled={buscando}>
+              {buscando ? "Buscando..." : "Mis Tickets"}
+            </button>
+          </form>
+        </div>
+      </div>
+
       {resultado && (
-        <div style={{ marginTop: 16 }}>
+        <div className="consulta-results">
           {resultado.error ? (
-            <span style={{ color: "red" }}>{resultado.error}</span>
+            <div className="consulta-error">
+              <div className="error-icon">⚠️</div>
+              <div className="error-text">{resultado.error}</div>
+            </div>
           ) : Array.isArray(resultado) ? (
             resultado.length === 0 ? (
-              <span>No hay tickets en proceso para este DNI.</span>
+              <div className="consulta-info">
+                <div className="info-icon">ℹ️</div>
+                <div className="info-text">No tiene tickets pendientes. Todos sus tickets están cerrados.</div>
+              </div>
             ) : (
-              resultado.map(t => (
-                <div key={t.codigo} style={{ marginBottom: 12, borderBottom: "1px solid #444" }}>
-                  <div><b>Código:</b> {t.codigo}</div>
-                  <div><b>Estado:</b> {t.estado}</div>
-                  <div><b>Prioridad:</b> {t.prioridad}</div>
-                  <div><b>Categoría:</b> {t.categoria}</div>
-                  <div><b>Descripción:</b> {t.descripcion}</div>
+              <div className="tickets-encontrados">
+                <div className="tickets-header">
+                  <h3>Tickets Encontrados</h3>
+                  <span className="tickets-count">{resultado.length}</span>
                 </div>
-              ))
+                <div className="tickets-list">
+                  {resultado.map(t => (
+                    <div key={t.codigo} className="ticket-item">
+                      <div className="ticket-item-header">
+                        <span className="ticket-item-code">{t.codigo}</span>
+                        <span className={`ticket-item-estado ${t.estado.toLowerCase().replace(' ', '-')}`}>
+                          {t.estado}
+                        </span>
+                      </div>
+                      <div className="ticket-item-details">
+                        <div className="detail-row">
+                          <span className="detail-label">Categoría:</span>
+                          <span className="detail-value">{t.categoria}</span>
+                        </div>
+                        <div className="detail-row">
+                          <span className="detail-label">Tipo:</span>
+                          <span className="detail-value">{t.tipo}</span>
+                        </div>
+                        <div className="detail-row">
+                          <span className="detail-label">Prioridad:</span>
+                          <span className="detail-value">{t.prioridad}</span>
+                        </div>
+                        <div className="detail-row full">
+                          <span className="detail-label">Descripción:</span>
+                          <span className="detail-value">{t.observacion_inicial}</span>
+                        </div>
+                        <div className="detail-row">
+                          <span className="detail-label">Fecha:</span>
+                          <span className="detail-value">
+                            {new Date(t.fecha_creacion).toLocaleDateString('es-ES')}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )
           ) : (
-            <>
-              <div><b>Código:</b> {resultado.codigo}</div>
-              <div><b>Estado:</b> {resultado.estado}</div>
-              <div><b>Prioridad:</b> {resultado.prioridad}</div>
-              <div><b>Categoría:</b> {resultado.categoria}</div>
-              <div><b>Descripción:</b> {resultado.descripcion}</div>
-              {resultado.solucion_aplicada && (
-                <div>
-                  <b>Solución:</b>
-                  <div>{resultado.solucion_aplicada}</div>
+            <div className="tickets-encontrados">
+              <div className="tickets-header">
+                <h3>Ticket Encontrado</h3>
+              </div>
+              <div className="tickets-list">
+                <div className="ticket-item">
+                  <div className="ticket-item-header">
+                    <span className="ticket-item-code">{resultado.codigo}</span>
+                    <span className={`ticket-item-estado ${resultado.estado?.toLowerCase().replace(' ', '-')}`}>
+                      {resultado.estado}
+                    </span>
+                  </div>
+                  <div className="ticket-item-details">
+                    <div className="detail-row">
+                      <span className="detail-label">Categoría:</span>
+                      <span className="detail-value">{resultado.categoria}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="detail-label">Tipo:</span>
+                      <span className="detail-value">{resultado.tipo}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="detail-label">Prioridad:</span>
+                      <span className="detail-value">{resultado.prioridad}</span>
+                    </div>
+                    <div className="detail-row full">
+                      <span className="detail-label">Descripción:</span>
+                      <span className="detail-value">{resultado.observacion_inicial}</span>
+                    </div>
+                    {resultado.fecha_creacion && (
+                      <div className="detail-row">
+                        <span className="detail-label">Fecha:</span>
+                        <span className="detail-value">
+                          {new Date(resultado.fecha_creacion).toLocaleDateString('es-ES')}
+                        </span>
+                      </div>
+                    )}
+                    {resultado.solucion_aplicada && (
+                      <div className="detail-row full">
+                        <span className="detail-label">Solución:</span>
+                        <span className="detail-value solution">{resultado.solucion_aplicada}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
-            </>
+              </div>
+            </div>
           )}
         </div>
       )}

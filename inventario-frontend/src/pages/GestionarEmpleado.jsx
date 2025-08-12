@@ -5,10 +5,8 @@ import { useAuth } from "../hooks/useAuth";
 
 const ESTADOS_CIVIL = ["Soltero", "Casado", "Divorciado", "Viudo", "Conviviente"];
 const SEXOS = ["Masculino", "Femenino", "Otro"];
-const REGIMENES = ["General", "Especial", "Otro"];
-const TIPOS_CONTRATO = ["Indeterminado", "Plazo Fijo", "Prácticas", "Locación", "Otro"];
 const TALLAS = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
-const RENOVACION_OPCIONES = [
+const ASIGNACION_FAMILIAR_OPCIONES = [
   { label: "Sí", value: true },
   { label: "No", value: false }
 ];
@@ -24,7 +22,7 @@ const CAMPOS_FORM = [
   { name: "SEDE", label: "Sede", type: "text" },
   { name: "AREA", label: "Área", type: "text" },
   { name: "PUESTO", label: "Puesto", type: "text" },
-  { name: "ASIGNACION FAMILIAR", label: "Asignación Familiar", type: "switch", options: RENOVACION_OPCIONES }, // <-- ahora boolean
+  { name: "ASIGNACION FAMILIAR", label: "Asignación Familiar", type: "switch", options: ASIGNACION_FAMILIAR_OPCIONES },
   { name: "SEXO", label: "Sexo", type: "select", options: SEXOS },
   { name: "SISTEMAS DE PENSIONES", label: "Sistemas de Pensiones", type: "text" },
   { name: "TIPO DE AFP", label: "Tipo de AFP", type: "text" },
@@ -37,15 +35,15 @@ const CAMPOS_FORM = [
   { name: "CUENTA BANCARIA HABERES", label: "Cuenta Bancaria Haberes", type: "text" },
   { name: "MONEDA DE CTA HABERES", label: "Moneda de Cuenta Haberes", type: "text" },
   { name: "TIPO DE PLANILLA", label: "Tipo de Planilla", type: "text" },
-  { name: "REGIMEN VACACIONAL", label: "Régimen Vacacional", type: "select", options: REGIMENES },
+  { name: "REGIMEN VACACIONAL", label: "Régimen Vacacional", type: "text" },
   { name: "CORREO ELECTRONICO INSTITUCIONAL", label: "Correo Institucional", type: "email" },
   { name: "CORREO ELECTRONICO PERSONAL", label: "Correo Personal", type: "email" },
-  { name: "TIPO DE CONTRATO", label: "Tipo de Contrato", type: "select", options: TIPOS_CONTRATO },
+  { name: "TIPO DE CONTRATO", label: "Tipo de Contrato", type: "text" },
   { name: "FECHA INICIO DE CONTRATO", label: "Fecha Inicio Contrato", type: "date" },
   { name: "FECHA FIN DE CONTRATO", label: "Fecha Fin Contrato", type: "date" },
   { name: "PERIODO DE PRUEBA", label: "Periodo de Prueba", type: "text" },
   { name: "PERIODO DE CONTRATO", label: "Periodo de Contrato", type: "text" },
-  { name: "RENOVACIÓN", label: "Renovación", type: "switch", options: RENOVACION_OPCIONES },
+  { name: "RENOVACIÓN", label: "Renovación", type: "text" },
   { name: "GRADO DE ESTUDIOS", label: "Grado de Estudios", type: "text" },
   { name: "CENTRO DE ESTUDIOS", label: "Centro de Estudios", type: "text" },
   { name: "AÑO DE EGRESO", label: "Año de Egreso", type: "number", min: 1900, max: 2100 },
@@ -93,7 +91,7 @@ const mapFormToApi = (form) => ({
   fecha_fin_contrato: form["FECHA FIN DE CONTRATO"],
   periodo_prueba: form["PERIODO DE PRUEBA"],
   periodo_contrato: form["PERIODO DE CONTRATO"],
-  renovacion: form["RENOVACIÓN"] === undefined ? false : (form["RENOVACIÓN"] === true || form["RENOVACIÓN"] === "true"),
+  renovacion: form["RENOVACIÓN"],
   grado_estudios: form["GRADO DE ESTUDIOS"],
   centro_estudios: form["CENTRO DE ESTUDIOS"],
   anio_egreso: form["AÑO DE EGRESO"],
@@ -134,7 +132,7 @@ const mapApiToForm = (api) => ({
   "FECHA FIN DE CONTRATO": toDateInput(api.fecha_fin_contrato),
   "PERIODO DE PRUEBA": api.periodo_prueba || "",
   "PERIODO DE CONTRATO": api.periodo_contrato || "",
-  "RENOVACIÓN": api.renovacion === true || api.renovacion === "true" ? true : false,
+  "RENOVACIÓN": api.renovacion || "",
   "GRADO DE ESTUDIOS": api.grado_estudios || "",
   "CENTRO DE ESTUDIOS": api.centro_estudios || "",
   "AÑO DE EGRESO": api.anio_egreso || "",

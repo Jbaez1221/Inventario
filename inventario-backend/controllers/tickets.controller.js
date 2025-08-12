@@ -1,5 +1,6 @@
 const TicketsModel = require("../models/tickets.model");
 const EmpleadosModel = require("../models/empleados.model"); // Importa el modelo de empleados
+const EmailService = require("../services/email.service");
 
 const crearTicketPublico = async (req, res) => {
   try {
@@ -87,10 +88,41 @@ const asignarPersonal = async (req, res) => {
     const { personalId, comentarios } = req.body;
     const ticket = await TicketsModel.asignarPersonal(req.params.id, personalId, comentarios);
     if (!ticket) return res.status(404).json({ error: "Ticket no encontrado" });
+
+    const tecnico = await EmpleadosModel.obtenerEmpleadoPorId(personalId);
+    if (tecnico) {
+      const correoTecnico = tecnico.correo_institucional || tecnico.correo_personal;
+      if (correoTecnico) {
+        await EmailService.enviarNotificacionTicketAsignado({ tecnico, ticket });
+        console.log(`[EMAIL] Se envió notificación de asignación a técnico: ${correoTecnico}`);
+      } else {
+        console.warn("[EMAIL] El técnico no tiene correo registrado:", tecnico);
+      }
+    }
+
+    // Notificar al solicitante si hay comentario
+    if (comentarios && comentarios.trim() !== "") {
+      const solicitante = await EmpleadosModel.obtenerEmpleadoPorId(ticket.solicitante_id);
+      if (solicitante) {
+        const correoSolicitante = solicitante.correo_institucional || solicitante.correo_personal;
+        if (correoSolicitante) {
+          await EmailService.enviarNotificacionComentarioAsignacion({
+            solicitante,
+            ticket,
+            comentario: comentarios
+          });
+          console.log(`[EMAIL] Se envió notificación de comentario al solicitante: ${correoSolicitante}`);
+        } else {
+          console.warn("[EMAIL] El solicitante no tiene correo registrado:", solicitante);
+        }
+      }
+    }
+
     await TicketsModel.agregarHistorial(req.params.id, personalId, "Asignación", comentarios || "Asignado a personal");
     res.json(ticket);
   } catch (error) {
-    res.status(500).json({ error: "Error al asignar personal" });
+    console.error("Error en asignarPersonal:", error);
+    res.status(500).json({ error: error.message || "Error al asignar personal" });
   }
 };
 

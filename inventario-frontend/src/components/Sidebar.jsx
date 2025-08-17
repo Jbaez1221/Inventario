@@ -36,38 +36,65 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
       <div className="sidebar-content">
         <nav className="sidebar-links">
 
-          {!token && (
-            <>
-              <NavLink to="/equipos" className="nav-link" onClick={handleLinkClick}>
-                <FaLaptop className="nav-icon" />
-                {isOpen && "Equipos"}
-              </NavLink>
-              <NavLink to="/empleados" className="nav-link" onClick={handleLinkClick}>
-                <FaUsers className="nav-icon" />
-                {isOpen && "Empleados"}
-              </NavLink>
-              <NavLink to="/historial" className="nav-link" onClick={handleLinkClick}>
-                <FaHistory className="nav-icon" />
-                {isOpen && "Historial"}
-              </NavLink>
-              <NavLink to="/solicitudes" className="nav-link" onClick={handleLinkClick}>
-                <FaFileAlt className="nav-icon" />
-                {isOpen && "Solicitudes"}
-              </NavLink>
-              <NavLink to="/tickets/crear" className="nav-link" onClick={handleLinkClick}>
-                <FaTicketAlt className="nav-icon" />
-                {isOpen && "Crear Ticket"}
-              </NavLink>
-              <NavLink to="/tickets/estado" className="nav-link" onClick={handleLinkClick}>
-                <FaTicketAlt className="nav-icon" />
-                {isOpen && "Estado Ticket"}
-              </NavLink>
-              <NavLink to="/tickets/soluciones" className="nav-link" onClick={handleLinkClick}>
-                <FaTicketAlt className="nav-icon" />
-                {isOpen && "Soluciones Tickets"}
-              </NavLink>
-            </>
-          )}
+            {!token && (
+              <>
+                <div className="sidebar-section">
+                  <div className="sidebar-section-title">
+                    <FaBuilding className="nav-icon" />
+                    {isOpen && "Recursos Humanos"}
+                  </div>
+                  <NavLink to="/empleados" className="nav-link" onClick={handleLinkClick}>
+                    <FaUsers className="nav-icon" />
+                    {isOpen && "Empleados"}
+                  </NavLink>
+                </div>
+
+                <div className="sidebar-section">
+                  <div className="sidebar-section-title">
+                    <FaCogs className="nav-icon" />
+                    {isOpen && "Sistemas"}
+                  </div>
+                  
+                  <div className="sidebar-subsection">
+                    <div className="sidebar-subsection-title">
+                      <FaTicketAlt className="nav-icon" />
+                      {isOpen && "Asistencias"}
+                    </div>
+                    <NavLink to="/tickets/crear" className="nav-link nav-link-sub" onClick={handleLinkClick}>
+                      <FaTicketAlt className="nav-icon" />
+                      {isOpen && "Crear Ticket"}
+                    </NavLink>
+                    <NavLink to="/tickets/estado" className="nav-link nav-link-sub" onClick={handleLinkClick}>
+                      <FaTicketAlt className="nav-icon" />
+                      {isOpen && "Estado Ticket"}
+                    </NavLink>
+                    <NavLink to="/tickets/soluciones" className="nav-link nav-link-sub" onClick={handleLinkClick}>
+                      <FaTicketAlt className="nav-icon" />
+                      {isOpen && "Soluciones Tickets"}
+                    </NavLink>
+                  </div>
+
+                  <div className="sidebar-subsection">
+                    <div className="sidebar-subsection-title">
+                      <FaLayerGroup className="nav-icon" />
+                      {isOpen && "Inventario"}
+                    </div>
+                    <NavLink to="/equipos" className="nav-link nav-link-sub" onClick={handleLinkClick}>
+                      <FaLaptop className="nav-icon" />
+                      {isOpen && "Equipos"}
+                    </NavLink>
+                    <NavLink to="/historial" className="nav-link nav-link-sub" onClick={handleLinkClick}>
+                      <FaHistory className="nav-icon" />
+                      {isOpen && "Historial"}
+                    </NavLink>
+                    <NavLink to="/solicitudes" className="nav-link nav-link-sub" onClick={handleLinkClick}>
+                      <FaFileAlt className="nav-icon" />
+                      {isOpen && "Solicitudes"}
+                    </NavLink>
+                  </div>
+                </div>
+              </>
+            )}
 
           {token && (
             <>

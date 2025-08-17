@@ -911,6 +911,57 @@ input[type="time"]:focus {
   margin-bottom: 6px;
 }
 
+/* Estilos para secciones y subsecciones públicas */
+.sidebar-section {
+  margin-bottom: 20px;
+}
+
+.sidebar-section-title {
+  font-weight: bold;
+  color: #e0e0e0;
+  padding: 10px 25px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #232323;
+  border-radius: 8px;
+  margin: 4px 10px 8px 10px;
+  letter-spacing: 0.02em;
+  border-left: 3px solid #007bff;
+}
+
+.sidebar-subsection {
+  margin: 8px 0 8px 20px;
+}
+
+.sidebar-subsection-title {
+  font-weight: 600;
+  color: #c0c0c0;
+  cursor: pointer;
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #2a2a2a;
+  border-radius: 6px;
+  margin: 4px 8px;
+  transition: background 0.2s, color 0.2s;
+  letter-spacing: 0.01em;
+  font-size: 0.9rem;
+}
+
+.sidebar-subsection-title:hover {
+  background: #333;
+  color: #fff;
+}
+
+.nav-link-sub {
+  margin-left: 16px !important;
+  padding-left: 20px !important;
+  font-size: 0.85rem !important;
+  border-left: 2px solid #444;
+}
+
 .sidebar .nav-link .nav-icon {
   color: #bdbdbd;
   transition: color 0.2s;

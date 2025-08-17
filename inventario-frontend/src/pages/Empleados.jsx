@@ -189,37 +189,43 @@ const Empleados = () => {
           <thead>
             <tr>
               <th>ID</th>
-              <th>DNI</th>
+              {token && <th>DNI</th>}
               <th>Apellidos y Nombres</th>
               <th>Área</th>
               <th>Puesto</th>
               <th>Sede</th>
-              <th>Acciones</th>
+              {!token && <th>Correo Institucional</th>}
+              {!token && <th>Número Institucional</th>}
+              {token && <th>Acciones</th>}
             </tr>
           </thead>
           <tbody>
             {paginatedEmpleados.map((empleado) => (
               <tr key={empleado.id || empleado.DNI}>
                 <td>{empleado.ID || empleado.id}</td>
-                <td>{empleado.DNI}</td>
+                {token && <td>{empleado.DNI}</td>}
                 <td>{empleado.APELLIDOS_NOMBRES}</td>
                 <td>{empleado.AREA}</td>
                 <td>{empleado.PUESTO}</td>
                 <td>{empleado.SEDE}</td>
-                <td className="acciones">
-                  <button className="btn-info btn-icon" onClick={() => { setEmpleadoVisualizar(empleado); setModalEmpleadoVisible(true); }} title="Ver detalle">
-                    <FaEye />
-                  </button>
-                  {token && (rol === "admin" || rol === "rrhh") && (
-                    <button
-                      className="btn-primary btn-icon"
-                      onClick={() => navigate(`/empleados/gestionar/${empleado.DNI}`)}
-                      title="Editar"
-                    >
-                      <FaPencilAlt />
+                {!token && <td>{empleado["CORREO ELECTRONICO INSTITUCIONAL"] || "—"}</td>}
+                {!token && <td>{empleado["TELEFONO COORPORATIVO"] || "—"}</td>}
+                {token && (
+                  <td className="acciones">
+                    <button className="btn-info btn-icon" onClick={() => { setEmpleadoVisualizar(empleado); setModalEmpleadoVisible(true); }} title="Ver detalle">
+                      <FaEye />
                     </button>
-                  )}
-                </td>
+                    {(rol === "admin" || rol === "rrhh") && (
+                      <button
+                        className="btn-primary btn-icon"
+                        onClick={() => navigate(`/empleados/gestionar/${empleado.DNI}`)}
+                        title="Editar"
+                      >
+                        <FaPencilAlt />
+                      </button>
+                    )}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

@@ -91,9 +91,9 @@ function generarActaPDF(datos, tipoActa) {
     doc.text(`DNI: ${datos.empleado.dni}`, firmaDevuelveX, y);
     y += 15;
     const fecha = tipoActa === 'entrega' ? datos.fecha_entrega : datos.fecha_devolucion;
-    const fechaObj = new Date(fecha);
-    const fechaFormateada = fechaObj.toLocaleDateString("es-PE", { timeZone: 'America/Lima' });
-    const horaFormateada = fechaObj.toLocaleTimeString("es-PE", { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Lima' });
+    const fechaActual = new Date();
+    const fechaFormateada = fechaActual.toLocaleDateString("es-PE", { timeZone: 'America/Lima' });
+    const horaFormateada = fechaActual.toLocaleTimeString("es-PE", { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Lima' });
     doc.text(`Fecha: ${fechaFormateada} - ${horaFormateada}`, firmaDevuelveX, y);
 
     doc.end();
@@ -195,9 +195,9 @@ function generarActaPDFConFirmas(datos, tipoActa) {
 
     const yFecha = Math.max(nombreIzqY + 25, nombreDerY + 25);
     const fecha = tipoActa === 'entrega' ? datos.fecha_entrega : datos.fecha_devolucion;
-    const fechaObj = new Date(fecha);
-    const fechaFormateada = fechaObj.toLocaleDateString("es-PE", { timeZone: 'America/Lima' });
-    const horaFormateada = fechaObj.toLocaleTimeString("es-PE", { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Lima' });
+    const fechaActual = new Date();
+    const fechaFormateada = fechaActual.toLocaleDateString("es-PE", { timeZone: 'America/Lima' });
+    const horaFormateada = fechaActual.toLocaleTimeString("es-PE", { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Lima' });
     doc.font("Helvetica").fontSize(10).text(
       `Fecha: ${fechaFormateada} - ${horaFormateada}`,
       0,

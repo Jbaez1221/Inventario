@@ -100,7 +100,6 @@ const asignarPersonal = async (req, res) => {
       }
     }
 
-    // Notificar al solicitante si hay comentario
     if (comentarios && comentarios.trim() !== "") {
       const solicitante = await EmpleadosModel.obtenerEmpleadoPorId(ticket.solicitante_id);
       if (solicitante) {

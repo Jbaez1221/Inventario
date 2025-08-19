@@ -148,7 +148,7 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
                         <div className="sidebar-group-title" onClick={() => setOpenPublicAsistencias(!openPublicAsistencias)}>
                           {openPublicAsistencias ? <FaChevronDown /> : <FaChevronRight />}
                           <FaTicketAlt className="nav-icon" />
-                          {isOpen && "Asistencias"}
+                          {isOpen && "Soporte"}
                         </div>
                         {openPublicAsistencias && (
                           <div className="sidebar-group-items">

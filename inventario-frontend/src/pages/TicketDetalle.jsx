@@ -89,7 +89,7 @@ export default function TicketDetalle({ ticket, onClose, onUpdate }) {
                 rows={3}
                 style={{ width: "100%" }}
               />
-              <button className="btn-primary" onClick={guardarComentario}>
+              <button className="btn-save" onClick={guardarComentario}>
                 Guardar comentario
               </button>
             </div>

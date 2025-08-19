@@ -339,7 +339,7 @@ const GestionarEmpleado = () => {
           <button type="submit" className="btn-primary" disabled={enviando}>
             {enviando ? "Guardando..." : id ? "Actualizar" : "Registrar"}
           </button>
-          <button type="button" className="btn-secondary" onClick={() => navigate("/empleados")} disabled={enviando}>
+          <button type="button" className="btn-cancel" onClick={() => navigate("/empleados")} disabled={enviando}>
             Cancelar
           </button>
         </div>

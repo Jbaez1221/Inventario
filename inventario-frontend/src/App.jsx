@@ -4,7 +4,9 @@ import { AuthProvider } from "./context/AuthProvider";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+import Home from "./pages/Home";
 import Equipos from "./pages/Equipos";
+import EquiposAdmin from "./pages/EquiposAdmin";
 import Empleados from "./pages/Empleados";
 import GestionarEmpleado from "./pages/GestionarEmpleado";
 import Asignaciones from "./pages/asignaciones";
@@ -19,15 +21,25 @@ import BuscarSolucionesTickets from "./pages/BuscarSolucionesTickets";
 import TicketsGestion from "./pages/TicketsGestion";
 import TicketDetalle from "./pages/TicketDetalle";
 
+const RedirectTicketWithId = () => {
+  const id = window.location.pathname.split('/').pop();
+  return <Navigate to={`/ticket-detalle/${id}`} replace />;
+};
+
 function App() {
   return (
     <Router>
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={<Navigate to="/equipos" replace />} />
+            <Route index element={<Home />} />
 
             <Route path="equipos" element={<Equipos />} />
+            <Route path="equipos-admin" element={
+              <ProtectedRoute>
+                <EquiposAdmin />
+              </ProtectedRoute>
+            } />
             <Route path="empleados" element={<Empleados />} />
             <Route path="empleados/gestionar" element={<GestionarEmpleado />} />
             <Route path="empleados/gestionar/:id" element={<GestionarEmpleado />} />
@@ -66,12 +78,13 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="tickets/crear" element={<CrearTicketPublico />} />
-            <Route path="tickets/estado" element={<EstadoTicketPublico />} />
-            <Route path="tickets/soluciones" element={<BuscarSolucionesTickets />} />
+            
+            <Route path="crear-ticket-publico" element={<CrearTicketPublico />} />
+            <Route path="estado-ticket-publico" element={<EstadoTicketPublico />} />
+            <Route path="buscar-soluciones-tickets" element={<BuscarSolucionesTickets />} />
 
             <Route
-              path="tickets"
+              path="tickets-gestion"
               element={
                 <ProtectedRoute>
                   <TicketsGestion />
@@ -79,13 +92,19 @@ function App() {
               }
             />
             <Route
-              path="tickets/:id"
+              path="ticket-detalle/:id"
               element={
                 <ProtectedRoute>
                   <TicketDetalle />
                 </ProtectedRoute>
               }
             />
+
+            <Route path="tickets/crear" element={<Navigate to="/crear-ticket-publico" replace />} />
+            <Route path="tickets/estado" element={<Navigate to="/estado-ticket-publico" replace />} />
+            <Route path="tickets/soluciones" element={<Navigate to="/buscar-soluciones-tickets" replace />} />
+            <Route path="tickets" element={<Navigate to="/tickets-gestion" replace />} />
+            <Route path="tickets/:id" element={<RedirectTicketWithId />} />
           </Route>
         </Routes>
       </AuthProvider>

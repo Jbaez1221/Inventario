@@ -32,7 +32,7 @@ export default function AsignarPersonalTicket({ ticketId, onAsignado, modal = fa
             </select>
             <div className="modal-actions">
               <button type="submit" className="btn-primary">Asignar</button>
-              <button type="button" className="btn-secondary" onClick={onClose}>Cancelar</button>
+              <button type="button" className="btn-cancel" onClick={onClose}>Cancelar</button>
             </div>
           </form>
         </div>

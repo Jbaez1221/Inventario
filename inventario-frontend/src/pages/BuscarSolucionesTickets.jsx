@@ -142,12 +142,31 @@ export default function BuscarSolucionesTickets() {
                     {t.categoria} • {t.tipo}
                   </div>
                 </div>
-                
                 <div>
                   <div className="solution-label">Solución aplicada:</div>
                   <div className="solution-text">
                     {t.solucion || "Sin solución registrada"}
                   </div>
+                  {t.solucionado_por && (
+                    <div className="solution-author">
+                      <strong>Resuelto por:</strong> {t.solucionado_por}
+                      {t.correo_tecnico && (
+                        <span style={{marginLeft:8, fontSize:'0.9em', color:'var(--accent-info)'}}>
+                          ({t.correo_tecnico})
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {t.fecha_cierre && (
+                    <div className="solution-date">
+                      <strong>Fecha de resolución:</strong> {new Date(t.fecha_cierre).toLocaleDateString('es-ES')} - {new Date(t.fecha_cierre).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  )}
+                  {t.anydesk_info && (
+                    <div className="anydesk-info">
+                      <strong>🖥️ Soporte remoto:</strong> Se utilizó AnyDesk (ID: {t.anydesk_info})
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

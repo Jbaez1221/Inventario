@@ -13,7 +13,8 @@ router.post("/", protegerRuta, TicketsController.crearTicket);
 router.get("/", protegerRuta, TicketsController.listarTickets);
 router.get("/:id", protegerRuta, TicketsController.obtenerTicketPorId);
 router.put("/:id/asignar", protegerRuta, TicketsController.asignarPersonal);
-router.put("/:id/estado", protegerRuta, TicketsController.cambiarEstadoTicket); // Cambiar estado (en proceso, cerrado, etc)
+router.put("/:id/estado", protegerRuta, TicketsController.cambiarEstadoTicket);
+router.put("/:id/anydesk", protegerRuta, TicketsController.actualizarAnydeskInfo);
 router.get("/:id/historial", protegerRuta, TicketsController.listarHistorial);
 router.post("/:id/historial", protegerRuta, TicketsController.agregarHistorial);
 router.get("/empleados/sistemas", protegerRuta, TicketsController.listarEmpleadosSistemas);

@@ -91,7 +91,6 @@
   --accent-danger: #f85149;
   --accent-info: #79c0ff;
   
-  /* Variables para inputs y formularios */
   --input-bg: #21262d;
   --form-focus-color: #58a6ff;
   
@@ -2524,4 +2523,127 @@ input[type="time"]:focus {
   .action-content h4 {
     font-size: 1.1rem;
   }
+}
+
+/* Estilos para mostrar quien resolvio el ticket */
+.solution-author {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background-color: var(--card-background);
+  border-left: 3px solid var(--accent-primary);
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: var(--text-color);
+}
+
+.solution-date {
+  margin-top: 6px;
+  font-size: 0.85em;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.solution-author strong,
+.solution-date strong {
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+/* Nota informativa para soluciones */
+.solution-note {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background-color: var(--accent-info-light);
+  border: 1px solid var(--accent-info);
+  border-radius: 6px;
+  font-size: 0.85em;
+  color: var(--accent-info);
+  text-align: center;
+}
+
+.solution-note em {
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* Estilos para información de AnyDesk */
+.anydesk-info {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background-color: rgba(46, 125, 50, 0.1);
+  border-left: 3px solid var(--accent-success);
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: var(--text-color);
+}
+
+.anydesk-info strong {
+  color: var(--accent-success);
+  font-weight: 600;
+}
+
+/* Estilos para ayuda de AnyDesk en crear ticket */
+.anydesk-help {
+  margin: -8px 0 16px 0;
+  padding: 8px 12px;
+  background-color: rgba(33, 150, 243, 0.1);
+  border-left: 3px solid var(--accent-info);
+  border-radius: 4px;
+}
+
+.anydesk-help small {
+  font-size: 0.85em;
+  color: var(--accent-info);
+  line-height: 1.4;
+}
+
+.anydesk-help strong {
+  font-weight: 600;
+}
+
+/* Estilos para AnyDesk en tabla de tickets */
+.anydesk-available {
+  background-color: rgba(46, 125, 50, 0.1);
+  color: var(--accent-success);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 500;
+  cursor: help;
+  display: inline-block;
+}
+
+.anydesk-not-available {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.anydesk-available:hover {
+  background-color: rgba(46, 125, 50, 0.2);
+}
+
+/* Estilos para AnyDesk en modal de detalle */
+.anydesk-detail {
+  margin: 12px 0;
+  padding: 12px;
+  background-color: rgba(46, 125, 50, 0.1);
+  border-left: 4px solid var(--accent-success);
+  border-radius: 6px;
+}
+
+.anydesk-code {
+  font-family: monospace;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-left: 8px;
+  font-weight: bold;
+  color: var(--accent-success);
+  font-size: 1.1em;
+  user-select: all;
+  cursor: text;
+}
+
+.anydesk-detail b {
+  color: var(--accent-success);
 }

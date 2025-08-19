@@ -14,7 +14,7 @@ const crearTicket = async (ticket) => {
   const codigo = await generarCodigoTicket();
   const campos = [
     "codigo", "solicitante_id", "correo_solicitante", "area_solicitante", "celular_solicitante",
-    "tipo", "categoria", "prioridad", "estado", "observacion_inicial"
+    "tipo", "categoria", "prioridad", "estado", "observacion_inicial", "anydesk_info"
   ];
   const valores = [
     codigo,
@@ -26,7 +26,8 @@ const crearTicket = async (ticket) => {
     ticket.categoria,
     ticket.prioridad,
     "Abierto",
-    ticket.observacion_inicial
+    ticket.observacion_inicial,
+    ticket.anydesk_info || null
   ];
   const placeholders = campos.map((_, i) => `$${i + 1}`).join(", ");
   const result = await db.query(
@@ -104,6 +105,14 @@ const cambiarEstadoTicket = async (ticketId, estado, solucion_aplicada, satisfac
   return result.rows[0];
 };
 
+const actualizarAnydeskInfo = async (ticketId, anydeskInfo) => {
+  const result = await db.query(
+    `UPDATE tickets SET anydesk_info = $1 WHERE id = $2 RETURNING *`,
+    [anydeskInfo, ticketId]
+  );
+  return result.rows[0];
+};
+
 const agregarHistorial = async (ticketId, usuarioId, accion, detalle) => {
   await db.query(
     `INSERT INTO tickets_historial (ticket_id, usuario_id, accion, detalle) VALUES ($1, $2, $3, $4)`,
@@ -136,20 +145,30 @@ const buscarPorCodigoYCorreo = async (codigo, correo) => {
 };
 
 const buscarTicketsSimilares = async ({ categoria, tipo, palabra }) => {
-  let query = "SELECT * FROM tickets WHERE estado = 'Cerrado'";
+  let query = `
+    SELECT 
+      t.*,
+      ea.nombres AS asignado_nombres,
+      ea.apellidos AS asignado_apellidos,
+      ea.correo_institucional AS asignado_correo
+    FROM tickets t
+    LEFT JOIN empleados ea ON t.personal_asignado_id = ea.id
+    WHERE t.estado = 'Cerrado'
+  `;
   const params = [];
   if (categoria) {
     params.push(categoria);
-    query += ` AND categoria = $${params.length}`;
+    query += ` AND t.categoria = $${params.length}`;
   }
   if (tipo) {
     params.push(tipo);
-    query += ` AND tipo = $${params.length}`;
+    query += ` AND t.tipo = $${params.length}`;
   }
   if (palabra) {
     params.push(`%${palabra}%`);
-    query += ` AND solucion_aplicada ILIKE $${params.length}`;
+    query += ` AND t.solucion_aplicada ILIKE $${params.length}`;
   }
+  query += ` ORDER BY t.fecha_creacion DESC`;
   const result = await db.query(query, params);
   return result.rows;
 };
@@ -182,6 +201,7 @@ module.exports = {
   obtenerTicketPorId,
   asignarPersonal,
   cambiarEstadoTicket,
+  actualizarAnydeskInfo,
   agregarHistorial,
   listarHistorial,
   listarEmpleadosSistemas,

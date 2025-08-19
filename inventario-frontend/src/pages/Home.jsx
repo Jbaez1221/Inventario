@@ -6,14 +6,13 @@ import {
   FaDesktop, 
   FaUsers, 
   FaTicketAlt, 
-  FaBell, 
   FaCog, 
   FaClipboardList,
   FaUserPlus,
   FaSearch,
-  FaExclamationTriangle,
   FaHistory,
-  FaUserShield
+  FaUserShield,
+  FaCheck
 } from 'react-icons/fa';
 
 const Home = () => {
@@ -23,9 +22,10 @@ const Home = () => {
     equiposLibres: 0,
     totalEmpleados: 0,
     ticketsPendientes: 0,
+    ticketsAsignadosTotal: 0,
+    ticketsEnProcesoEspera: 0,
     equiposTotal: 0
   });
-  const [ticketsAsignados, setTicketsAsignados] = useState([]);
   const [loading, setLoading] = useState(true);
   const [empleadoData, setEmpleadoData] = useState(null);
 
@@ -127,18 +127,44 @@ const Home = () => {
         equiposTotal: equiposRes.data.length
       });
 
-      if (token && rol === 'tecnico sistemas' && user?.user?.id) {
+      // Cargar tickets asignados para técnico sistemas
+      if (token && rol === 'tecnico sistemas' && user?.user?.empleado_id) {
         try {
-          const ticketsRes = await axios.get(`/tickets/asignados/${user.user.id}`);
-          setTicketsAsignados(ticketsRes.data.filter(t => 
+          // Usar el endpoint correcto para obtener todos los tickets y filtrar por asignado
+          const ticketsRes = await axios.get('/tickets');
+          const todosTickets = ticketsRes.data || [];
+          
+          // Filtrar tickets asignados al técnico actual
+          const ticketsAsignadosData = todosTickets.filter(t => 
+            t.personal_asignado_id === user.user.empleado_id
+          );
+          
+          // Filtrar tickets pendientes (no cerrados) para el técnico
+          const ticketsPendientesTecnico = ticketsAsignadosData.filter(t => 
+            t.estado !== 'Cerrado'
+          );
+          
+          // Total de tickets asignados (todos los estados)
+          const totalAsignados = ticketsAsignadosData.length;
+          
+          // Contar tickets en proceso/espera
+          const ticketsEnProcesoEspera = ticketsAsignadosData.filter(t => 
             t.estado === 'En proceso' || t.estado === 'En espera'
-          ));
+          ).length;
+          
+          // Actualizar estadísticas con tickets pendientes del técnico
+          setStats(prev => ({ 
+            ...prev, 
+            ticketsPendientes: ticketsPendientesTecnico.length,
+            ticketsAsignadosTotal: totalAsignados,
+            ticketsEnProcesoEspera: ticketsEnProcesoEspera
+          }));
         } catch (error) {
           console.error('Error cargando tickets:', error);
         }
       }
 
-      if (token && (rol === 'admin' || rol === 'tecnico sistemas')) {
+      if (token && rol === 'admin') {
         try {
           const ticketsRes = await axios.get('/tickets');
           const pendientes = ticketsRes.data.filter(t => 
@@ -154,7 +180,7 @@ const Home = () => {
     } finally {
       setLoading(false);
     }
-  }, [token, rol, user?.user?.id]);
+  }, [token, rol, user?.user?.empleado_id]);
 
   useEffect(() => {
     cargarDatos();
@@ -214,7 +240,6 @@ const Home = () => {
         </p>
       </div>
 
-      {/* Vista Pública (Sin Login) */}
       {!token && (
         <>
           <div className="stats-grid">
@@ -273,56 +298,26 @@ const Home = () => {
           <div className="stats-grid">
             <CardStat
               icon={FaTicketAlt}
-              title="Tickets Asignados"
-              value={ticketsAsignados.length}
-              color={ticketsAsignados.length > 0 ? "var(--accent-warning)" : "var(--accent-success)"}
+              title="Tickets Pendientes"
+              value={stats.ticketsPendientes}
+              color={stats.ticketsPendientes > 0 ? "var(--accent-warning)" : "var(--accent-success)"}
               onClick={() => navigate('/tickets-gestion')}
             />
             <CardStat
               icon={FaClipboardList}
-              title="Tickets Pendientes"
-              value={stats.ticketsPendientes}
+              title="Total Asignados"
+              value={stats.ticketsAsignadosTotal || 0}
               color="var(--accent-info)"
               onClick={() => navigate('/tickets-gestion')}
             />
+            <CardStat
+              icon={FaCheck}
+              title="En Proceso/Espera"
+              value={stats.ticketsEnProcesoEspera || 0}
+              color="var(--accent-primary)"
+              onClick={() => navigate('/tickets-gestion')}
+            />
           </div>
-
-          {ticketsAsignados.length > 0 && (
-            <div className="notifications-section">
-              <div className="notification-header">
-                <FaBell className="notification-icon" />
-                <h2>Tickets Asignados - Acción Requerida</h2>
-              </div>
-              <div className="tickets-list">
-                {ticketsAsignados.slice(0, 3).map(ticket => (
-                  <div 
-                    key={ticket.id} 
-                    className="ticket-notification"
-                    onClick={() => navigate(`/ticket-detalle/${ticket.id}`)}
-                  >
-                    <div className="ticket-info">
-                      <h4>Ticket #{ticket.id}</h4>
-                      <p>{ticket.tipo} - {ticket.categoria}</p>
-                      <span className={`status ${ticket.estado.toLowerCase().replace(' ', '-')}`}>
-                        {ticket.estado}
-                      </span>
-                    </div>
-                    <div className="ticket-action">
-                      <FaExclamationTriangle />
-                    </div>
-                  </div>
-                ))}
-                {ticketsAsignados.length > 3 && (
-                  <button 
-                    className="btn-primary"
-                    onClick={() => navigate('/tickets-gestion')}
-                  >
-                    Ver todos los tickets ({ticketsAsignados.length})
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
 
           <div className="quick-actions">
             <h2>Gestión de Tickets</h2>

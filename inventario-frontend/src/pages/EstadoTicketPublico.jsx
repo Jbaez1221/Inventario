@@ -132,7 +132,7 @@ export default function EstadoTicketPublico() {
                         <div className="detail-row">
                           <span className="detail-label">Fecha:</span>
                           <span className="detail-value">
-                            {new Date(t.fecha_creacion).toLocaleDateString('es-ES')}
+                            {new Date(t.fecha_creacion).toLocaleDateString('es-ES')} - {new Date(t.fecha_creacion).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
                       </div>
@@ -175,7 +175,7 @@ export default function EstadoTicketPublico() {
                       <div className="detail-row">
                         <span className="detail-label">Fecha:</span>
                         <span className="detail-value">
-                          {new Date(resultado.fecha_creacion).toLocaleDateString('es-ES')}
+                          {new Date(resultado.fecha_creacion).toLocaleDateString('es-ES')} - {new Date(resultado.fecha_creacion).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
                     )}

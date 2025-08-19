@@ -12,9 +12,17 @@ export default function AsignarPersonalTicket({ ticketId, onAsignado, modal = fa
 
   const handleAsignar = async e => {
     e.preventDefault();
-    await axios.put(`/tickets/${ticketId}/asignar`, { personalId });
-    onAsignado();
-    if (modal && onClose) onClose();
+    try {
+      await axios.put(`/tickets/${ticketId}/asignar`, { personalId });
+      setTimeout(() => {
+        onAsignado();
+        if (modal && onClose) onClose();
+      }, 500);
+    } catch (error) {
+      console.error("Error al asignar ticket:", error);
+      onAsignado();
+      if (modal && onClose) onClose();
+    }
   };
 
   if (modal) {

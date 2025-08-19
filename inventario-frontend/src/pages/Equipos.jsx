@@ -379,7 +379,7 @@ const Equipos = () => {
                     <button onClick={() => setEquipoVisualizar(equipo) || setModalEquipoVisible(true)} className="btn-info btn-icon" title="Visualizar">
                       <FaEye />
                     </button>
-                    <button onClick={() => iniciarEdicion(equipo)} className="btn-primary btn-icon" title="Editar"><FaPencilAlt /></button>
+                    <button onClick={() => iniciarEdicion(equipo)} className="btn-edit btn-icon" title="Editar"><FaPencilAlt /></button>
                     <button onClick={() => eliminarEquipo(equipo.id)} className="btn-danger btn-icon" title="Eliminar"><FaTrash /></button>
                     <button onClick={() => verHistorial(equipo.id)} className="btn-info btn-icon" title="Historial"><FaHistory /></button>
                   </td>

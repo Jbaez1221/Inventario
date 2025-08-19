@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axiosBackend from "../api/axios"; 
 import TicketDetalle from "./TicketDetalle";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useAuth } from "../hooks/useAuth";
 
 export default function TicketsGestion() {
@@ -11,6 +11,9 @@ export default function TicketsGestion() {
   const [modalObsVisible, setModalObsVisible] = useState(false);
   const [modalObsTexto, setModalObsTexto] = useState("");
   const [modalObsTitulo, setModalObsTitulo] = useState("");
+  
+  const [paginaActual, setPaginaActual] = useState(1);
+  const itemsPorPagina = 10;
 
   const cargarTickets = async () => {
     try {
@@ -38,9 +41,36 @@ export default function TicketsGestion() {
     );
   }
 
+  // Cálculos de paginación
+  const totalTickets = ticketsFiltrados.length;
+  const totalPaginas = Math.ceil(totalTickets / itemsPorPagina);
+  const indiceInicio = (paginaActual - 1) * itemsPorPagina;
+  const indiceFin = indiceInicio + itemsPorPagina;
+  const ticketsPaginados = ticketsFiltrados.slice(indiceInicio, indiceFin);
+
+  // Función para cambiar página
+  const cambiarPagina = (nuevaPagina) => {
+    if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
+      setPaginaActual(nuevaPagina);
+    }
+  };
+
+  // Resetear página cuando cambien los tickets
+  useEffect(() => {
+    setPaginaActual(1);
+  }, [tickets]);
+
   return (
     <div>
       <h2>Gestión de Tickets</h2>
+      
+      {/* Información de paginación */}
+      <div className="pagination-info">
+        <span>
+          Mostrando {indiceInicio + 1} - {Math.min(indiceFin, totalTickets)} de {totalTickets} tickets
+        </span>
+      </div>
+
       <table className="tabla-datos">
         <thead>
           <tr>
@@ -54,7 +84,7 @@ export default function TicketsGestion() {
           </tr>
         </thead>
         <tbody>
-          {ticketsFiltrados.map(t => (
+          {ticketsPaginados.map(t => (
             <tr key={t.id}>
               <td>{t.codigo}</td>
               <td>{t.estado}</td>
@@ -99,6 +129,39 @@ export default function TicketsGestion() {
           ))}
         </tbody>
       </table>
+
+      {/* Controles de paginación */}
+      {totalPaginas > 1 && (
+        <div className="pagination-controls">
+          <button 
+            className="pagination-btn"
+            onClick={() => cambiarPagina(paginaActual - 1)}
+            disabled={paginaActual === 1}
+          >
+            <FaChevronLeft />
+          </button>
+          
+          <div className="pagination-numbers">
+            {Array.from({ length: totalPaginas }, (_, i) => i + 1).map(numero => (
+              <button
+                key={numero}
+                className={`pagination-number ${numero === paginaActual ? 'active' : ''}`}
+                onClick={() => cambiarPagina(numero)}
+              >
+                {numero}
+              </button>
+            ))}
+          </div>
+          
+          <button 
+            className="pagination-btn"
+            onClick={() => cambiarPagina(paginaActual + 1)}
+            disabled={paginaActual === totalPaginas}
+          >
+            <FaChevronRight />
+          </button>
+        </div>
+      )}
 
       {modalObsVisible && (
         <div className="modal-overlay" onClick={() => setModalObsVisible(false)}>

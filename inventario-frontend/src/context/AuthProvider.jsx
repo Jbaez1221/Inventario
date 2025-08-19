@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 import axiosBackend from '../api/axios';
 import { jwtDecode } from 'jwt-decode';
@@ -7,11 +8,13 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [user, setUser] = useState(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setToken(null);
     setUser(null);
-  };
+    navigate('/');
+  }, [navigate]);
 
   useEffect(() => {
     if (token) {
@@ -42,12 +45,13 @@ export const AuthProvider = ({ children }) => {
     return () => {
       axiosBackend.interceptors.response.eject(responseInterceptor);
     };
-  }, [token]);
+  }, [token, logout]);
 
   const login = async (credentials) => {
     const response = await axiosBackend.post('/auth/login', credentials);
     setToken(response.data.token);
     setIsLoginModalOpen(false);
+    navigate('/');
   };
 
   const openLoginModal = () => setIsLoginModalOpen(true);

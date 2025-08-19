@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import LoginModal from './LoginModal';
+import ThemeToggle from './ThemeToggle';
 import { useAuth } from '../hooks/useAuth';
 import { FaBars } from 'react-icons/fa';
 
@@ -39,6 +40,8 @@ const Layout = () => {
 
   return (
     <div className="app-container">
+      <ThemeToggle />
+      
       <button className="mobile-menu-toggle" onClick={toggleSidebar}>
         <FaBars />
       </button>

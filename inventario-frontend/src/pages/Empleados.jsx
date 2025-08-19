@@ -9,8 +9,8 @@ const SECCIONES_MODAL = [
     titulo: "Datos Personales",
     icon: (
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-        <circle cx="12" cy="8" r="4" stroke="#8ab4f8" strokeWidth="2"/>
-        <path d="M4 20c0-3.314 3.582-6 8-6s8 2.686 8 6" stroke="#8ab4f8" strokeWidth="2"/>
+        <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2"/>
+        <path d="M4 20c0-3.314 3.582-6 8-6s8 2.686 8 6" stroke="currentColor" strokeWidth="2"/>
       </svg>
     ),
     campos: [
@@ -32,8 +32,8 @@ const SECCIONES_MODAL = [
     titulo: "Datos de Contrato",
     icon: (
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-        <rect x="4" y="3" width="16" height="18" rx="2" stroke="#8ab4f8" strokeWidth="2"/>
-        <path d="M8 7h8M8 11h8M8 15h4" stroke="#8ab4f8" strokeWidth="2"/>
+        <rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
+        <path d="M8 7h8M8 11h8M8 15h4" stroke="currentColor" strokeWidth="2"/>
       </svg>
     ),
     campos: [
@@ -56,8 +56,8 @@ const SECCIONES_MODAL = [
     titulo: "Datos Bancarios",
     icon: (
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-        <rect x="3" y="6" width="18" height="12" rx="2" stroke="#8ab4f8" strokeWidth="2"/>
-        <path d="M3 10h18" stroke="#8ab4f8" strokeWidth="2"/>
+        <rect x="3" y="6" width="18" height="12" rx="2" stroke="currentColor" strokeWidth="2"/>
+        <path d="M3 10h18" stroke="currentColor" strokeWidth="2"/>
       </svg>
     ),
     campos: [
@@ -70,8 +70,8 @@ const SECCIONES_MODAL = [
     titulo: "Sistemas de Pensiones",
     icon: (
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-        <rect x="4" y="10" width="16" height="8" rx="2" stroke="#8ab4f8" strokeWidth="2"/>
-        <path d="M2 10l10-6 10 6" stroke="#8ab4f8" strokeWidth="2"/>
+        <rect x="4" y="10" width="16" height="8" rx="2" stroke="currentColor" strokeWidth="2"/>
+        <path d="M2 10l10-6 10 6" stroke="currentColor" strokeWidth="2"/>
       </svg>
     ),
     campos: [
@@ -85,9 +85,9 @@ const SECCIONES_MODAL = [
     titulo: "Contacto y Estudios",
     icon: (
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-        <path d="M6 8v2a6 6 0 006 6h2" stroke="#8ab4f8" strokeWidth="2"/>
-        <rect x="14" y="14" width="6" height="6" rx="1" stroke="#8ab4f8" strokeWidth="2"/>
-        <circle cx="8" cy="6" r="2" stroke="#8ab4f8" strokeWidth="2"/>
+        <path d="M6 8v2a6 6 0 006 6h2" stroke="currentColor" strokeWidth="2"/>
+        <rect x="14" y="14" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="2"/>
+        <circle cx="8" cy="6" r="2" stroke="currentColor" strokeWidth="2"/>
       </svg>
     ),
     campos: [
@@ -212,12 +212,12 @@ const Empleados = () => {
                 {!token && <td>{empleado["TELEFONO COORPORATIVO"] || "—"}</td>}
                 {token && (
                   <td className="acciones">
-                    <button className="btn-info btn-icon" onClick={() => { setEmpleadoVisualizar(empleado); setModalEmpleadoVisible(true); }} title="Ver detalle">
+                    <button className="btn-view btn-icon" onClick={() => { setEmpleadoVisualizar(empleado); setModalEmpleadoVisible(true); }} title="Ver detalle">
                       <FaEye />
                     </button>
                     {(rol === "admin" || rol === "rrhh") && (
                       <button
-                        className="btn-primary btn-icon"
+                        className="btn-edit btn-icon"
                         onClick={() => navigate(`/empleados/gestionar/${empleado.DNI}`)}
                         title="Editar"
                       >
@@ -285,12 +285,12 @@ const Empleados = () => {
             </div>
 
             <div className="modal-actions">
-              <button className="btn-secondary" onClick={() => setModalEmpleadoVisible(false)}>
+              <button className="btn-cancel" onClick={() => setModalEmpleadoVisible(false)}>
                 Cerrar
               </button>
               {token && (rol === "admin" || rol === "rrhh") && (
                 <button 
-                  className="btn-primary" 
+                  className="btn-edit" 
                   onClick={() => {
                     setModalEmpleadoVisible(false);
                     navigate(`/empleados/gestionar/${empleadoVisualizar.DNI}`);

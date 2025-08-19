@@ -44,22 +44,18 @@ export default function TicketHistorial({ ticketId, onClose }) {
         ) : (
           <div style={{ maxHeight: 400, overflowY: 'auto' }}>
             {historial.map(h => (
-              <div key={h.id} style={{ 
-                borderBottom: '1px solid #333', 
-                padding: '10px 0',
-                marginBottom: '8px'
-              }}>
-                <div style={{ fontSize: '0.9em', color: '#bbb' }}>
+              <div key={h.id} className="historial-item">
+                <div className="historial-fecha">
                   {formatearFecha(h.fecha)}
                 </div>
-                <div style={{ fontWeight: 'bold', margin: '4px 0' }}>
+                <div className="historial-accion">
                   {h.accion}
                 </div>
-                <div style={{ margin: '4px 0' }}>
+                <div className="historial-detalle">
                   {h.detalle}
                 </div>
                 {h.nombres && (
-                  <div style={{ fontSize: '0.9em', color: '#8ab4f8' }}>
+                  <div className="historial-autor">
                     Por: {h.nombres} {h.apellidos}
                   </div>
                 )}
@@ -69,7 +65,7 @@ export default function TicketHistorial({ ticketId, onClose }) {
         )}
         
         <div className="modal-actions">
-          <button className="btn-secondary" onClick={onClose}>Cerrar</button>
+          <button className="btn-cancel" onClick={onClose}>Cerrar</button>
         </div>
       </div>
     </div>

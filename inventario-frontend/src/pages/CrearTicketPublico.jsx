@@ -32,7 +32,8 @@ export default function CrearTicketPublico() {
     tipo: "",
     categoria: "",
     prioridad: "Media",
-    observacion_inicial: ""
+    observacion_inicial: "",
+    anydesk_info: ""
   });
   const [mensaje, setMensaje] = useState("");
   const [codigo, setCodigo] = useState("");
@@ -109,6 +110,18 @@ export default function CrearTicketPublico() {
           value={form.observacion_inicial}
           onChange={handleChange}
         />
+        <input
+          name="anydesk_info"
+          placeholder="AnyDesk ID (opcional - para soporte remoto)"
+          value={form.anydesk_info}
+          onChange={handleChange}
+          title="Si tienes AnyDesk instalado, proporciona tu ID para que el técnico pueda conectarse remotamente y resolver tu problema más rápido"
+        />
+        <div className="anydesk-help">
+          <small>
+            💡 <strong>AnyDesk:</strong> Si tienes AnyDesk instalado, proporciona tu ID para soporte remoto más rápido
+          </small>
+        </div>
         <button type="submit" className="btn-primary">Enviar Ticket</button>
       </form>
       {mensaje && <div>{mensaje}</div>}

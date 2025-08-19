@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axiosBackend from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
 import TicketHistorial from "../components/TicketHistorial";
@@ -11,35 +11,49 @@ export default function TicketDetalle({ ticket, onClose, onUpdate }) {
   const [solucion, setSolucion] = useState("");
   const [showHistorial, setShowHistorial] = useState(false);
 
-  useEffect(() => {
-    axiosBackend.get(`/tickets/${ticket.id}`)
-      .then(res => setDetalle(res.data));
+  const refrescarTicket = useCallback(async () => {
+    try {
+      const res = await axiosBackend.get(`/tickets/${ticket.id}`);
+      setDetalle(res.data);
+    } catch (error) {
+      console.error("Error al refrescar ticket:", error);
+    }
   }, [ticket.id]);
+
+  useEffect(() => {
+    refrescarTicket();
+  }, [refrescarTicket]);
 
   const esTecnicoAsignado =
     user?.user?.rol === "tecnico sistemas" &&
     detalle.personal_asignado_id === user.user.empleado_id;
 
   const guardarComentario = async () => {
-    await axiosBackend.put(`/tickets/${detalle.id}/asignar`, {
-      personalId: detalle.personal_asignado_id,
-      comentarios: comentario
-    });
-    const res = await axiosBackend.get(`/tickets/${ticket.id}`);
-    setDetalle(res.data);
-    setComentario("");
-    if (onUpdate) onUpdate();
+    try {
+      await axiosBackend.put(`/tickets/${detalle.id}/asignar`, {
+        personalId: detalle.personal_asignado_id,
+        comentarios: comentario
+      });
+      await refrescarTicket();
+      setComentario("");
+      if (onUpdate) onUpdate();
+    } catch (error) {
+      console.error("Error al guardar comentario:", error);
+    }
   };
 
   const cerrarTicket = async () => {
-    await axiosBackend.put(`/tickets/${detalle.id}/estado`, {
-      estado: "Cerrado",
-      solucion_aplicada: solucion
-    });
-    const res = await axiosBackend.get(`/tickets/${ticket.id}`);
-    setDetalle(res.data);
-    setSolucion("");
-    if (onUpdate) onUpdate();
+    try {
+      await axiosBackend.put(`/tickets/${detalle.id}/estado`, {
+        estado: "Cerrado",
+        solucion_aplicada: solucion
+      });
+      await refrescarTicket();
+      setSolucion("");
+      if (onUpdate) onUpdate();
+    } catch (error) {
+      console.error("Error al cerrar ticket:", error);
+    }
   };
 
   return (
@@ -58,14 +72,22 @@ export default function TicketDetalle({ ticket, onClose, onUpdate }) {
             : "Sin asignar"}
         </div>
         <div><b>Descripción:</b> {detalle.observacion_inicial}</div>
+        {detalle.anydesk_info && (
+          <div className="anydesk-detail">
+            <b>🖥️ AnyDesk del usuario:</b> 
+            <span className="anydesk-code">{detalle.anydesk_info}</span>
+            <small style={{display: 'block', marginTop: '4px', color: 'var(--text-muted)'}}>
+              Puedes usar este ID para conectarte remotamente
+            </small>
+          </div>
+        )}
         {(user?.user?.rol === "sistemas" || user?.user?.rol === "admin") &&
           !detalle.personal_asignado_id && (
             <div style={{ margin: "12px 0" }}>
               <AsignarPersonalTicket
                 ticketId={detalle.id}
                 onAsignado={async () => {
-                  const res = await axiosBackend.get(`/tickets/${detalle.id}`);
-                  setDetalle(res.data);
+                  await refrescarTicket();
                   if (onUpdate) onUpdate();
                 }}
                 modal={false}

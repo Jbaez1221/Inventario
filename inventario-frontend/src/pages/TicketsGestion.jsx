@@ -41,21 +41,18 @@ export default function TicketsGestion() {
     );
   }
 
-  // Cálculos de paginación
   const totalTickets = ticketsFiltrados.length;
   const totalPaginas = Math.ceil(totalTickets / itemsPorPagina);
   const indiceInicio = (paginaActual - 1) * itemsPorPagina;
   const indiceFin = indiceInicio + itemsPorPagina;
   const ticketsPaginados = ticketsFiltrados.slice(indiceInicio, indiceFin);
 
-  // Función para cambiar página
   const cambiarPagina = (nuevaPagina) => {
     if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
       setPaginaActual(nuevaPagina);
     }
   };
 
-  // Resetear página cuando cambien los tickets
   useEffect(() => {
     setPaginaActual(1);
   }, [tickets]);
@@ -64,7 +61,6 @@ export default function TicketsGestion() {
     <div>
       <h2>Gestión de Tickets</h2>
       
-      {/* Información de paginación */}
       <div className="pagination-info">
         <span>
           Mostrando {indiceInicio + 1} - {Math.min(indiceFin, totalTickets)} de {totalTickets} tickets
@@ -79,6 +75,7 @@ export default function TicketsGestion() {
             <th>Solicitante</th>
             <th>Prioridad</th>
             <th>Asignado a</th>
+            <th>AnyDesk</th>
             <th>Descripción</th>
             <th>Acciones</th>
           </tr>
@@ -98,6 +95,15 @@ export default function TicketsGestion() {
                 {t.asignado_nombres
                   ? `${t.asignado_nombres} ${t.asignado_apellidos}`
                   : "Sin asignar"}
+              </td>
+              <td>
+                {t.anydesk_info ? (
+                  <span className="anydesk-available" title={`AnyDesk: ${t.anydesk_info}`}>
+                    🖥️ {t.anydesk_info}
+                  </span>
+                ) : (
+                  <span className="anydesk-not-available">—</span>
+                )}
               </td>
               <td>
                 {t.observacion_inicial
@@ -130,7 +136,6 @@ export default function TicketsGestion() {
         </tbody>
       </table>
 
-      {/* Controles de paginación */}
       {totalPaginas > 1 && (
         <div className="pagination-controls">
           <button 

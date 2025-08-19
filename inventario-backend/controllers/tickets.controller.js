@@ -4,7 +4,7 @@ const EmailService = require("../services/email.service");
 
 const crearTicketPublico = async (req, res) => {
   try {
-    const { dni, tipo, categoria, prioridad, observacion_inicial } = req.body;
+    const { dni, tipo, categoria, prioridad, observacion_inicial, anydesk_info } = req.body;
 
     const empleado = await EmpleadosModel.buscarPorDni(dni);
     if (!empleado) {
@@ -18,7 +18,8 @@ const crearTicketPublico = async (req, res) => {
       tipo,
       categoria,
       prioridad,
-      observacion_inicial
+      observacion_inicial,
+      anydesk_info
     };
 
     const ticket = await TicketsModel.crearTicket(ticketData);
@@ -48,7 +49,12 @@ const buscarTicketsPublico = async (req, res) => {
       estado: t.estado,
       solucion: t.solucion_aplicada,
       categoria: t.categoria,
-      tipo: t.tipo
+      tipo: t.tipo,
+      fecha_cierre: t.fecha_cierre,
+      solucionado_por: t.asignado_nombres && t.asignado_apellidos 
+        ? `${t.asignado_nombres} ${t.asignado_apellidos}` 
+        : null,
+      correo_tecnico: t.asignado_correo
     })));
   } catch (error) {
     res.status(500).json({ error: "Error al buscar tickets" });
@@ -141,6 +147,27 @@ const cambiarEstadoTicket = async (req, res) => {
   }
 };
 
+const actualizarAnydeskInfo = async (req, res) => {
+  try {
+    const { anydesk_info } = req.body;
+    const ticket = await TicketsModel.actualizarAnydeskInfo(req.params.id, anydesk_info);
+    if (!ticket) return res.status(404).json({ error: "Ticket no encontrado" });
+
+    const empleadoId = req.user?.empleado_id || null;
+    await TicketsModel.agregarHistorial(
+      req.params.id, 
+      empleadoId, 
+      "Información AnyDesk", 
+      `AnyDesk: ${anydesk_info || 'Información removida'}`
+    );
+
+    res.json(ticket);
+  } catch (error) {
+    console.error("Error al actualizar información de AnyDesk:", error);
+    res.status(500).json({ error: error.message || "Error al actualizar información de AnyDesk" });
+  }
+};
+
 const listarHistorial = async (req, res) => {
   try {
     const historial = await TicketsModel.listarHistorial(req.params.id);
@@ -203,6 +230,7 @@ module.exports = {
   obtenerTicketPorId,
   asignarPersonal,
   cambiarEstadoTicket,
+  actualizarAnydeskInfo,
   listarHistorial,
   agregarHistorial,
   listarEmpleadosSistemas,

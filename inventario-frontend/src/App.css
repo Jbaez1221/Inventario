@@ -91,6 +91,10 @@
   --accent-danger: #f85149;
   --accent-info: #79c0ff;
   
+  /* Variables para inputs y formularios */
+  --input-bg: #21262d;
+  --form-focus-color: #58a6ff;
+  
   --sidebar-bg: #0d1117;
   --sidebar-border: #21262d;
   --sidebar-shadow: 0 0 0 1px rgba(240, 246, 252, 0.1), 0 4px 16px rgba(0, 0, 0, 0.4);
@@ -822,7 +826,6 @@ h2 {
   border-color: var(--accent-primary);
 }
 
-/* Responsive para paginación */
 @media (max-width: 768px) {
   .pagination-controls {
     gap: 5px;

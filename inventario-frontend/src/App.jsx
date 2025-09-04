@@ -20,6 +20,9 @@ import EstadoTicketPublico from "./pages/EstadoTicketPublico";
 import BuscarSolucionesTickets from "./pages/BuscarSolucionesTickets";
 import TicketsGestion from "./pages/TicketsGestion";
 import TicketDetalle from "./pages/TicketDetalle";
+import BuscarInfo from "./pages/BuscarInfo";
+import BuscarSAP from "./pages/BuscarSap";
+import Tarifario from "./pages/Tarifario";
 
 const RedirectTicketWithId = () => {
   const id = window.location.pathname.split('/').pop();
@@ -83,11 +86,15 @@ function App() {
             <Route path="estado-ticket-publico" element={<EstadoTicketPublico />} />
             <Route path="buscar-soluciones-tickets" element={<BuscarSolucionesTickets />} />
 
+            <Route path="tarifario"  element={<Tarifario/>}/>
+            <Route path="buscar-info" element={<BuscarInfo/>}/>
+            <Route path="buscar-sap" element={<BuscarInfo/>}/>
+
             <Route
               path="tickets-gestion"
               element={
                 <ProtectedRoute>
-                  <TicketsGestion />
+                  <TicketsGestion/>
                 </ProtectedRoute>
               }
             />

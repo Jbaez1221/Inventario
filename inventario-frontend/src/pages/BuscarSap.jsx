@@ -115,7 +115,7 @@ const BuscarSAP = () => {
 
   return (
     <div>
-      <h2>Equipos disponibles para asignar</h2>
+      <h2>Equipos disponibles para anosnasonsdvnasdonv</h2>
       {mensaje && <div className="mensaje-exito">{mensaje}</div>}
 
       <div className="filtros-container">

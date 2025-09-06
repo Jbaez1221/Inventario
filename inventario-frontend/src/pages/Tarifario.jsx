@@ -1,124 +1,200 @@
 import { useEffect, useState, useRef } from "react";
 import axiosBackend from "../api/axios";
 import { useAuth } from "../hooks/useAuth";
-import SignatureCanvas from 'react-signature-canvas'; 
+import SignatureCanvas from 'react-signature-canvas';
 
 const Tarifario = () => {
   const { token, user } = useAuth();
   const rol = user?.user?.rol;
 
   const [mensaje, setMensaje] = useState("");
-  const [equiposDisponibles, setEquiposDisponibles] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [equipoSeleccionado, setEquipoSeleccionado] = useState(null);
-  const [dni, setDni] = useState("");
-  const [observaciones, setObservaciones] = useState("");
-  const [busqueda, setBusqueda] = useState("");
-  const [imagenFile, setImagenFile] = useState(null);
-  const [imagenPreview, setImagenPreview] = useState("");
-  const fileInputRef = useRef(null);
-  const firmaEntregaRef = useRef(null);
-  const firmaRecibeRef = useRef(null);
+  const [vehiculos, setVehiculos] = useState([]);
+  const [vehiculoSeleccionado, setVehiculoSeleccionado] = useState("");
+  const [modelos, setModelos] = useState([]);
+  const [modeloSeleccionado, setModeloSeleccionado] = useState("");
+  const [modeloDetalle, setModeloDetalle] = useState({});
 
   useEffect(() => {
-    obtenerEquiposDisponibles();
+    const fetchVehiculos = async () => {
+      try {
+        const res = await axiosBackend.get("/vehiculos");
+        setVehiculos(res.data);
+      } catch (error) {
+        console.error("Error al obtener vehículos:", error);
+      }
+    };
+    fetchVehiculos();
   }, []);
 
-  const obtenerEquiposDisponibles = async () => {
-    try {
-      const response = await axiosBackend.get("/equipos/disponibles");
-      setEquiposDisponibles(response.data);
-    } catch (error) {
-      console.error("Error al obtener equipos disponibles", error);
+  useEffect(() => {
+    if (!vehiculoSeleccionado) {
+      setModelos([]);
+      setModeloSeleccionado("");
+      setModeloDetalle({});
+      return;
     }
-  };
-
-  const abrirFormularioAsignacion = (equipo) => {
-    setEquipoSeleccionado(equipo);
-    setDni("");
-    setObservaciones("");
-    setImagenFile(null);
-    setImagenPreview("");
-    setModalVisible(true);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImagenFile(file);
-      setImagenPreview(URL.createObjectURL(file));
-    }
-  };
-
-  const asignarConFirmas = async () => {
-    const dniTrimmed = dni.trim();
-    if (!dniTrimmed) return alert("Debe ingresar el DNI del empleado");
-    if (firmaEntregaRef.current.isEmpty() || firmaRecibeRef.current.isEmpty()) {
-      return alert("Ambas firmas son requeridas para generar el acta.");
-    }
-
-    const formData = new FormData();
-    formData.append("dni", dniTrimmed);
-    formData.append("equipo_id", equipoSeleccionado.id);
-    formData.append("observaciones", observaciones);
-    if (imagenFile) {
-      formData.append("imagen_entrada", imagenFile);
-    }
-    formData.append("firmaEntrega", firmaEntregaRef.current.toDataURL('image/png'));
-    formData.append("firmaRecibe", firmaRecibeRef.current.toDataURL('image/png'));
-
-    try {
-      const response = await axiosBackend.post(
-        `/asignaciones/crear-con-firmas`,
-        formData,
-        { responseType: 'blob' }
-      );
-
-      const file = new Blob([response.data], { type: 'application/pdf' });
-      const fileURL = URL.createObjectURL(file);
-      const link = document.createElement('a');
-      link.href = fileURL;
-      const contentDisposition = response.headers['content-disposition'];
-      let fileName = `acta-asignacion-firmada-${dniTrimmed}.pdf`;
-      if (contentDisposition) {
-        const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
-        if (fileNameMatch && fileNameMatch.length === 2) fileName = fileNameMatch[1];
+    const fetchModelos = async () => {
+      try {
+        const res = await axiosBackend.get(`/vehiculos/${vehiculoSeleccionado}/modelos`);
+        setModelos(res.data);
+      } catch (error) {
+        console.error("Error al obtener modelos:", error);
       }
-      link.setAttribute('download', fileName);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(fileURL);
+    };
+    fetchModelos();
+  }, [vehiculoSeleccionado]);
 
-      setMensaje("Equipo asignado y acta firmada generada correctamente ✅");
-      setTimeout(() => setMensaje(""), 4000);
-      setModalVisible(false);
-      obtenerEquiposDisponibles();
-    } catch (error) {
-      console.error("Error en el proceso de asignación con firmas:", error);
-      alert("No se pudo completar la asignación. Verifique el DNI, las firmas y la imagen.");
+  useEffect(() => {
+    if (!modeloSeleccionado) {
+      setModeloDetalle({});
+      return;
     }
-  };
+    const fetchModeloDetalle = async () => {
+      try {
+        const res = await axiosBackend.get(`/modelos/${modeloSeleccionado}`);
+        setModeloDetalle(res.data);
+      } catch (error) {
+        console.error("Error al obtener detalle del modelo:", error);
+      }
+    };
+    fetchModeloDetalle();
+  }, [modeloSeleccionado]);
 
-  const equiposFiltrados = equiposDisponibles.filter((equipo) => {
-    const busquedaLower = busqueda.toLowerCase().trim();
-    if (!busquedaLower) return true;
-    return Object.values(equipo).some(val =>
-      val && String(val).toLowerCase().includes(busquedaLower)
-    );
-  });
-
-  if (!token || (rol !== "admin" && rol !== "sistemas")) {
-    return <div>No tienes permisos para ver esta sección.</div>;
-  }
+  /*  if (!token || (rol !== "admin" && rol !== "sistemas")) {
+     return <div>No tienes permisos para ver esta sección.</div>;
+   } */
 
   return (
     <div>
-      <h2>Equipos disponibles para asignar</h2>
-      {mensaje && <div className="mensaje-exito">{mensaje}</div>}
+      <div className="vehiculos-modelos">
+        <h2>Tarifario</h2>
 
-      <div className="filtros-container">
+        <div className="formulario">
+          <div className="form-group">
+            <label>Vehículo</label>
+            <select
+              value={vehiculoSeleccionado}
+              onChange={(e) => setVehiculoSeleccionado(e.target.value)}
+            >
+              <option value="">-- Seleccione un vehículo --</option>
+              {vehiculos.map((vehiculo) => (
+                <option key={vehiculo.idvehiculo} value={vehiculo.idvehiculo}>
+                  {vehiculo.vehiculo}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Modelo</label>
+            <select
+              disabled={!vehiculoSeleccionado}
+              value={modeloSeleccionado}
+              onChange={(e) => setModeloSeleccionado(e.target.value)}
+            >
+              <option value="">-- Seleccione un modelo --</option>
+              {modelos.map((m) => (
+                <option key={m.idmodelo} value={m.idmodelo}>
+                  {m.modelo}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <input
+              type="text"
+              readOnly
+              value={modeloDetalle.aplica || ""}
+              placeholder="Aplica"
+              size={modeloDetalle.aplica ? Math.max(modeloDetalle.aplica.length, 5) : 3}
+              className="border rounded px-2 py-1"
+            />
+            <input
+                type="text"
+                readOnly
+                value={modeloDetalle.codigomodelo || ""}
+                placeholder="Código Modelo"
+                className="border rounded px-2 py-1 w-40"
+              />
+          </div>
+          {/* <span>:</span> */}
+
+
+        </div>
+      </div>
+
+      {/* {token && (rol === "admin" || rol === "sistemas") && (
+        <div className="migrar">
+          <input name="tipo" value={form.tipo} onChange={handleChange} placeholder="Tipo" />
+          <input name="marca" value={form.marca} onChange={handleChange} placeholder="Marca" />
+          <input name="modelo" value={form.modelo} onChange={handleChange} placeholder="Modelo" />
+          <input name="serie" value={form.serie} onChange={handleChange} placeholder="Serie" />
+          <input name="memoria" value={form.memoria} onChange={handleChange} placeholder="Memoria (e.g., 16GB RAM)" />
+          <input name="almacenamiento" value={form.almacenamiento} onChange={handleChange} placeholder="Almacenamiento (e.g., 512GB SSD)" />
+          <input name="fecha_ingreso" type="date" value={form.fecha_ingreso} onChange={handleChange} />
+          <input name="ubicacion" value={form.ubicacion} onChange={handleChange} placeholder="Ubicación" />
+          {modoEdicion && (
+            <select name="estado" value={form.estado} onChange={handleChange}>
+              <option value="Disponible">Disponible</option>
+              <option value="Reparación">Reparación</option>
+              <option value="Baja">Baja</option>
+            </select>
+          )}
+          <input
+            name="garantia"
+            type="number"
+            min="0"
+            value={form.garantia || ""}
+            onChange={handleChange}
+            placeholder="Años de garantía"
+          />
+          <div className="form-group-full-width">
+            <input name="valor_compra" type="number" value={form.valor_compra} onChange={handleChange} placeholder="Valor de compra" />
+          </div>
+          <div className="form-group-full-width">
+            <textarea
+              name="observaciones"
+              value={form.observaciones}
+              onChange={handleChange}
+              placeholder="Observaciones"
+              rows="3"
+            />
+          </div>
+
+          <div className="form-group-full-width" style={{ gridColumn: '1 / -1' }}>
+            <label>Imagen del Equipo</label>
+            <div className="file-input-wrapper">
+              <button type="button" onClick={() => fileInputRef.current.click()}>
+                Seleccionar archivo
+              </button>
+              <input
+                id="imagen-equipo"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+              />
+              {imagenFile && <span className="file-name">{imagenFile.name}</span>}
+              {!imagenFile && imagenPreview && <span className="file-name">Imagen actual</span>}
+            </div>
+            {imagenPreview && (
+              <div className="image-preview">
+                <img src={imagenPreview} alt="Vista previa del equipo" />
+              </div>
+            )}
+          </div>
+
+          <div className="botones">
+            <button onClick={guardarEquipo}>{modoEdicion ? "Actualizar" : "Agregar"}</button>
+            {modoEdicion && <button onClick={cancelarEdicion}>Cancelar</button>}
+          </div>
+        </div>
+      )} */}
+
+
+      {mensaje && <div className="mensaje-exito">{mensaje}</div>}
+      {/* <div className="filtros-container">
         <input
           type="text"
           placeholder="Buscar por tipo, marca, modelo, serie..."
@@ -126,9 +202,9 @@ const Tarifario = () => {
           onChange={(e) => setBusqueda(e.target.value)}
         />
         <button onClick={() => setBusqueda("")}>Limpiar</button>
-      </div>
+      </div> */}
 
-      <div className="tabla-container">
+      {/* <div className="tabla-container">
         <table className="tabla-datos">
           <thead>
             <tr>
@@ -247,7 +323,7 @@ const Tarifario = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

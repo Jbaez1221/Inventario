@@ -59,10 +59,20 @@ app.use('/api/usuarios', usuariosRoutes);
 const ticketsRoutes = require("./routes/tickets.routes");
 app.use("/api/tickets", ticketsRoutes);
 
+// Route SAP
+const sapRoutes = require("./routes/sap");
+app.use("/api/sap", sapRoutes);
+
+// Ordenes de venta
+const ventasRoutes = require("./routes/ventas.routes");
+app.use("/api/ventas", ventasRoutes);
+
+
 app.get("/", (req, res) => {
   res.send("API Inventario corriendo ✅");
 });
 
+
 app.listen(PORT, () => {
-  console.log('Servidor corriendo en http://192.168.1.238:4002');
+  console.log('Servidor corriendo en http://192.168.25.39:4002');
 });

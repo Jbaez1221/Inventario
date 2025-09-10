@@ -6,28 +6,22 @@ import {
   FaLaptop, FaUsers, FaClipboardList, FaHistory, FaTachometerAlt,
   FaSignInAlt, FaSignOutAlt, FaFileAlt, FaUserShield, FaChevronDown, FaChevronRight,
   FaUserCog, FaBuilding, FaCogs, FaTicketAlt, FaLayerGroup, FaHome, FaUser, FaCarCrash,
-  FaThList, FaSearch 
+  FaThList, FaSearch
 } from 'react-icons/fa';
 import { LuFileSearch2 } from "react-icons/lu";
 import logo from '../assets/logo-corasur.png';
 import "../App.css";
 
 const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
-  const { token, user, logout, openLoginModal } = useAuth();
+  const { token, user, logout } = useAuth();
 
   const [openAdmin, setOpenAdmin] = useState(true);
   const [openRRHH, setOpenRRHH] = useState(true);
   const [openSistemas, setOpenSistemas] = useState(true);
   const [openInventariado, setOpenInventariado] = useState(true);
   const [openTickets, setOpenTickets] = useState(true);
-  const [openTaller, setTaller] = useState(true);
+  const [openTaller, setOpenTaller] = useState(true);
   const [empleadoData, setEmpleadoData] = useState(null);
-
-  const [openPublicRRHH, setOpenPublicRRHH] = useState(true);
-  const [openPublicSistemas, setOpenPublicSistemas] = useState(true);
-  const [openPublicAsistencias, setOpenPublicAsistencias] = useState(true);
-  const [openPublicInventario, setOpenPublicInventario] = useState(true);
-  const [openPublicTaller, setOpenPublicTaller] = useState(true);
 
   const handleLinkClick = () => {
     if (closeSidebar) closeSidebar();
@@ -116,117 +110,18 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
 
       <div className="sidebar-content">
         <nav className="sidebar-links">
-          <NavLink to="/" className="nav-link" onClick={handleLinkClick}>
+          <NavLink to="/home" className="nav-link" onClick={handleLinkClick}>
             <FaHome className="nav-icon" />
             {isOpen && "Home"}
           </NavLink>
 
-          {!token && (
-            <>
-              <div className="sidebar-group">
-                <div className="sidebar-group-title" onClick={() => setOpenPublicRRHH(!openPublicRRHH)}>
-                  {openPublicRRHH ? <FaChevronDown /> : <FaChevronRight />}
-                  <FaBuilding className="nav-icon" />
-                  {isOpen && "Recursos Humanos"}
-                </div>
-                {openPublicRRHH && (
-                  <div className="sidebar-group-items">
-                    <NavLink to="/empleados" className="nav-link" onClick={handleLinkClick}>
-                      <FaUsers className="nav-icon" />
-                      {isOpen && "Empleados"}
-                    </NavLink>
-                  </div>
-                )}
-              </div>
-
-              <div className="sidebar-group">
-                <div className="sidebar-group-title" onClick={() => setOpenPublicSistemas(!openPublicSistemas)}>
-                  {openPublicSistemas ? <FaChevronDown /> : <FaChevronRight />}
-                  <FaCogs className="nav-icon" />
-                  {isOpen && "Sistemas"}
-                </div>
-
-                {openPublicSistemas && (
-                  <div className="sidebar-group-items">
-                    <div className="sidebar-group">
-                      <div className="sidebar-group-title" onClick={() => setOpenPublicAsistencias(!openPublicAsistencias)}>
-                        {openPublicAsistencias ? <FaChevronDown /> : <FaChevronRight />}
-                        <FaTicketAlt className="nav-icon" />
-                        {isOpen && "Soporte"}
-                      </div>
-                      {openPublicAsistencias && (
-                        <div className="sidebar-group-items">
-                          <NavLink to="/crear-ticket-publico" className="nav-link" onClick={handleLinkClick}>
-                            <FaTicketAlt className="nav-icon" />
-                            {isOpen && "Crear Ticket"}
-                          </NavLink>
-                          <NavLink to="/estado-ticket-publico" className="nav-link" onClick={handleLinkClick}>
-                            <FaTicketAlt className="nav-icon" />
-                            {isOpen && "Estado Ticket"}
-                          </NavLink>
-                          <NavLink to="/buscar-soluciones-tickets" className="nav-link" onClick={handleLinkClick}>
-                            <FaTicketAlt className="nav-icon" />
-                            {isOpen && "Soluciones Tickets"}
-                          </NavLink>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="sidebar-group">
-                      <div className="sidebar-group-title" onClick={() => setOpenPublicInventario(!openPublicInventario)}>
-                        {openPublicInventario ? <FaChevronDown /> : <FaChevronRight />}
-                        <FaLayerGroup className="nav-icon" />
-                        {isOpen && "Inventario"}
-                      </div>
-                      {openPublicInventario && (
-                        <div className="sidebar-group-items">
-                          <NavLink to="/equipos" className="nav-link" onClick={handleLinkClick}>
-                            <FaLaptop className="nav-icon" />
-                            {isOpen && "Equipos"}
-                          </NavLink>
-                          <NavLink to="/historial" className="nav-link" onClick={handleLinkClick}>
-                            <FaHistory className="nav-icon" />
-                            {isOpen && "Historial"}
-                          </NavLink>
-                          <NavLink to="/solicitudes" className="nav-link" onClick={handleLinkClick}>
-                            <FaFileAlt className="nav-icon" />
-                            {isOpen && "Solicitudes"}
-                          </NavLink>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="sidebar-group">
-                <div className="sidebar-group-title" onClick={() => setOpenPublicTaller(!openPublicTaller)}>
-                  {openPublicTaller ? <FaChevronDown /> : <FaChevronRight />}
-                  <FaCarCrash className="nav-icon" />
-                  {isOpen && "Taller"}
-                </div>
-                {openPublicTaller && (
-                  <div className="sidebar-group-items">
-                    <NavLink to="/tarifario" className="nav-link" onClick={handleLinkClick}>
-                      <FaThList className="nav-icon" />
-                      {isOpen && "Tarifario"}
-                    </NavLink>
-                    <NavLink to="/buscar-info" className="nav-link" onClick={handleLinkClick}>
-                      <LuFileSearch2 className="nav-icon" />
-                      {isOpen && "Buscar Info"}
-                    </NavLink>
-                    <NavLink to="/buscar-sap" className="nav-link" onClick={handleLinkClick}>
-                      <FaSearch className="nav-icon" />
-                      {isOpen && "Buscar SAP"}
-                    </NavLink>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-
           {token && (
             <>
+              <NavLink to="/dashboard" className="nav-link" onClick={handleLinkClick}>
+                <FaTachometerAlt className="nav-icon" />
+                {isOpen && "Dashboard"}
+              </NavLink>
+
               {rol === "admin" && (
                 <div className="sidebar-group">
                   <div className="sidebar-group-title" onClick={() => setOpenAdmin(!openAdmin)}>
@@ -267,7 +162,7 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
                 </div>
               )}
 
-              {(rol === "admin" || rol === "sistemas" || rol === "tecnico sistemas") && (
+              {(rol === "admin" || rol === "sistemas" || rol === "tecnico sistemas" || rol === "servicio taller") && (
                 <div className="sidebar-group">
                   <div className="sidebar-group-title" onClick={() => setOpenSistemas(!openSistemas)}>
                     {openSistemas ? <FaChevronDown /> : <FaChevronRight />}
@@ -289,93 +184,102 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
                                 <FaLaptop className="nav-icon" />
                                 {isOpen && "Equipos Admin"}
                               </NavLink>
-                              <NavLink to="/equipos" className="nav-link" onClick={handleLinkClick}>
-                                <FaLaptop className="nav-icon" />
-                                {isOpen && "Equipos"}
-                              </NavLink>
                               <NavLink to="/asignaciones" className="nav-link" onClick={handleLinkClick}>
                                 <FaClipboardList className="nav-icon" />
                                 {isOpen && "Asignaciones"}
                               </NavLink>
-                              <NavLink to="/historial" className="nav-link" onClick={handleLinkClick}>
-                                <FaHistory className="nav-icon" />
-                                {isOpen && "Historial"}
+                            </div>
+                          )}
+                          {(rol === "admin" || rol === "tecnico sistemas" || rol === "servicio taller" || rol === "rrhh" || rol === "sistemas") && openInventariado && (
+                                <div className="sidebar-group-items">
+                                  <NavLink to="/equipos" className="nav-link" onClick={handleLinkClick}>
+                                    <FaLaptop className="nav-icon" />
+                                    {isOpen && "Equipos"}
+                                  </NavLink>
+                                  <NavLink to="/historial" className="nav-link" onClick={handleLinkClick}>
+                                    <FaHistory className="nav-icon" />
+                                    {isOpen && "Historial"}
+                                  </NavLink>
+                                  <NavLink to="/solicitudes" className="nav-link" onClick={handleLinkClick}>
+                                    <FaFileAlt className="nav-icon" />
+                                    {isOpen && "Solicitudes"}
+                                  </NavLink>
+                                </div>
+                              )}
+                        </div>
+                      )}
+                      {(rol === "admin" || rol === "tecnico sistemas" || rol === "servicio taller" || rol === "rrhh" || rol === "sistemas") && (
+                        <div className="sidebar-group">
+                          <div className="sidebar-group-title" onClick={() => setOpenTickets(!openTickets)}>
+                            {openTickets ? <FaChevronDown /> : <FaChevronRight />}
+                            <FaTicketAlt className="nav-icon" />
+                            {isOpen && "Tickets"}
+                          </div>
+                          {openTickets && (
+                            <div className="sidebar-group-items">
+                              <NavLink to="/crear-ticket-publico" className="nav-link" onClick={handleLinkClick}>
+                                <FaTicketAlt className="nav-icon" />
+                                {isOpen && "Crear Ticket"}
                               </NavLink>
-                              <NavLink to="/solicitudes" className="nav-link" onClick={handleLinkClick}>
-                                <FaFileAlt className="nav-icon" />
-                                {isOpen && "Solicitudes"}
+                              <NavLink to="/estado-ticket-publico" className="nav-link" onClick={handleLinkClick}>
+                                <FaTicketAlt className="nav-icon" />
+                                {isOpen && "Estado Ticket"}
+                              </NavLink>
+                              <NavLink to="/buscar-soluciones-tickets" className="nav-link" onClick={handleLinkClick}>
+                                <FaTicketAlt className="nav-icon" />
+                                {isOpen && "Soluciones Tickets"}
+                              </NavLink>
+                            </div>
+                          )}
+                          {(rol === "admin" || rol === "tecnico sistemas" || rol === "sistemas") && openTickets && (
+                            <div className="sidebar-group-items">
+                              <NavLink to="/tickets-gestion" className="nav-link" onClick={handleLinkClick}>
+                                <FaTicketAlt className="nav-icon" />
+                                {isOpen && "Gestión de Tickets"}
                               </NavLink>
                             </div>
                           )}
                         </div>
                       )}
-                      <div className="sidebar-group">
-                        <div className="sidebar-group-title" onClick={() => setOpenTickets(!openTickets)}>
-                          {openTickets ? <FaChevronDown /> : <FaChevronRight />}
-                          <FaTicketAlt className="nav-icon" />
-                          {isOpen && "Tickets"}
-                        </div>
-                        {openTickets && (
-                          <div className="sidebar-group-items">
-                            <NavLink to="/tickets-gestion" className="nav-link" onClick={handleLinkClick}>
-                              <FaTicketAlt className="nav-icon" />
-                              {isOpen && "Gestión de Tickets"}
-                            </NavLink>
-                            <NavLink to="/buscar-soluciones-tickets" className="nav-link" onClick={handleLinkClick}>
-                              <FaTicketAlt className="nav-icon" />
-                              {isOpen && "Soluciones Tickets"}
-                            </NavLink>
-                          </div>
-                        )}
-                      </div>
+
                     </div>
                   )}
                 </div>
               )}
 
-              {(rol === "admin" || rol === "taller") && (
+              {(rol === "admin" || rol === "servicio taller") && (
                 <div className="sidebar-group">
-                <div className="sidebar-group-title" onClick={() => setOpenPublicTaller(!openPublicTaller)}>
-                  {openPublicTaller ? <FaChevronDown /> : <FaChevronRight />}
-                  <FaCarCrash className="nav-icon" />
-                  {isOpen && "Taller"}
-                </div>
-                {openPublicTaller && (
-                  <div className="sidebar-group-items">
-                    <NavLink to="/crear-ticket-publico" className="nav-link" onClick={handleLinkClick}>
-                      <FaThList className="nav-icon" />
-                      {isOpen && "Tarifario"}
-                    </NavLink>
-                    <NavLink to="/estado-ticket-publico" className="nav-link" onClick={handleLinkClick}>
-                      <LuFileSearch2  className="nav-icon" />
-                      {isOpen && "Buscar Info"}
-                    </NavLink>
-                    <NavLink to="/buscar-soluciones-tickets" className="nav-link" onClick={handleLinkClick}>
-                      <FaSearch  className="nav-icon" />
-                      {isOpen && "Buscar SAP"}
-                    </NavLink>
+                  <div className="sidebar-group-title" onClick={() => setOpenTaller(!openTaller)}>
+                    {openTaller ? <FaChevronDown /> : <FaChevronRight />}
+                    <FaCarCrash className="nav-icon" />
+                    {isOpen && "Taller"}
                   </div>
-                )}
-              </div>)}
-
-              <NavLink to="/dashboard" className="nav-link" onClick={handleLinkClick}>
-                <FaTachometerAlt className="nav-icon" />
-                {isOpen && "Dashboard"}
-              </NavLink>
+                  {openTaller && (
+                    <div className="sidebar-group-items">
+                      <NavLink to="/tarifario" className="nav-link" onClick={handleLinkClick}>
+                        <FaThList className="nav-icon" />
+                        {isOpen && "Tarifario"}
+                      </NavLink>
+                      <NavLink to="/buscar-info" className="nav-link" onClick={handleLinkClick}>
+                        <LuFileSearch2 className="nav-icon" />
+                        {isOpen && "Buscar Info"}
+                      </NavLink>
+                      <NavLink to="/buscar-sap" className="nav-link" onClick={handleLinkClick}>
+                        <FaSearch className="nav-icon" />
+                        {isOpen && "Buscar SAP"}
+                      </NavLink>
+                    </div>
+                  )}
+                </div>)}
             </>
           )}
         </nav>
 
         <div className="sidebar-footer">
-          {token ? (
+          {token && (
             <button onClick={logout} className="nav-link btn-logout">
               <FaSignOutAlt className="nav-icon" />
               {isOpen && "Cerrar Sesión"}
-            </button>
-          ) : (
-            <button onClick={openLoginModal} className="nav-link btn-login">
-              <FaSignInAlt className="nav-icon" />
-              {isOpen && "Iniciar Sesión"}
             </button>
           )}
         </div>

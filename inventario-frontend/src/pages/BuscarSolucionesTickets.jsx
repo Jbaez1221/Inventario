@@ -56,60 +56,70 @@ export default function BuscarSolucionesTickets() {
       <p className="dashboard-subtitle">
         Encuentra soluciones de tickets anteriores. Puedes usar uno o varios filtros.
       </p>
-      
+
       <form onSubmit={handleBuscar} className="buscar-soluciones-form">
         <div className="filtros-row">
           <div className="form-group">
-            <label>Categoría</label>
-            <select
-              name="categoria"
-              value={filtros.categoria}
-              onChange={handleChange}
-            >
-              <option value="">Todas las categorías</option>
-              {CATEGORIAS.map(c => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
+            <label>
+              Categoría{' '}
+              <select
+                name="categoria"
+                value={filtros.categoria}
+                onChange={handleChange}
+              >
+                <option value="">Todas las categorías</option>
+                {CATEGORIAS.map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </label>
+
           </div>
 
           <div className="form-group">
-            <label>Tipo</label>
-            <select
-              name="tipo"
-              value={filtros.tipo}
-              onChange={handleChange}
-            >
-              <option value="">Todos los tipos</option>
-              {TIPOS.map(t => (
-                <option key={t} value={t}>{t}</option>
-              ))}
-            </select>
+            <label>
+              Tipo{' '}
+              <select
+                name="tipo"
+                value={filtros.tipo}
+                onChange={handleChange}
+              >
+                <option value="">Todos los tipos</option>
+                {TIPOS.map(t => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+
+            </label>
+
           </div>
 
           <div className="form-group">
-            <label>Palabra clave</label>
-            <input
-              type="text"
-              name="palabra"
-              placeholder="Buscar en soluciones..."
-              value={filtros.palabra}
-              onChange={handleChange}
-            />
+            <label>
+              Palabra clave{' '}
+              <input
+                type="text"
+                name="palabra"
+                placeholder="Buscar en soluciones..."
+                value={filtros.palabra}
+                onChange={handleChange}
+              />
+            </label>
+
           </div>
         </div>
 
         <div className="botones-row">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn-primary"
             disabled={buscando}
           >
             {buscando ? "Buscando..." : "Buscar"}
           </button>
 
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="btn-secondary"
             onClick={limpiarFiltros}
           >
@@ -151,7 +161,7 @@ export default function BuscarSolucionesTickets() {
                     <div className="solution-author">
                       <strong>Resuelto por:</strong> {t.solucionado_por}
                       {t.correo_tecnico && (
-                        <span style={{marginLeft:8, fontSize:'0.9em', color:'var(--accent-info)'}}>
+                        <span style={{ marginLeft: 8, fontSize: '0.9em', color: 'var(--accent-info)' }}>
                           ({t.correo_tecnico})
                         </span>
                       )}

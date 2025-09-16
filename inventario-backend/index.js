@@ -59,6 +59,15 @@ app.use('/api/usuarios', usuariosRoutes);
 const ticketsRoutes = require("./routes/tickets.routes");
 app.use("/api/tickets", ticketsRoutes);
 
+const vehiculoRoutes = require("./routes/vehiculo.tarifario.route");
+app.use("/api/Tvehiculo", vehiculoRoutes);
+
+const modeloRoutes = require("./routes/modelo.tarifario.route.js");
+app.use("/api/Tmodelo", modeloRoutes);
+
+const subidaRoutes = require("./routes/subida.tarifario.route.js");
+app.use("/api/Tsubida", subidaRoutes);
+
 app.get("/", (req, res) => {
   res.send("API Inventario corriendo ✅");
 });

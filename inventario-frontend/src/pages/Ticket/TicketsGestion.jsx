@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import axiosBackend from "../api/axios"; 
+import axiosBackend from "../../api/axios"; 
 import TicketDetalle from "./TicketDetalle";
 import { FaSearch, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function TicketsGestion() {
   const { user } = useAuth();

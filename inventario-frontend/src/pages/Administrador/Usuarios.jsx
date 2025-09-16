@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
-import axiosBackend from "../api/axios";
-import { useAuth } from "../hooks/useAuth";
+import axiosBackend from "../../api/axios";
+import { useAuth } from "../../hooks/useAuth";
 import { FaPlus, FaTrash, FaTimes } from "react-icons/fa";
 
 const Usuarios = () => {

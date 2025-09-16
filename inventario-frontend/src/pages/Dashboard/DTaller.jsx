@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from "react";
-import axiosBackend from "../api/axios";
+import axiosBackend from "../../api/axios";
 import {
   FaLaptop,
   FaCheckCircle,
@@ -17,11 +16,11 @@ import {
   Tooltip,
   Legend,
   CategoryScale,
-  LinearScale,
+  LinearScale, 
   BarElement,
   Title,
 } from "chart.js";
-import "../App.css";
+import "../../App.css";
 
 ChartJS.register(
   ArcElement,
@@ -33,7 +32,7 @@ ChartJS.register(
   Title
 );
 
-const Dashboard = () => {
+const Dtaller = () => {
   const [estadisticas, setEstadisticas] = useState({
     totalEquipos: 0,
     disponibles: 0,
@@ -279,4 +278,4 @@ const Card = ({ titulo, valor, icon }) => (
   </div>
 );
 
-export default Dashboard;
+export default Dtaller;

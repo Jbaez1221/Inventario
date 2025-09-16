@@ -1,7 +1,9 @@
 import { useState } from "react";
 import CarScene from "./CarScene.jsx";
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth.js';
 import { useNavigate } from 'react-router-dom';
+import logo from '../../assets/logo-corasur.png';
+import styles from './log.module.css'
 
 export default function Log() {
   const [hover, setHover] = useState(false);
@@ -33,21 +35,22 @@ export default function Log() {
       <CarScene zoom={hover} side="right" />
 
       {/* Overlay con el login */}
-      <div style={styles.overlay}>
+      <div className={styles.overlay}>
+        
         <form
-          style={styles.form}
+          className={styles.form}
           onSubmit={handleSubmit}
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
         >
-          <h2 style={styles.title}>Iniciar Sesión</h2>
-          {error && (
-            <div style={styles.error}>
+          <img src={logo} alt="Corasur Logo" className="sidebar-logo" />
+          {error && ( 
+            <div className={styles.error}>
               {error}
             </div>
           )}
           <input
-            style={styles.input}
+            className={styles.input}
             type="text"
             placeholder="Usuario"
             value={username}
@@ -55,66 +58,16 @@ export default function Log() {
             required
           />
           <input
-            style={styles.input}
+            className={styles.input}
             type="password"
             placeholder="Contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button style={styles.button} type="submit">Ingresar</button>
+          <button className={styles.button} type="submit">Ingresar</button>
         </form>
       </div>
     </>
   );
 }
-
-const styles = {
-  overlay: {
-    position: "fixed",
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: "36vw",
-    minWidth: 320,
-    maxWidth: 520,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "2rem",
-    zIndex: 2,
-    background: "linear-gradient(90deg, rgba(11,18,32,0.85), rgba(11,18,32,0.35) 70%, transparent)",
-  },
-  form: {
-    width: "100%",
-    maxWidth: 360,
-    display: "flex",
-    flexDirection: "column",
-    gap: "1rem",
-    background: "rgba(255,255,255,0.06)",
-    borderRadius: 12,
-    padding: "2rem",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
-    backdropFilter: "blur(4px)",
-  },
-  title: { margin: 0, textAlign: "center", color: "#fff" },
-  input: {
-    padding: "0.75rem 1rem",
-    borderRadius: 8,
-    border: "1px solid #334155",
-    outline: "none",
-    fontSize: 16,
-    background: "#0b1220",
-    color: "#fff",
-  },
-  button: {
-    padding: "0.75rem 1rem",
-    borderRadius: 8,
-    border: "none",
-    fontSize: 16,
-    cursor: "pointer",
-  },
-  error: {
-    color: "#ffffffff"
-  }
-};

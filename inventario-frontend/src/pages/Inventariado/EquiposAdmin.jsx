@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axiosBackend from "../api/axios";
+import axiosBackend from "../../api/axios";
 
 const EquiposAdmin = () => {
   const [equipos, setEquipos] = useState([]);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axiosBackend from "../api/axios";
-import { useAuth } from "../hooks/useAuth";
+import axiosBackend from "../../api/axios";
+import { useAuth } from "../../hooks/useAuth";
 
 const ESTADOS_CIVIL = ["Soltero", "Casado", "Divorciado", "Viudo", "Conviviente"];
 const SEXOS = ["Masculino", "Femenino", "Otro"];

@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import axiosBackend from "../api/axios";
-import { useAuth } from "../hooks/useAuth";
-import TicketHistorial from "../components/TicketHistorial";
-import AsignarPersonalTicket from "../components/AsignarPersonalTicket";
+import axiosBackend from "../../api/axios";
+import { useAuth } from "../../hooks/useAuth";
+import TicketHistorial from "../../components/TicketHistorial";
+import AsignarPersonalTicket from "../../components/AsignarPersonalTicket";
 
 export default function TicketDetalle({ ticket, onClose, onUpdate }) {
   const { user } = useAuth();

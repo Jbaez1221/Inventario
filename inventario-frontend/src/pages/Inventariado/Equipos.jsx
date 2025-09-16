@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import axiosBackend, { API_URL } from "../api/axios";
-import { useAuth } from "../hooks/useAuth";
+import axiosBackend, { API_URL } from "../../api/axios";
+import { useAuth } from "../../hooks/useAuth";
 import { FaPencilAlt, FaTrash, FaHistory, FaEye, FaSearch } from "react-icons/fa";
 
 const Equipos = () => {

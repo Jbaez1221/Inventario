@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import axiosBackend, { API_URL } from "../api/axios";
-import { useAuth } from "../hooks/useAuth";
+import axiosBackend, { API_URL } from "../../api/axios";
+import { useAuth } from "../../hooks/useAuth";
 import SignatureCanvas from 'react-signature-canvas';
 import { FaSearch } from "react-icons/fa";
 

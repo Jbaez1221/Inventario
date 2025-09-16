@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axiosBackend from "../api/axios";
+import axiosBackend from "../../api/axios";
 
 const TIPOS = [
   "Incidencia",

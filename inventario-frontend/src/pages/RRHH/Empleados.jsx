@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosBackend from "../api/axios";
-import { useAuth } from "../hooks/useAuth";
+import axiosBackend from "../../api/axios";
+import { useAuth } from "../../hooks/useAuth";
 import { FaEye, FaPencilAlt } from "react-icons/fa";
 
 const SECCIONES_MODAL = [

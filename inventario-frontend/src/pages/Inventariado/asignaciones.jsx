@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from "react";
-import axiosBackend from "../api/axios";
-import { useAuth } from "../hooks/useAuth";
+import axiosBackend from "../../api/axios";
+import { useAuth } from "../../hooks/useAuth";
 import SignatureCanvas from 'react-signature-canvas'; 
 
-const BuscarInfo = () => {
+const Asignaciones = () => {
   const { token, user } = useAuth();
   const rol = user?.user?.rol;
 
@@ -252,4 +252,4 @@ const BuscarInfo = () => {
   );
 };
 
-export default BuscarInfo;
+export default Asignaciones;

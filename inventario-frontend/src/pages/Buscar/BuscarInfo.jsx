@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from "react";
-import axiosBackend from "../api/axios";
-import { useAuth } from "../hooks/useAuth";
+import axiosBackend from "../../api/axios";
+import { useAuth } from "../../hooks/useAuth";
 import SignatureCanvas from 'react-signature-canvas'; 
 
-const BuscarSAP = () => {
+const BuscarInfo = () => {
   const { token, user } = useAuth();
   const rol = user?.user?.rol;
 
@@ -115,7 +115,7 @@ const BuscarSAP = () => {
 
   return (
     <div>
-      <h2>Equipos disponibles para anosnasonsdvnasdonv</h2>
+      <h2>Equipos disponibles para asignar</h2>
       {mensaje && <div className="mensaje-exito">{mensaje}</div>}
 
       <div className="filtros-container">
@@ -252,4 +252,4 @@ const BuscarSAP = () => {
   );
 };
 
-export default BuscarSAP;
+export default BuscarInfo;

@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from "react";
-import axiosBackend from "../api/axios";
-import { useAuth } from "../hooks/useAuth";
+import axiosBackend from "../../api/axios";
+import { useAuth } from "../../hooks/useAuth";
 import SignatureCanvas from 'react-signature-canvas'; 
 
-const Asignaciones = () => {
+const BuscarSAP = () => {
   const { token, user } = useAuth();
   const rol = user?.user?.rol;
 
@@ -115,7 +115,7 @@ const Asignaciones = () => {
 
   return (
     <div>
-      <h2>Equipos disponibles para asignar</h2>
+      <h2>Equipos disponibles para anosnasonsdvnasdonv</h2>
       {mensaje && <div className="mensaje-exito">{mensaje}</div>}
 
       <div className="filtros-container">
@@ -252,4 +252,4 @@ const Asignaciones = () => {
   );
 };
 
-export default Asignaciones;
+export default BuscarSAP;

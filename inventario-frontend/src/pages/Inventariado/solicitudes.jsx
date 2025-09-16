@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import axiosBackend from "../api/axios";
-import { useAuth } from "../hooks/useAuth";
+import axiosBackend from "../../api/axios";
+import { useAuth } from "../../hooks/useAuth";
 import { FaSearch } from "react-icons/fa";
 
 const Solicitudes = () => {

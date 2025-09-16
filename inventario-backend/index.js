@@ -68,6 +68,15 @@ app.use("/api/Tmodelo", modeloRoutes);
 const subidaRoutes = require("./routes/subida.tarifario.route.js");
 app.use("/api/Tsubida", subidaRoutes);
 
+const mantenimientoRoutes = require("./routes/mantenimiento.tarifario.route.js");
+app.use("/api/Tmantenimiento", mantenimientoRoutes);
+
+const mantenimientokmRoutes = require("./routes/mantenimientokm.tarifario.route.js");
+app.use("/api/Tmantenimientokm", mantenimientokmRoutes);
+
+const tipomantenimientoRoutes = require("./routes/tipomantenimiento.tarifario.route.js");
+app.use("/api/Ttipomantenimiento", tipomantenimientoRoutes);
+
 app.get("/", (req, res) => {
   res.send("API Inventario corriendo ✅");
 });

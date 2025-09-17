@@ -2680,3 +2680,168 @@ input[type="time"]:focus {
 .anydesk-detail b {
   color: var(--accent-success);
 }
+
+/* ===== Base ===== */
+.tarifario-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+/* ===== Filtros ===== */
+.filtros-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.filtros-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 15px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+select,
+input {
+  padding: 8px 10px;
+  margin-top: 5px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: var(--input-bg);
+  color: var(--text-primary);
+}
+
+select:disabled,
+input[readonly] {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+}
+
+/* ===== Tabla ===== */
+.tabla-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.tabla-tarifario {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  min-width: 600px; /* evita que se comprima demasiado */
+}
+
+.tabla-tarifario th,
+.tabla-tarifario td {
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  text-align: left;
+  font-size: 0.9rem;
+  white-space: nowrap; /* mantiene las celdas en una sola línea */
+}
+
+.tabla-tarifario th {
+  background-color: var(--table-header-bg);
+  color: var(--table-header-text);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.tabla-tarifario tr:nth-child(even) {
+  background-color: var(--bg-secondary);
+}
+
+.tabla-tarifario tr:hover {
+  background-color: var(--bg-hover);
+}
+
+/* ===== Estados ===== */
+.loading,
+.empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.error-message {
+  background: var(--accent-danger);
+  border: 1px solid var(--accent-danger);
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  color: var(--text-inverse);
+}
+
+.success-message {
+  background: var(--accent-success);
+  border: 1px solid var(--accent-success);
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 15px;
+  color: var(--text-inverse);
+}
+
+/* ===== Responsividad ===== */
+@media (max-width: 1024px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+  .tabla-tarifario {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .tarifario-container {
+    padding: 15px;
+  }
+  .filtros-grid {
+    grid-template-columns: 1fr;
+  }
+  .tabla-tarifario {
+    font-size: 0.8rem;
+    min-width: 500px; /* aún permite scroll horizontal */
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.3rem;
+  }
+  .filtros-card {
+    padding: 10px;
+  }
+  .tabla-tarifario {
+    font-size: 0.75rem;
+    min-width: 400px;
+  }
+  .tabla-tarifario th,
+  .tabla-tarifario td {
+    padding: 6px;
+  }
+}

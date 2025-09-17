@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axiosBackend from "../../api/axios";
-import { useAuth } from "../../hooks/useAuth";
 import "../../App.css";
 
 const numberOrDash = (v) =>
@@ -125,7 +124,8 @@ const Tarifario = () => {
         <h2>Filtros</h2>
         <div className="filtros-grid">
           <label>
-            Subida
+            Version
+            {' '}
             <select
               value={subidaSeleccionada}
               onChange={(e) => {
@@ -145,6 +145,7 @@ const Tarifario = () => {
 
           <label>
             Vehículo
+            {' '}
             <select
               value={vehiculoSeleccionado}
               disabled={!subidaSeleccionada}
@@ -164,6 +165,7 @@ const Tarifario = () => {
 
           <label>
             Modelo
+            {' '}
             <select
               value={modeloSeleccionado}
               disabled={!vehiculoSeleccionado}
@@ -191,7 +193,7 @@ const Tarifario = () => {
               readOnly
               value={modeloDetalle.codigo_modelo || ""}
               placeholder="Código Modelo"
-              size={modeloDetalle.codigo_modelo || 11}
+              size={modeloDetalle.codigo_modelo || 12}
             />
           </div>
         </div>

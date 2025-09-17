@@ -14,14 +14,14 @@ import "../App.css";
 
 const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
   const { token, user, logout } = useAuth();
-  const [openAdmin, setOpenAdmin] = useState(true);
-  const [openRRHH, setOpenRRHH] = useState(true);
-  const [openSistemas, setOpenSistemas] = useState(true);
-  const [openInventariado, setOpenInventariado] = useState(true);
-  const [openTickets, setOpenTickets] = useState(true);
-  const [openTaller, setOpenTaller] = useState(true);
-  const [openAsesor, setOpenAsesor] = useState(true);
-  const [openBuscar, setOpenBuscar] = useState(true);
+  const [openAdmin, setOpenAdmin] = useState(false);
+  const [openRRHH, setOpenRRHH] = useState(false);
+  const [openSistemas, setOpenSistemas] = useState(false);
+  const [openInventariado, setOpenInventariado] = useState(false);
+  const [openTickets, setOpenTickets] = useState(false);
+  const [openTaller, setOpenTaller] = useState(false);
+  const [openAsesor, setOpenAsesor] = useState(false);
+  const [openBuscar, setOpenBuscar] = useState(false);
   const [empleadoData, setEmpleadoData] = useState(null);
 
   const handleLinkClick = () => {
@@ -124,7 +124,7 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
                   {isOpen && "Dashboard Taller"}
                 </NavLink>
               )}
-              {(rol === "admin" || rol === "jefe RRHH") && (
+              {(rol === "admin" || rol === "jefe rrhh") && (
                 <NavLink to="/dashboard-rrhh" className="nav-link" onClick={handleLinkClick}>
                   <FaTachometerAlt className="nav-icon" />
                   {isOpen && "Dashboard RRHH"}
@@ -176,7 +176,7 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
                 </div>
               )}
 
-              {(rol === "admin" || rol === "sistemas" || rol === "tecnico sistemas" || rol === "servicio taller") && (
+              {(rol === "admin" || rol === "sistemas" || rol === "tecnico sistemas" || rol === "servicio taller" || rol === "jefe sistemas" || rol === "jefe taller" || rol === "jefe rrhh" || rol === "tecnico taller" || rol === "asesor servicio" || rol === "asistente rrhh" || rol === "empleado") && (
                 <div className="sidebar-group">
                   <div className="sidebar-group-title" onClick={() => setOpenSistemas(!openSistemas)}>
                     {openSistemas ? <FaChevronDown /> : <FaChevronRight />}
@@ -223,7 +223,7 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
                           )}
                         </div>
                       )}
-                      {(rol === "admin" || rol === "jefe taller" || rol === "jefe rrhh" || rol === "tecnico taller" || rol === "tecnico sistemas" || rol === "asesor servicio" || rol === "asistente rrhh" || rol === "empleado") && (
+                      {(rol === "admin" || rol === "jefe taller" || rol === "jefe rrhh" || rol === "tecnico taller" || rol === "tecnico sistemas" || rol === "asesor servicio" || rol === "asistente rrhh" || rol === "empleado" || rol === "jefe sistemas") && (
                         <div className="sidebar-group">
                           <div className="sidebar-group-title" onClick={() => setOpenTickets(!openTickets)}>
                             {openTickets ? <FaChevronDown /> : <FaChevronRight />}

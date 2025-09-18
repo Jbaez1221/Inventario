@@ -100,6 +100,7 @@ const Tarifario = () => {
         ]);
         setModeloDetalle(det.data);
         setKms(tarif.data.kilometrajes || []);
+        console.log("este es anteni con mode:", tarif);
         setItems(
           (tarif.data.items || []).sort((a, b) => {
             const order = { "MANO DE OBRA": 1, REPUESTOS: 2, FLUIDOS: 3 };
@@ -113,6 +114,42 @@ const Tarifario = () => {
       }
     })();
   }, [modeloSeleccionado]);
+
+  let tablaContent;
+  if (loadingTabla) {
+    tablaContent = <div className="loading">Cargando tarifario…</div>;
+  } else if (items.length === 0) {
+    tablaContent = <div className="empty">No hay datos para mostrar.</div>;
+  } else {
+    tablaContent = (
+      <table className="tabla-tarifario">
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Descripción</th>
+            <th>Código</th>
+            <th>Unidad</th>
+            {kms.map((km) => (
+              <th key={km}>{km} km</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((it) => (
+            <tr key={it.id_mant}>
+              <td>{it.tipo}</td>
+              <td>{it.descripcion}</td>
+              <td>{it.codigo || "-"}</td>
+              <td>{it.unidad || "-"}</td>
+              {kms.map((km) => (
+                <td key={km}>{formatCurrency(it.precios?.[km])}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  }
 
   return (
     <div className="tarifario-container">
@@ -200,40 +237,7 @@ const Tarifario = () => {
       </div>
 
       <h2>Precios de Mantenimiento</h2>
-      <div className="tabla-wrapper">
-        {loadingTabla ? (
-          <div className="loading">Cargando tarifario…</div>
-        ) : items.length === 0 ? (
-          <div className="empty">No hay datos para mostrar.</div>
-        ) : (
-          <table className="tabla-tarifario">
-            <thead>
-              <tr>
-                <th>Tipo</th>
-                <th>Descripción</th>
-                <th>Código</th>
-                <th>Unidad</th>
-                {kms.map((km) => (
-                  <th key={km}>{km} km</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((it, idx) => (
-                <tr key={idx}>
-                  <td>{it.tipo}</td>
-                  <td>{it.descripcion}</td>
-                  <td>{it.codigo || "-"}</td>
-                  <td>{it.unidad || "-"}</td>
-                  {kms.map((km) => (
-                    <td key={km}>{formatCurrency(it.precios?.[km])}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      <div className="tabla-wrapper">{tablaContent}</div>
     </div>
   );
 };

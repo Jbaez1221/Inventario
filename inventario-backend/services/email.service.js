@@ -90,7 +90,7 @@ const enviarNotificacionTicketAsignado = async ({ tecnico, ticket }) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: "robby863401@gmail.com",
+      user: "inventariocorasur@gmail.com",
       pass: process.env.EMAIL_PASS, 
     },
   });
@@ -98,7 +98,7 @@ const enviarNotificacionTicketAsignado = async ({ tecnico, ticket }) => {
   let correo = tecnico.correo_institucional || tecnico.correo_personal;
   if (!correo) return;
   await transporter.sendMail({
-    from: '"Inventario CORASUR" <robby863401@gmail.com>',
+    from: '"Inventario CORASUR" <inventario@corasur.com>',
     to: correo,
     subject: `Nuevo ticket asignado: ${ticket.codigo}`,
     text: `Se te ha asignado el ticket ${ticket.codigo}.\nPrioridad: ${ticket.prioridad}\nDescripción: ${ticket.observacion_inicial || "Sin descripción"}`
@@ -109,7 +109,7 @@ const enviarNotificacionComentarioAsignacion = async ({ solicitante, ticket, com
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: "robby863401@gmail.com",
+      user: "inventariocorasur@gmail.com",
       pass: process.env.EMAIL_PASS, 
     },
   });
@@ -117,7 +117,7 @@ const enviarNotificacionComentarioAsignacion = async ({ solicitante, ticket, com
   let correo = solicitante.correo_institucional || solicitante.correo_personal;
   if (!correo) return;
   await transporter.sendMail({
-    from: '"Inventario CORASUR" <robby863401@gmail.com>',
+    from: '"Inventario CORASUR" <inventariocorasur@gmail.com>',
     to: correo,
     subject: `Comentario sobre tu ticket ${ticket.codigo}`,
     text: `Comentario del área de soporte:\n${comentario}\n\nTicket: ${ticket.codigo}\nEstado: ${ticket.estado}`

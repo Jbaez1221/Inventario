@@ -16,12 +16,27 @@ export const AuthProvider = ({ children }) => {
   }, [navigate]);
 
   useEffect(() => {
+    let logoutTimer;
+
     if (token) {
       localStorage.setItem("token", token);
       axiosBackend.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
       try {
         const decoded = jwtDecode(token);
         setUser(decoded);
+
+        if (decoded.exp) {
+          const expirationTime = decoded.exp * 1000 - Date.now();
+
+          if (expirationTime <= 0) {
+            logout();
+          } else {
+            logoutTimer = setTimeout(() => {
+              logout();
+            }, expirationTime);
+          }
+        }
       } catch {
         setUser(null);
       }
@@ -43,6 +58,7 @@ export const AuthProvider = ({ children }) => {
 
     return () => {
       axiosBackend.interceptors.response.eject(responseInterceptor);
+      if (logoutTimer) clearTimeout(logoutTimer); 
     };
   }, [token, logout]);
 

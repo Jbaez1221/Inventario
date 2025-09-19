@@ -11,15 +11,19 @@ app.use(express.static('public'));
 
 const db = require('./database');
 const bcrypt = require('bcryptjs');
+
 async function crearAdminPorDefecto() {
   const adminUsername = 'admin';
   const adminPassword = 'admin123';
+
   let result = await db.query("SELECT id FROM roles WHERE nombre = 'admin'");
   let rolId;
+
   if (result.rows.length === 0) {
     result = await db.query("INSERT INTO roles (nombre) VALUES ('admin') RETURNING id");
   }
   rolId = result.rows[0].id;
+
   result = await db.query("SELECT id FROM usuarios WHERE username = $1", [adminUsername]);
   if (result.rows.length === 0) {
     const passwordHash = await bcrypt.hash(adminPassword, 10);
@@ -59,19 +63,35 @@ app.use('/api/usuarios', usuariosRoutes);
 const ticketsRoutes = require("./routes/tickets.routes");
 app.use("/api/tickets", ticketsRoutes);
 
-// Route SAP
+// ===== Rutas Tarifario (vehículo/modelo/subida/mantenimiento) =====
+const vehiculoRoutes = require("./routes/vehiculo.tarifario.route");
+app.use("/api/Tvehiculo", vehiculoRoutes);
+
+const modeloRoutes = require("./routes/modelo.tarifario.route.js");
+app.use("/api/Tmodelo", modeloRoutes);
+
+const subidaRoutes = require("./routes/subida.tarifario.route.js");
+app.use("/api/Tsubida", subidaRoutes);
+
+const mantenimientoRoutes = require("./routes/mantenimiento.tarifario.route.js");
+app.use("/api/Tmantenimiento", mantenimientoRoutes);
+
+const mantenimientokmRoutes = require("./routes/mantenimientokm.tarifario.route.js");
+app.use("/api/Tmantenimientokm", mantenimientokmRoutes);
+
+const tipomantenimientoRoutes = require("./routes/tipomantenimiento.tarifario.route.js");
+app.use("/api/Ttipomantenimiento", tipomantenimientoRoutes);
+
+// ===== Rutas SAP y Ventas =====
 const sapRoutes = require("./routes/sap");
 app.use("/api/sap", sapRoutes);
 
-// Ordenes de venta
 const ventasRoutes = require("./routes/ventas.routes");
 app.use("/api/ventas", ventasRoutes);
-
 
 app.get("/", (req, res) => {
   res.send("API Inventario corriendo ✅");
 });
-
 
 app.listen(PORT, () => {
   console.log('Servidor corriendo en http://192.168.25.39:4002');

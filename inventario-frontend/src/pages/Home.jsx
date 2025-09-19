@@ -236,7 +236,7 @@ const Home = () => {
            rol === 'tecnico sistemas' ? 'Panel de técnico - Gestiona tus tickets asignados' :
            rol === 'rrhh' ? 'Panel de Recursos Humanos - Gestión de personal' :
            rol === 'sistemas' ? 'Panel de Sistemas - Administración de inventario y tickets' :
-           'Panel de administración - Control total del sistema'}
+           'Panel de administración - Control del sistema'}
         </p>
       </div>
 

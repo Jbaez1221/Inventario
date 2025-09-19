@@ -5,25 +5,27 @@ import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Home from "./pages/Home";
-import Equipos from "./pages/Equipos";
-import EquiposAdmin from "./pages/EquiposAdmin";
-import Empleados from "./pages/Empleados";
-import GestionarEmpleado from "./pages/GestionarEmpleado";
-import Asignaciones from "./pages/asignaciones";
-import HistorialEquipo from "./pages/HistorialEquipo";
-import Dashboard from "./pages/dashboard";
-import Solicitudes from "./pages/solicitudes";
-import Roles from "./pages/Roles";
-import Usuarios from "./pages/Usuarios";
-import CrearTicketPublico from "./pages/CrearTicketPublico";
-import EstadoTicketPublico from "./pages/EstadoTicketPublico";
-import BuscarSolucionesTickets from "./pages/BuscarSolucionesTickets";
-import TicketsGestion from "./pages/TicketsGestion";
-import TicketDetalle from "./pages/TicketDetalle";
-import BuscarInfo from "./pages/BuscarInfo";
-import BuscarSAP from "./pages/BuscarSap";
-import Tarifario from "./pages/Tarifario";
-import Log from "./pages/log";
+import Equipos from "./pages/Inventariado/Equipos";
+import EquiposAdmin from "./pages/Inventariado/EquiposAdmin";
+import Empleados from "./pages/RRHH/Empleados";
+import GestionarEmpleado from "./pages/RRHH/GestionarEmpleado";
+import Asignaciones from "./pages/Inventariado/asignaciones";
+import HistorialEquipo from "./pages/Inventariado/HistorialEquipo";
+import Dsistemas from "./pages/Dashboard/Dsistemas";
+import Dtaller from "./pages/Dashboard/DTaller";
+import Drrhh from "./pages/Dashboard/Drrhh";
+import Solicitudes from "./pages/Inventariado/solicitudes";
+import Roles from "./pages/Administrador/Roles";
+import Usuarios from "./pages/Administrador/Usuarios";
+import CrearTicketPublico from "./pages/Ticket/CrearTicketPublico";
+import EstadoTicketPublico from "./pages/Ticket/EstadoTicketPublico";
+import BuscarSolucionesTickets from "./pages/Ticket/BuscarSolucionesTickets";
+import TicketsGestion from "./pages/Ticket/TicketsGestion";
+import TicketDetalle from "./pages/Ticket/TicketDetalle";
+import BuscarInfo from "./pages/Buscar/BuscarInfo";
+import BuscarSAP from "./pages/Buscar/BuscarSap";
+import Tarifario from "./pages/Precio/Tarifario";
+import Log from "./pages/Login/Log";
 
 const RedirectTicketWithId = () => {
   const id = window.location.pathname.split('/').pop();
@@ -35,10 +37,7 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          {/* Login público */}
           <Route path="/" element={<Log />} />
-
-          {/* Todo lo demás protegido */}
           <Route
             element={
               <ProtectedRoute>
@@ -55,17 +54,17 @@ function App() {
             <Route path="asignaciones" element={<Asignaciones />} />
             <Route path="historial" element={<HistorialEquipo />} />
             <Route path="solicitudes" element={<Solicitudes />} />
-            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="dashboard-sistemas" element={<Dsistemas/>} />
+            <Route path="dashboard-rrhh" element={<Drrhh/>} />
+            <Route path="dashboard-taller" element={<Dtaller/>} />
             <Route path="roles" element={<Roles />} />
             <Route path="usuarios" element={<Usuarios />} />
-
             <Route path="crear-ticket-publico" element={<CrearTicketPublico />} />
             <Route path="estado-ticket-publico" element={<EstadoTicketPublico />} />
             <Route path="buscar-soluciones-tickets" element={<BuscarSolucionesTickets />} />
             <Route path="tarifario" element={<Tarifario />} />
             <Route path="buscar-info" element={<BuscarInfo />} />
             <Route path="buscar-sap" element={<BuscarSAP />} />
-
             <Route path="tickets-gestion" element={<TicketsGestion />} />
             <Route path="ticket-detalle/:id" element={<TicketDetalle />} />
 
